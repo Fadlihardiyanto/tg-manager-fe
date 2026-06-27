@@ -1,0 +1,242 @@
+'use client';
+
+import { useState, useMemo } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useStore } from '@tanstack/react-form';
+import { Button } from '@/components/ui/button';
+import { Icons } from '@/components/icons';
+import { useAppForm } from '@/components/ui/tanstack-form';
+import { TextField } from '@/components/forms/fields';
+import {
+  tenantRegisterSchema,
+  type TenantRegisterInput
+} from '../schemas/auth-schema';
+import { useRegisterMutation } from '../api/queries';
+import { toast } from 'sonner';
+
+/** Password strength checks */
+function getPasswordChecks(password: string) {
+  return {
+    length: password.length >= 8,
+    numberOrSymbol:
+      /[0-9!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?`~]/.test(password),
+    mixedCase: /[a-z]/.test(password) && /[A-Z]/.test(password)
+  };
+}
+
+const RegisterForm = () => {
+  const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const registerMutation = useRegisterMutation();
+
+  const form = useAppForm({
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: ''
+    } as TenantRegisterInput,
+    validators: {
+      onChange: tenantRegisterSchema
+    },
+    onSubmit: async ({ value }) => {
+      try {
+        const res = await registerMutation.mutateAsync({
+          name: value.name,
+          email: value.email,
+          password: value.password,
+          confirm_password: value.confirmPassword
+        });
+
+        if (res.success) {
+          toast.success('Registration successful', {
+            description:
+              res.message ||
+              'Please check your email to verify your account.'
+          });
+          // BE guide: redirect to check-email page with email param
+          router.push(`/check-email?email=${encodeURIComponent(value.email)}`);
+        } else {
+          toast.error('Registration failed', {
+            description: res.message || 'An error occurred'
+          });
+        }
+      } catch (error: unknown) {
+        const message =
+          error instanceof Error ? error.message : 'Please try again later';
+        toast.error('Registration failed', { description: message });
+      }
+    }
+  });
+
+  /** Live form values (reactive via useStore) */
+  const formValues = useStore(form.store, (s) => s.values);
+
+  /** Live password checks */
+  const passwordChecks = useMemo(
+    () => getPasswordChecks(formValues.password),
+    [formValues.password]
+  );
+
+  return (
+    <div className='flex flex-col w-full'>
+      {/* BEGIN: Header Section */}
+      <header className="flex flex-col items-center text-center mb-6">
+        <div className="relative flex items-center justify-center mb-4 h-16 w-full max-w-[250px]">
+          <img src="/uration-blue-version.png" alt="Uration Logo" className="relative h-full w-auto object-contain" />
+        </div>
+        <h1 className="text-2xl font-bold text-foreground mb-2">Create an account</h1>
+        <p className="text-muted-foreground text-sm">
+          Join the automation revolution for Telegram.
+        </p>
+      </header>
+
+      <form.AppForm>
+        <form.Form className='space-y-5 w-full'>
+          {/* Name */}
+          <form.AppField
+            name='name'
+            children={(field) => (
+              <TextField
+                label=''
+                type='text'
+                placeholder='Full Name'
+                className='px-4 h-12 border border-border rounded-xl focus-visible:ring-ring text-base placeholder:text-muted-foreground bg-background'
+              />
+            )}
+          />
+
+          {/* Email */}
+          <form.AppField
+            name='email'
+            children={(field) => (
+              <TextField
+                label=''
+                type='email'
+                placeholder='Email Address'
+                className='px-4 h-12 border border-border rounded-xl focus-visible:ring-ring text-base placeholder:text-muted-foreground bg-background'
+              />
+            )}
+          />
+
+          {/* Password */}
+          <form.AppField
+            name='password'
+            children={(field) => (
+              <TextField
+                label=''
+                type={showPassword ? 'text' : 'password'}
+                placeholder='Password'
+                hideError
+                rightElement={
+                  <button
+                    type='button'
+                    tabIndex={-1}
+                    onClick={() => setShowPassword(!showPassword)}
+                    className='cursor-pointer text-muted-foreground hover:text-foreground transition-colors'
+                  >
+                    {showPassword ? (
+                      <Icons.eyeOff className='h-5 w-5' />
+                    ) : (
+                      <Icons.eye className='h-5 w-5' />
+                    )}
+                  </button>
+                }
+                className='px-4 h-12 border border-border rounded-xl focus-visible:ring-ring font-mono tracking-widest text-base placeholder:text-muted-foreground bg-background'
+              />
+            )}
+          />
+
+          {/* Password Validation Checklist */}
+          <div className='-mt-2 mb-2 flex flex-col gap-2'>
+            <ValidationItem label='Least 8 characters' valid={passwordChecks.length} />
+            <ValidationItem label='Least one number (0-9) or a symbol' valid={passwordChecks.numberOrSymbol} />
+            <ValidationItem label='Lowercase (a-z) and uppercase (A-Z)' valid={passwordChecks.mixedCase} />
+          </div>
+
+          {/* Confirm Password */}
+          <form.AppField
+            name='confirmPassword'
+            children={(field) => (
+              <TextField
+                label=''
+                type={showConfirmPassword ? 'text' : 'password'}
+                placeholder='Re-Type Password'
+                rightElement={
+                  <button
+                    type='button'
+                    tabIndex={-1}
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className='cursor-pointer text-muted-foreground hover:text-foreground transition-colors'
+                  >
+                    {showConfirmPassword ? (
+                      <Icons.eyeOff className='h-5 w-5' />
+                    ) : (
+                      <Icons.eye className='h-5 w-5' />
+                    )}
+                  </button>
+                }
+                className='px-4 h-12 border border-border rounded-xl focus-visible:ring-ring font-mono tracking-widest text-base placeholder:text-muted-foreground bg-background'
+              />
+            )}
+          />
+
+          <form.SubmitButton
+            className='w-full bg-primary text-primary-foreground font-semibold h-12 rounded-xl hover:bg-primary/90 active:scale-[0.98] transition-all mt-4 text-base'
+            disabled={registerMutation.isPending}
+          >
+            {registerMutation.isPending ? (
+              <>
+                <Icons.spinner className='mr-2 h-5 w-5 animate-spin' />
+                Signing up...
+              </>
+            ) : (
+              'Sign Up'
+            )}
+          </form.SubmitButton>
+        </form.Form>
+      </form.AppForm>
+
+      {/* BEGIN: Footer */}
+      <footer className="mt-6 text-center">
+        <p className="text-sm text-muted-foreground">
+          Already a member?{' '}
+          <Link
+            href="/login"
+            className="text-foreground font-bold hover:underline transition-all"
+          >
+            Sign In
+          </Link>
+        </p>
+      </footer>
+    </div>
+  );
+}
+
+/** Inline validation check item */
+function ValidationItem({
+  label,
+  valid
+}: {
+  label: string;
+  valid: boolean;
+}) {
+  return (
+    <div
+      className={`flex items-center gap-2 text-xs ${
+        valid ? 'text-green-500' : 'text-muted-foreground'
+      }`}
+    >
+      {valid ? (
+        <Icons.check className='h-3.5 w-3.5 text-green-500' />
+      ) : (
+        <span className='h-1.5 w-1.5 rounded-full bg-muted-foreground' />
+      )}
+      <span>{label}</span>
+    </div>
+  );
+}
+
+export default RegisterForm;

@@ -1,0 +1,95 @@
+{
+  "Hero": {
+    "title": "Otomatisasi Keanggotaan Grup <br></br> <highlight>Telegram</highlight> Anda",
+    "description": "Otomatisasi pengelolaan anggota, amankan akses khusus undangan, dan terima pembayaran instan via VA & QRIS untuk grup Telegram Anda.",
+    "getStarted": "Mulai Sekarang",
+    "watchDemo": "Lihat Demo"
+  },
+  "Navbar": {
+    "signIn": "Masuk",
+    "getStarted": "Mulai Sekarang"
+  },
+  "Features": {
+    "header": "Fitur Canggih, Bekerja Secara Otomatis.",
+    "items": {
+      "payment": {
+        "title": "Pembayaran Instan",
+        "description": "Biarkan anggota Anda membayar dengan mudah melalui QRIS, Virtual Account, atau E-Wallet. Setelah pembayaran berhasil, mereka mendapatkan akses instan ke grup Anda tanpa konfirmasi manual."
+      },
+      "gatekeeping": {
+        "title": "Penjaga Pintu Otomatis",
+        "description": "Uration bertindak sebagai penjaga 24/7 Anda. Sistem kami menghasilkan tautan undangan aman yang unik untuk setiap pelanggan, sepenuhnya mencegah akses tidak sah dan kebocoran tautan."
+      },
+      "revenue": {
+        "title": "Pendapatan Langsung ke Bank",
+        "description": "Kami tidak menahan dana Anda. Hubungkan kunci API Midtrans Anda sendiri, dan 100% dari pendapatan komunitas mengalir langsung ke rekening bank pribadi Anda secara instan."
+      },
+      "kick": {
+        "title": "Sistem Kick Otomatis Anti Gagal",
+        "description": "Ditenagai oleh antrean pesan super cepat, sistem secara instan mendeteksi langganan yang sudah habis dan menghapus anggota tidak aktif dalam hitungan milidetik. Tidak akan ada keterlambatan."
+      },
+      "analytics": {
+        "title": "Analitik Dashboard Lanjutan",
+        "description": "Wawasan Pendapatan & Anggota. Pantau MRR (Pendapatan Berulang Bulanan) harian Anda, pertumbuhan langganan, dan jumlah anggota aktif secara real-time. Buat keputusan berbasis data untuk memperbesar komunitas Anda hanya dengan sekilas pandang."
+      },
+      "bot": {
+        "title": "Bot & Perintah Kustom",
+        "description": "Merek Anda, Aturan Anda. Hubungkan bot Telegram Anda sendiri melalui BotFather. Kustomisasi penuh perintahnya, pesan sambutan, dan respons dinamis agar sesuai dengan merek unik komunitas Anda."
+      }
+    }
+  },
+  "FAQ": {
+    "header": "Pertanyaan yang Sering Diajukan",
+    "subHeader": "Jawaban cepat untuk pertanyaan umum tentang produk dan layanan kami.",
+    "items": {
+      "q1": {
+        "question": "Bagaimana Uration mengotomatisasi proses orientasi anggota baru?",
+        "answer": "Setelah anggota berhasil menyelesaikan pembayaran melalui checkout Midtrans (via QRIS, Virtual Account, atau E-Wallet), Uration langsung membuat tautan undangan sekali pakai yang aman. Sistem secara otomatis mengirim tautan ini dan memberikan akses tanpa memerlukan persetujuan atau konfirmasi manual dari Anda."
+      },
+      "q2": {
+        "question": "Apakah Uration menahan atau memotong pendapatan komunitas saya?",
+        "answer": "Tidak akan pernah. Uration menggunakan integrasi langsung. Dengan menghubungkan kunci API Midtrans Anda, 100% pendapatan langganan mengalir langsung dari anggota ke rekening bank Anda secara instan."
+      },
+      "q3": {
+        "question": "Apa yang terjadi jika anggota lupa memperbarui atau langganannya kedaluwarsa?",
+        "answer": "Uration bekerja sebagai penjaga digital 24/7. Didukung oleh backend ultra-cepat, sistem terus memantau masa aktif. Tepat saat langganan habis, sistem memicu perintah otomatis untuk langsung mengeluarkan anggota yang tidak aktif dari grup."
+      },
+      "q4": {
+        "question": "Bolehkah saya menggunakan merek bot Telegram saya sendiri dan menyesuaikan perintahnya?",
+        "answer": "Tentu saja! Anda bisa menghubungkan bot Telegram khusus melalui BotFather. Uration memungkinkan Anda menyesuaikan pesan sambutan, label tombol interaktif, dan perintah khusus (seperti /signal, /rules, dll.) agar sesuai dengan identitas komunitas Anda."
+      },
+      "q5": {
+        "question": "Bagaimana cara Uration mencegah anggota membocorkan atau membagikan tautan undangan?",
+        "answer": "Tautan Telegram biasa bisa dibagikan, namun Uration mengatasinya dengan membuat Tautan Aman Unik untuk setiap anggota. Tautan ini hanya berlaku untuk sekali pakai dan terikat langsung ke ID Telegram anggota tersebut, membuatnya tidak berguna jika dibagikan ke orang lain."
+      },
+      "q6": {
+        "question": "Bolehkah saya menguji platform sebelum meluncurkannya ke audiens?",
+        "answer": "Ya, bisa. Uration menyediakan Mode Sandbox yang terintegrasi sempurna dengan Midtrans Sandbox. Hal ini memungkinkan Anda mensimulasikan pembayaran tiruan, menguji penjaga pintu bot, dan mengatur perintah dengan aman sebelum benar-benar dirilis."
+      }
+    }
+  },
+  "Pricing": {
+    "header": "Harga yang simpel dan transparan",
+    "subHeader": "Pilih paket yang sesuai dengan ukuran komunitas Anda. Mulai secara gratis dan tingkatkan seiring perkembangan Anda.",
+    "mostPopular": "Paling Populer",
+    "perMonth": "per bulan",
+    "getStarted": "Mulai Sekarang",
+    "free": "Rp 0"
+  },
+  "Footer": {
+    "brandDescription": "Platform penjaga & monetisasi Telegram otomatis. Fokus pada membangun komunitas, biar kami yang menangani pembayaran dan akses.",
+    "rightsReserved": "Hak cipta dilindungi.",
+    "product": "Produk",
+    "resources": "Sumber Daya",
+    "legal": "Hukum",
+    "features": "Fitur",
+    "pricing": "Harga",
+    "signIn": "Masuk",
+    "signUp": "Daftar",
+    "documentation": "Dokumentasi",
+    "faq": "FAQ",
+    "contactSupport": "Hubungi Dukungan",
+    "termsOfService": "Syarat Ketentuan",
+    "privacyPolicy": "Kebijakan Privasi"
+  }
+}

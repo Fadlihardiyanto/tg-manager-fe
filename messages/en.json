@@ -1,0 +1,95 @@
+{
+  "Hero": {
+    "title": "Automate Your <br></br> <highlight>Telegram</highlight> Group Memberships",
+    "description": "Automate gatekeeping, secure invite-only access, and accept instant payments via VA & QRIS for your Telegram membership groups.",
+    "getStarted": "Get Started",
+    "watchDemo": "Watch Demo"
+  },
+  "Navbar": {
+    "signIn": "Sign In",
+    "getStarted": "Get Started"
+  },
+  "Features": {
+    "header": "Powerful Features, Built for Autopilot.",
+    "items": {
+      "payment": {
+        "title": "Instant Payment Checkouts",
+        "description": "Let your members pay seamlessly via QRIS, Virtual Accounts, or E-Wallets. Once payment is successful, they gain instant access to your group without any manual confirmation."
+      },
+      "gatekeeping": {
+        "title": "Automated Gatekeeping",
+        "description": "Uration acts as your 24/7 guardian. Our system generates unique secure invite links for every subscriber, completely preventing unauthorized access and link leaks."
+      },
+      "revenue": {
+        "title": "Direct-to-Bank Revenue",
+        "description": "We don't hold your funds. Connect your own Midtrans API key, and 100% of your community revenue flows directly into your personal bank account instantly."
+      },
+      "kick": {
+        "title": "Bulletproof Autopilot Kick",
+        "description": "Powered by ultra-fast message queues, the system instantly detects lapsed subscriptions and removes inactive members within milliseconds. No compliance delays, ever."
+      },
+      "analytics": {
+        "title": "Advanced Dashboard Analytics",
+        "description": "Revenue & Member Insights. Track your daily MRR (Monthly Recurring Revenue), subscription growth, and active member counts in real-time. Make data-driven decisions to scale your community with a single glance."
+      },
+      "bot": {
+        "title": "Custom Branded Bot & Commands",
+        "description": "Your Brand, Your Rules. Connect your own Telegram bot via BotFather. Fully customize its commands, welcome messages, and dynamic responses to match your community's unique branding."
+      }
+    }
+  },
+  "FAQ": {
+    "header": "Frequently Asked Questions",
+    "subHeader": "Quick answers to common questions about our products and services.",
+    "items": {
+      "q1": {
+        "question": "How does Uration automate the onboarding process for new members?",
+        "answer": "Once a member successfully completes their payment through your Midtrans checkout (via QRIS, Virtual Account, or E-Wallet), Uration instantly generates a one-time secure invite link. The system automatically sends this link to the member and grants them access without requiring any manual approval or confirmation from you."
+      },
+      "q2": {
+        "question": "Does Uration hold or take a cut from my community's revenue?",
+        "answer": "No, never. Uration utilizes a direct integration system. By connecting your own Midtrans API key to your Uration dashboard, 100% of your subscription revenue flows straight from your members into your personal or business bank account instantly."
+      },
+      "q3": {
+        "question": "What happens if a member forgets to renew or their subscription expires?",
+        "answer": "Uration works as your bulletproof 24/7 digital gatekeeper. Powered by ultra-fast backend queues, the system continuously monitors subscription validity. The exact millisecond a subscription lapses, the system triggers an autopilot command to instantly kick the inactive member from your private group or channel."
+      },
+      "q4": {
+        "question": "Can I use my own Telegram bot brand and customize its commands?",
+        "answer": "Absolutely! You can connect your own custom Telegram bot created via BotFather. Uration allows you to completely customize welcome messages, interactive button labels, and custom commands (like /signal, /rules, etc.) to match your community's unique branding."
+      },
+      "q5": {
+        "question": "How does Uration prevent members from leaking or sharing the invite links?",
+        "answer": "Standard Telegram links can be easily forwarded, but Uration solves this by generating Unique Secure Links for each member. These links are restricted to a single use and tied directly to that specific member's Telegram ID, rendering them completely useless if forwarded or shared with free-riders."
+      },
+      "q6": {
+        "question": "Can I test the platform before launching it to my real audience?",
+        "answer": "Yes, you can. Uration provides a Sandbox Mode that integrates perfectly with Midtrans Sandbox. This allows you to completely simulate mock payments, test your bot's automated gatekeeping, and configure custom commands safely using play money before going live."
+      }
+    }
+  },
+  "Pricing": {
+    "header": "Simple, transparent pricing",
+    "subHeader": "Choose the plan that fits your community size. Start for free and upgrade as you grow.",
+    "mostPopular": "Most Popular",
+    "perMonth": "per month",
+    "getStarted": "Get Started",
+    "free": "Rp 0"
+  },
+  "Footer": {
+    "brandDescription": "Automated Telegram gatekeeper & monetization platform. Focus on building your community, let us handle the payments and access.",
+    "rightsReserved": "All rights reserved.",
+    "product": "Product",
+    "resources": "Resources",
+    "legal": "Legal",
+    "features": "Features",
+    "pricing": "Pricing",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "documentation": "Documentation",
+    "faq": "FAQ",
+    "contactSupport": "Contact Support",
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy"
+  }
+}
