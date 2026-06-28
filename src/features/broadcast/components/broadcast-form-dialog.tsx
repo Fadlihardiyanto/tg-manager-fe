@@ -351,7 +351,7 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
                 label='Jadwalkan (opsional)'
                 placeholder='Kosongkan untuk kirim sekarang'
                 description='Format: YYYY-MM-DD HH:MM (waktu lokal). Minimal 1 menit dari sekarang.'
-                type='datetime-local'
+                type='text'
               />
             </form.Form>
           </form.AppForm>
