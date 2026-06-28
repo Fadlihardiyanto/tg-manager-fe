@@ -6,7 +6,7 @@ import { membersQueryOptions } from '../api/queries';
 import { MembersListingContent } from './members-listing-content';
 import { MemberDetailDrawer } from './member-detail-drawer';
 
-export default function MemberListing() {
+export default async function MemberListing() {
   const page = searchParamsCache.get('page');
   const perPage = searchParamsCache.get('perPage');
   const search = searchParamsCache.get('search') ?? undefined;
@@ -22,7 +22,7 @@ export default function MemberListing() {
   };
 
   const queryClient = getQueryClient();
-  void queryClient.prefetchQuery(membersQueryOptions(filters));
+  await queryClient.prefetchQuery(membersQueryOptions(filters));
 
   return (
     <>

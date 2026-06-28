@@ -8,13 +8,16 @@ import {
   createPackage,
   updatePackage,
   deletePackage,
+  togglePackageStatus,
   associateGroupsToPackage
 } from './service';
 import { packageKeys } from './queries';
 import type {
   CreatePackageRequest,
   UpdatePackageRequest,
-  PackageGroupAssociateRequest
+  PackageGroupAssociateRequest,
+  Package,
+  PackagesListResponse
 } from './types';
 
 export const createPackageMutation = mutationOptions({
@@ -25,13 +28,8 @@ export const createPackageMutation = mutationOptions({
 });
 
 export const updatePackageMutation = mutationOptions({
-  mutationFn: ({
-    id,
-    values
-  }: {
-    id: string;
-    values: UpdatePackageRequest;
-  }) => updatePackage(id, values),
+  mutationFn: ({ id, values }: { id: string; values: UpdatePackageRequest }) =>
+    updatePackage(id, values),
   onSuccess: () => {
     getQueryClient().invalidateQueries({ queryKey: packageKeys.all });
   }
@@ -44,14 +42,35 @@ export const deletePackageMutation = mutationOptions({
   }
 });
 
+export const togglePackageStatusMutation = (isActive: boolean) =>
+  mutationOptions({
+    mutationFn: (id: string) => togglePackageStatus(id, isActive),
+    onMutate: async (id) => {
+      const queryClient = getQueryClient();
+      await queryClient.cancelQueries({ queryKey: packageKeys.all });
+      const previous = queryClient.getQueryData<PackagesListResponse>(packageKeys.list());
+      queryClient.setQueryData<PackagesListResponse | undefined>(packageKeys.list(), (old) => {
+        if (!old?.data) return old;
+        return {
+          ...old,
+          data: old.data.map((p: Package) => (p.id === id ? { ...p, is_active: isActive } : p))
+        };
+      });
+      return { previous };
+    },
+    onError: (_err, _id, ctx) => {
+      if (ctx?.previous) {
+        getQueryClient().setQueryData(packageKeys.list(), ctx.previous);
+      }
+    },
+    onSettled: () => {
+      getQueryClient().invalidateQueries({ queryKey: packageKeys.all });
+    }
+  });
+
 export const associateGroupsMutation = mutationOptions({
-  mutationFn: ({
-    packageId,
-    data
-  }: {
-    packageId: string;
-    data: PackageGroupAssociateRequest;
-  }) => associateGroupsToPackage(packageId, data),
+  mutationFn: ({ packageId, data }: { packageId: string; data: PackageGroupAssociateRequest }) =>
+    associateGroupsToPackage(packageId, data),
   onSuccess: () => {
     getQueryClient().invalidateQueries({ queryKey: packageKeys.all });
   }

@@ -4,16 +4,9 @@
 
 import { mutationOptions } from '@tanstack/react-query';
 import { getQueryClient } from '@/lib/query-client';
-import { createGroup, updateGroup, deleteGroup } from './service';
+import { updateGroup, deleteGroup } from './service';
 import { groupKeys } from './queries';
-import type { CreateGroupRequest, UpdateGroupRequest } from './types';
-
-export const createGroupMutation = mutationOptions({
-  mutationFn: (data: CreateGroupRequest) => createGroup(data),
-  onSuccess: () => {
-    getQueryClient().invalidateQueries({ queryKey: groupKeys.all });
-  }
-});
+import type { UpdateGroupRequest } from './types';
 
 export const updateGroupMutation = mutationOptions({
   mutationFn: ({ id, values }: { id: string; values: UpdateGroupRequest }) =>

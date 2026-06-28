@@ -1,4 +1,0 @@
-- API interactions are centralized in `src/lib/api-client.ts` and consumed by feature-specific service modules that handle endpoint construction and response parsing.
-- TanStack Query keys are organized into hierarchical objects (e.g., `productKeys`) within query option files to ensure consistent cache invalidation and lookup.
-- Feature modules follow a consistent internal structure with `api/` for data logic, `components/` for UI, and `schemas/` for Zod validation types.
-- Server-side actions in `src/features` use the 'use server' directive to handle sensitive operations like cookie management and direct database/API calls.

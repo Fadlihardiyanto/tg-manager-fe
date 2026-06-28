@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { deletePackageMutation, updatePackageMutation } from '../../api/mutations';
+import { deletePackageMutation } from '../../api/mutations';
 import { packageKeys } from '../../api/queries';
 import type { Package } from '../../api/types';
 import { Icons } from '@/components/icons';
@@ -39,21 +39,6 @@ export function CellAction({ data, onEdit }: CellActionProps) {
     }
   });
 
-  const toggleActiveMutation = useMutation({
-    ...updatePackageMutation,
-    onSuccess: () => {
-      toast.success(
-        data.is_active
-          ? 'Package deactivated successfully'
-          : 'Package activated successfully'
-      );
-      void queryClient.invalidateQueries({ queryKey: packageKeys.all });
-    },
-    onError: () => {
-      toast.error('Failed to update package status');
-    }
-  });
-
   return (
     <>
       <AlertModal
@@ -77,24 +62,6 @@ export function CellAction({ data, onEdit }: CellActionProps) {
               <Icons.edit className='mr-2 h-4 w-4' /> Edit Package
             </DropdownMenuItem>
           )}
-          <DropdownMenuItem
-            onClick={() =>
-              toggleActiveMutation.mutate({
-                id: data.id,
-                values: { is_all_access: data.is_all_access }
-              })
-            }
-          >
-            {data.is_active ? (
-              <>
-                <Icons.circleX className='mr-2 h-4 w-4' /> Deactivate
-              </>
-            ) : (
-              <>
-                <Icons.circleCheck className='mr-2 h-4 w-4' /> Activate
-              </>
-            )}
-          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className='text-destructive focus:text-destructive'

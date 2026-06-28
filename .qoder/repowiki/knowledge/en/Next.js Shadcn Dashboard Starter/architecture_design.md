@@ -1,5 +1,0 @@
-- Built on Next.js 16 App Router with React Server Components (RSC) and client-side interactivity via 'use client' directives.
-- Uses a feature-based directory structure (`src/features`) for domain logic (auth, products, users) with separated API services, queries, and UI components.
-- Integrates TanStack Query for server-state management and `nuqs` for URL search parameter state synchronization.
-- Employs shadcn/ui for accessible, unstyled component primitives composed into complex UI elements like data tables and forms.
-- Implements a custom `apiClient` wrapper around the native Fetch API for consistent backend communication.

@@ -1,6 +1,7 @@
 'use client';
 
 import { useAppForm, useFormFields } from '@/components/ui/tanstack-form';
+import { useStore } from '@tanstack/react-form';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -55,11 +56,7 @@ interface PackageFormDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export function PackageFormDialog({
-  package_,
-  open,
-  onOpenChange
-}: PackageFormDialogProps) {
+export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormDialogProps) {
   const isEdit = !!package_;
   const queryClient = useQueryClient();
   const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
@@ -68,12 +65,45 @@ export function PackageFormDialog({
   const { data: groupsData } = useQuery(groupsQueryOptions());
   const activeGroups = (groupsData?.data ?? []).filter((g) => g.is_active);
 
+  const form = useAppForm({
+    defaultValues: {
+      name: package_?.name ?? '',
+      price: package_?.price?.toString() ?? '',
+      duration_days: package_?.duration_days?.toString() ?? '',
+      is_all_access: package_?.is_all_access ?? false
+    } as PackageFormValues,
+    validators: {
+      onSubmit: packageFormSchema
+    },
+    onSubmit: async ({ value }) => {
+      const payload = {
+        name: value.name,
+        price: Number(value.price.replace(/\./g, '')),
+        duration_days: Number(value.duration_days),
+        is_all_access: value.is_all_access
+      };
+
+      if (isEdit && package_) {
+        await updateMutation.mutateAsync({
+          id: package_.id,
+          values: payload
+        });
+      } else {
+        await createMutation.mutateAsync(payload);
+      }
+    }
+  });
+
+  const { FormTextField, FormSwitchField } = useFormFields<PackageFormValues>();
+
+  const isAllAccess = useStore(form.store, (state) => state.values.is_all_access);
+
   const createMutation = useMutation({
     ...createPackageMutation,
     onSuccess: async (res) => {
       if (res.success) {
         // Associate groups if any selected (create mode only)
-        if (selectedGroupIds.length > 0 && res.data?.id) {
+        if (!isAllAccess && selectedGroupIds.length > 0 && res.data?.id) {
           await associateMutation.mutateAsync({
             packageId: res.data.id,
             data: { group_ids: selectedGroupIds }
@@ -93,10 +123,19 @@ export function PackageFormDialog({
 
   const updateMutation = useMutation({
     ...updatePackageMutation,
-    onSuccess: (res) => {
+    onSuccess: async (res) => {
       if (res.success) {
+        // Associate groups if any selected
+        if (!isAllAccess && selectedGroupIds.length > 0 && res.data?.id) {
+          await associateMutation.mutateAsync({
+            packageId: res.data.id,
+            data: { group_ids: selectedGroupIds }
+          });
+        }
         toast.success('Package updated successfully');
         onOpenChange(false);
+        form.reset();
+        setSelectedGroupIds([]);
         void queryClient.invalidateQueries({ queryKey: packageKeys.all });
       } else {
         toast.error(res.message || 'Failed to update package');
@@ -110,48 +149,12 @@ export function PackageFormDialog({
     onError: () => toast.error('Failed to associate groups to package')
   });
 
-  const form = useAppForm({
-    defaultValues: {
-      name: package_?.name ?? '',
-      price: package_?.price?.toString() ?? '',
-      duration_days: package_?.duration_days?.toString() ?? '',
-      is_all_access: package_?.is_all_access ?? false
-    } as PackageFormValues,
-    validators: {
-      onSubmit: packageFormSchema
-    },
-    onSubmit: async ({ value }) => {
-      const payload = {
-        name: value.name,
-        price: Number(value.price),
-        duration_days: Number(value.duration_days),
-        is_all_access: value.is_all_access
-      };
-
-      if (isEdit && package_) {
-        await updateMutation.mutateAsync({
-          id: package_.id,
-          values: payload
-        });
-      } else {
-        await createMutation.mutateAsync(payload);
-      }
-    }
-  });
-
-  const { FormTextField, FormSwitchField } =
-    useFormFields<PackageFormValues>();
-
   const isPending =
-    createMutation.isPending ||
-    updateMutation.isPending ||
-    associateMutation.isPending;
+    createMutation.isPending || updateMutation.isPending || associateMutation.isPending;
 
   function toggleGroup(groupId: string) {
     setSelectedGroupIds((prev) =>
-      prev.includes(groupId)
-        ? prev.filter((id) => id !== groupId)
-        : [...prev, groupId]
+      prev.includes(groupId) ? prev.filter((id) => id !== groupId) : [...prev, groupId]
     );
   }
 
@@ -168,9 +171,7 @@ export function PackageFormDialog({
     >
       <DialogContent className='sm:max-w-[520px] max-h-[85vh] overflow-y-auto'>
         <DialogHeader>
-          <DialogTitle>
-            {isEdit ? 'Edit Package' : 'Add New Package'}
-          </DialogTitle>
+          <DialogTitle>{isEdit ? 'Edit Package' : 'Add New Package'}</DialogTitle>
           <DialogDescription>
             {isEdit
               ? 'Update the package details.'
@@ -186,9 +187,7 @@ export function PackageFormDialog({
               required
               placeholder='1 Month VIP'
               validators={{
-                onBlur: z
-                  .string()
-                  .min(3, 'Package name must be at least 3 characters')
+                onBlur: z.string().min(3, 'Package name must be at least 3 characters')
               }}
             />
 
@@ -197,7 +196,11 @@ export function PackageFormDialog({
               label='Price (IDR)'
               required
               placeholder='150000'
-              description='Amount in Indonesian Rupiah (e.g. 150000)'
+              description='Amount in Indonesian Rupiah (e.g. 150.000)'
+              formatDisplay={(val) => {
+                const digits = String(val).replace(/\D/g, '');
+                return digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+              }}
               validators={{
                 onBlur: z
                   .string()
@@ -220,9 +223,7 @@ export function PackageFormDialog({
                   .min(1, 'Duration is required')
                   .refine(
                     (val) =>
-                      !isNaN(Number(val)) &&
-                      Number.isInteger(Number(val)) &&
-                      Number(val) >= 1,
+                      !isNaN(Number(val)) && Number.isInteger(Number(val)) && Number(val) >= 1,
                     'Must be a whole number ≥ 1'
                   )
               }}
@@ -234,8 +235,8 @@ export function PackageFormDialog({
               description='Grant access to all groups without restriction.'
             />
 
-            {/* Group multi-select (create mode only) */}
-            {!isEdit && activeGroups.length > 0 && (
+            {/* Group multi-select: show only when !is_all_access */}
+            {!isAllAccess && activeGroups.length > 0 && (
               <FieldGroup>
                 <FieldLabel>Associate Groups</FieldLabel>
                 <FieldDescription>
@@ -243,17 +244,13 @@ export function PackageFormDialog({
                 </FieldDescription>
                 <div className='flex flex-col gap-2 rounded-md border p-3 max-h-[160px] overflow-y-auto'>
                   {activeGroups.map((group) => (
-                    <label
-                      key={group.id}
-                      className='flex items-center gap-2 cursor-pointer'
-                    >
+                    <label key={group.id} className='flex items-center gap-2 cursor-pointer'>
                       <Checkbox
+                        className='border'
                         checked={selectedGroupIds.includes(group.id)}
                         onCheckedChange={() => toggleGroup(group.id)}
                       />
-                      <span className='text-sm font-medium'>
-                        {group.name}
-                      </span>
+                      <span className='text-sm font-medium'>{group.name}</span>
                       <span className='text-xs text-muted-foreground'>
                         ({group.member_count} members)
                       </span>
@@ -277,11 +274,7 @@ export function PackageFormDialog({
           >
             Cancel
           </Button>
-          <Button
-            type='submit'
-            form='package-form-dialog'
-            isLoading={isPending}
-          >
+          <Button type='submit' form='package-form-dialog' isLoading={isPending}>
             <Icons.check className='mr-2 h-4 w-4' />
             {isEdit ? 'Update Package' : 'Add Package'}
           </Button>

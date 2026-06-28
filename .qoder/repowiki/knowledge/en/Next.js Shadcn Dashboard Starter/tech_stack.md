@@ -1,6 +1,0 @@
-- Next.js 16.2.6 with React 19.2.4 and TypeScript 5.7.2.
-- TanStack Query v5 for data fetching and caching.
-- TanStack Form and React Hook Form patterns for form management.
-- Tailwind CSS v4 with `tailwindcss-animate` and `class-variance-authority` for styling.
-- Oxlint and Oxfmt for high-performance linting and formatting.
-- Bun as the primary package manager and runtime (indicated by `bun.lock` and `Dockerfile.bun`).

@@ -22,11 +22,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger
-} from '@/components/ui/popover';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -67,24 +63,21 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    if (
-      data.subscription?.status === 'active' &&
-      data.subscription?.expired_at
-    ) {
-      const expiry = new Date(data.subscription.expired_at);
+    if (data.global_status && data.nearest_expiry) {
+      const expiry = new Date(data.nearest_expiry);
       expiry.setHours(0, 0, 0, 0);
       return expiry > today ? expiry : today;
     }
 
     return today;
-  }, [data.subscription]);
+  }, [data.global_status, data.nearest_expiry]);
 
   const defaultMonth = useMemo(() => {
-    if (data.subscription?.expired_at) {
-      return new Date(data.subscription.expired_at);
+    if (data.nearest_expiry) {
+      return new Date(data.nearest_expiry);
     }
     return new Date();
-  }, [data.subscription]);
+  }, [data.nearest_expiry]);
 
   const handleKick = async () => {
     try {
@@ -123,8 +116,8 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will kick {data.first_name} {data.last_name} from the
-              community. This action cannot be undone.
+              This will kick {data.first_name} {data.last_name} from the community. This action
+              cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -142,19 +135,22 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         </AlertDialogContent>
       </AlertDialog>
 
-      <Dialog open={isExtendOpen} onOpenChange={(open) => {
-        setIsExtendOpen(open);
-        if (!open) {
-          setSelectedDate(undefined);
-        }
-      }}>
+      <Dialog
+        open={isExtendOpen}
+        onOpenChange={(open) => {
+          setIsExtendOpen(open);
+          if (!open) {
+            setSelectedDate(undefined);
+          }
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Extend Access</DialogTitle>
             <DialogDescription>
               Select the new expiry date for {data.first_name} {data.last_name}.
-              {data.subscription?.status === 'active' && data.subscription?.expired_at && (
-                <> Current expiry: {format(new Date(data.subscription.expired_at), 'PP')}.</>
+              {data.global_status && data.nearest_expiry && (
+                <> Current expiry: {format(new Date(data.nearest_expiry), 'PP')}.</>
               )}
             </DialogDescription>
           </DialogHeader>
@@ -162,10 +158,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           <div className='flex justify-center py-4'>
             <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
               <PopoverTrigger asChild>
-                <Button
-                  variant='outline'
-                  className='w-[280px] justify-start text-left font-normal'
-                >
+                <Button variant='outline' className='w-[280px] justify-start text-left font-normal'>
                   <Icons.calendar className='mr-2 size-4' />
                   {selectedDate ? (
                     format(selectedDate, 'PP')
@@ -194,13 +187,8 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
             <Button variant='outline' onClick={() => setIsExtendOpen(false)}>
               Cancel
             </Button>
-            <Button
-              disabled={!selectedDate || extendMut.isPending}
-              onClick={handleExtendConfirm}
-            >
-              {extendMut.isPending && (
-                <Icons.spinner className='mr-2 size-4 animate-spin' />
-              )}
+            <Button disabled={!selectedDate || extendMut.isPending} onClick={handleExtendConfirm}>
+              {extendMut.isPending && <Icons.spinner className='mr-2 size-4 animate-spin' />}
               Confirm
             </Button>
           </DialogFooter>
@@ -216,14 +204,10 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end'>
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem
-            onClick={() => setTimeout(() => setMemberId(data.id), 150)}
-          >
+          <DropdownMenuItem onClick={() => setTimeout(() => setMemberId(data.id), 150)}>
             <Icons.eye /> View Details
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => setTimeout(() => setIsExtendOpen(true), 150)}
-          >
+          <DropdownMenuItem onClick={() => setTimeout(() => setIsExtendOpen(true), 150)}>
             <Icons.calendar /> Extend Access
           </DropdownMenuItem>
           <DropdownMenuItem

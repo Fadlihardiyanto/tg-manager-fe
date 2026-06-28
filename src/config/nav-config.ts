@@ -77,6 +77,21 @@ export const navGroups: NavGroup[] = [
         items: []
       },
       {
+        title: 'Commands',
+        url: '/dashboard/commands',
+        icon: 'command',
+        isActive: false,
+        items: []
+      },
+      {
+        title: 'Broadcast',
+        url: '/dashboard/broadcast',
+        icon: 'send',
+        shortcut: ['b', 'r'],
+        isActive: false,
+        items: []
+      },
+      {
         title: 'Discounts',
         url: '/dashboard/discounts',
         icon: 'tag',
@@ -101,8 +116,6 @@ export const navGroups: NavGroup[] = [
         icon: 'account',
         isActive: true,
         items: [
-
-
           {
             title: 'Login',
             shortcut: ['l', 'l'],

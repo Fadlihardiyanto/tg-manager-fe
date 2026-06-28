@@ -464,6 +464,31 @@ const { data } = useSuspenseQuery(entitiesQueryOptions(filters));
 - Hydrated pending queries from `void` prefetch won't prevent the loading state
 - Results in skeleton flash even when data is prefetched
 
+**Exception — Server Action queryFn + dynamic filters:**
+
+When the `queryFn` is a `'use server'` function (service layer) AND filters change dynamically (URL params, column filters), use `useQuery` + `placeholderData` instead of `useSuspenseQuery`:
+
+```tsx
+const { data } = useQuery(
+  queryOptions({
+    queryKey: entityKeys.list(filters),
+    queryFn: () => getList(filters),     // Server Action
+    placeholderData: (prev) => prev      // prevents empty flash on filter change
+  })
+);
+```
+
+Reason: `useSuspenseQuery` calls `queryFn` synchronously during render when the query is pending (via `fetchOptimistic()`). If the `queryFn` is a Server Action, calling `cookies()` from `next/headers` during render triggers React's "Cannot update a component (Router) while rendering a different component" error. With `useQuery`, the fetch runs in `useEffect` — `cookies()` is called outside the render phase, avoiding the conflict.
+
+The server-side prefetch must use `await` instead of `void` to ensure data is resolved before `dehydrate()`:
+
+```tsx
+const queryClient = getQueryClient();
+await queryClient.prefetchQuery(entityQueryOptions(filters));  // await, not void
+```
+
+This prevents hydration mismatch: the client receives resolved data, so `useQuery` returns data immediately on first render (no `isLoading` flash). `placeholderData` then handles filter changes by showing the previous data while the new fetch completes.
+
 ### Mutations
 
 Components import service functions for mutations. Use query key factories for invalidation:
@@ -724,6 +749,16 @@ See "Theming System" section above or `docs/themes.md`.
 
 - Check `access` property in nav config
 - Verify user has required org/permission/role
+
+**"Cannot update component (Router) while rendering" error**
+
+This happens when `useSuspenseQuery` calls a `'use server'` `queryFn` during render, which calls `cookies()` from `next/headers`. `cookies()` tries to update Router state during React's render phase.
+
+Fix:
+- Use `useQuery` + `placeholderData: (prev) => prev` instead of `useSuspenseQuery` when the `queryFn` is a Server Action with dynamic filters
+- Use `await` (not `void`) for server-side `prefetchQuery` to ensure data resolves before `dehydrate()`
+
+See "React Query" → "Exception — Server Action queryFn + dynamic filters" above for the full pattern.
 
 ---
 

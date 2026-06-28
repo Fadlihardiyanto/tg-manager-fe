@@ -256,7 +256,7 @@ function FileCard({ file, progress, onRemove }: FileCardProps) {
   return (
     <div className='relative flex items-center space-x-4'>
       <div className='flex flex-1 space-x-4'>
-        {isFileWithPreview(file) ? (
+        {isFileWithPreview(file) && file.type.startsWith('image/') ? (
           <Image
             src={file.preview}
             alt={file.name}
@@ -265,7 +265,11 @@ function FileCard({ file, progress, onRemove }: FileCardProps) {
             loading='lazy'
             className='aspect-square shrink-0 rounded-md object-cover'
           />
-        ) : null}
+        ) : (
+          <div className='flex size-12 shrink-0 items-center justify-center rounded-md border'>
+            <Icons.fileTypePdf className='size-6 text-muted-foreground' />
+          </div>
+        )}
         <div className='flex w-full flex-col gap-2'>
           <div className='space-y-px'>
             <p className='text-foreground/80 line-clamp-1 text-sm font-medium'>{file.name}</p>

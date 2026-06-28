@@ -22,15 +22,9 @@ export async function getMembers(filters: MemberFilters): Promise<MembersRespons
       headers: { ...authHeaders }
     });
   } catch (error: any) {
-    const isAuthError = error?.message?.toLowerCase().includes('token') ||
-                        error?.message?.toLowerCase().includes('autentikasi') ||
-                        error?.message?.toLowerCase().includes('unauthorized') ||
-                        error?.message?.includes('401') ||
-                        error?.message?.includes('403');
-
     return {
       success: false,
-      code: isAuthError ? 401 : 500,
+      code: 500, // ponytail: static, not used by UI
       message: error?.message || 'Server Error',
       meta: { page: 1, limit: 10, total: 0, total_pages: 0 },
       data: []
@@ -46,15 +40,8 @@ export async function getMember(id: string): Promise<MemberDetailResponse> {
       headers: { ...authHeaders }
     });
   } catch (error: any) {
-    const isAuthError = error?.message?.toLowerCase().includes('token') ||
-                        error?.message?.toLowerCase().includes('autentikasi') ||
-                        error?.message?.toLowerCase().includes('unauthorized') ||
-                        error?.message?.includes('401') ||
-                        error?.message?.includes('403');
-
     return {
       success: false,
-      code: isAuthError ? 401 : 500,
       message: error?.message || 'Server Error',
       data: {} as any
     };
@@ -65,14 +52,11 @@ export async function extendAccess(id: string, newExpiryAt: string): Promise<Act
   const authHeaders = await getAuthHeaders();
 
   try {
-    return await apiClient<ActionResponse>(
-      `/api/v1/tenant/members/${id}/extend`,
-      {
-        method: 'POST',
-        headers: { ...authHeaders },
-        body: JSON.stringify({ new_expiry_at: newExpiryAt })
-      }
-    );
+    return await apiClient<ActionResponse>(`/api/v1/tenant/members/${id}/extend`, {
+      method: 'POST',
+      headers: { ...authHeaders },
+      body: JSON.stringify({ new_expiry_at: newExpiryAt })
+    });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to extend access';
     return { success: false, message };
@@ -83,13 +67,10 @@ export async function kickMember(id: string): Promise<ActionResponse> {
   const authHeaders = await getAuthHeaders();
 
   try {
-    return await apiClient<ActionResponse>(
-      `/api/v1/tenant/members/${id}/kick`,
-      {
-        method: 'POST',
-        headers: { ...authHeaders }
-      }
-    );
+    return await apiClient<ActionResponse>(`/api/v1/tenant/members/${id}/kick`, {
+      method: 'POST',
+      headers: { ...authHeaders }
+    });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to kick member';
     return { success: false, message };
@@ -100,13 +81,10 @@ export async function manualSync(id: string): Promise<ActionResponse> {
   const authHeaders = await getAuthHeaders();
 
   try {
-    return await apiClient<ActionResponse>(
-      `/api/v1/tenant/members/${id}/sync`,
-      {
-        method: 'POST',
-        headers: { ...authHeaders }
-      }
-    );
+    return await apiClient<ActionResponse>(`/api/v1/tenant/members/${id}/sync`, {
+      method: 'POST',
+      headers: { ...authHeaders }
+    });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to sync member';
     return { success: false, message };
@@ -117,13 +95,10 @@ export async function resendLink(id: string): Promise<ActionResponse> {
   const authHeaders = await getAuthHeaders();
 
   try {
-    return await apiClient<ActionResponse>(
-      `/api/v1/tenant/members/${id}/resend-link`,
-      {
-        method: 'POST',
-        headers: { ...authHeaders }
-      }
-    );
+    return await apiClient<ActionResponse>(`/api/v1/tenant/members/${id}/resend-link`, {
+      method: 'POST',
+      headers: { ...authHeaders }
+    });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to resend link';
     return { success: false, message };
@@ -147,7 +122,10 @@ export async function bulkKickMembers(ids: string[]): Promise<ActionResponse> {
   }
 }
 
-export async function bulkExtendAccess(ids: string[], newExpiryAt: string): Promise<ActionResponse> {
+export async function bulkExtendAccess(
+  ids: string[],
+  newExpiryAt: string
+): Promise<ActionResponse> {
   try {
     const results = await Promise.all(ids.map((id) => extendAccess(id, newExpiryAt)));
     const allSucceeded = results.every((r) => r.success);

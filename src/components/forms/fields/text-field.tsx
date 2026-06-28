@@ -26,6 +26,10 @@ interface TextFieldProps extends Omit<
   rightElement?: React.ReactNode;
   /** Hide the inline field error message (use when validation is shown elsewhere) */
   hideError?: boolean;
+  /** Transform stored value for display (e.g. add thousand separators) */
+  formatDisplay?: (value: string | number) => string;
+  /** Strip unwanted characters from input (runs before formatDisplay) */
+  sanitize?: (value: string) => string;
 }
 
 export function TextField({
@@ -37,6 +41,8 @@ export function TextField({
   leftIcon,
   rightElement,
   hideError,
+  formatDisplay,
+  sanitize,
   ...inputProps
 }: TextFieldProps) {
   const field = useFieldContext();
@@ -61,14 +67,17 @@ export function TextField({
           <Input
             id={field.name}
             type={type}
-            value={value ?? ''}
+            value={formatDisplay ? formatDisplay(value ?? '') : (value ?? '')}
             onBlur={field.handleBlur}
             onChange={(e) => {
-              if (type === 'number') {
-                const v = e.target.value;
-                field.handleChange(v === '' ? '' : parseFloat(v));
+              const val = sanitize ? sanitize(e.target.value) : e.target.value;
+              if (formatDisplay) {
+                const cleaned = val.replace(/\D/g, '');
+                field.handleChange(cleaned);
+              } else if (type === 'number') {
+                field.handleChange(val === '' ? '' : parseFloat(val));
               } else {
-                field.handleChange(e.target.value);
+                field.handleChange(val);
               }
             }}
             aria-invalid={isTouched && !isValid}
@@ -76,9 +85,7 @@ export function TextField({
             {...inputProps}
           />
           {rightElement && (
-            <div className='absolute inset-y-0 right-0 flex items-center pr-3'>
-              {rightElement}
-            </div>
+            <div className='absolute inset-y-0 right-0 flex items-center pr-3'>{rightElement}</div>
           )}
           {isValidating && !rightElement && (
             <div className='absolute top-1/2 right-3 -translate-y-1/2'>

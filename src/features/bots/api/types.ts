@@ -11,7 +11,16 @@ export interface ApiResponse<T> {
   code: number;
   message: string;
   data: T;
+  errors?: Record<string, string>;
   request_id?: string;
+  meta?: ApiMeta;
+}
+
+export interface ApiMeta {
+  page: number;
+  limit: number;
+  total: number;
+  total_pages: number;
 }
 
 // ─── Bot Entity ─────────────────────────────────────────────────────

@@ -2,9 +2,9 @@ import Providers from '@/components/layout/providers';
 import { Toaster } from '@/components/ui/sonner';
 import { fontVariables } from '@/components/themes/font.config';
 import ThemeProvider from '@/components/themes/theme-provider';
+import { ThemeScript } from '@/components/themes/theme-script';
 import { cn } from '@/lib/utils';
 import type { Metadata, Viewport } from 'next';
-import Script from 'next/script';
 import NextTopLoader from 'nextjs-toploader';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { NextIntlClientProvider } from 'next-intl';
@@ -30,10 +30,10 @@ export const viewport: Viewport = {
   ]
 };
 
-export default async function RootLayout({ 
+export default async function RootLayout({
   children,
   params
-}: { 
+}: {
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
 }) {
@@ -53,6 +53,7 @@ export default async function RootLayout({
           fontVariables
         )}
       >
+        <ThemeScript />
         <NextTopLoader color='var(--primary)' showSpinner={false} />
         <NuqsAdapter>
           <NextIntlClientProvider messages={messages}>
@@ -74,4 +75,3 @@ export default async function RootLayout({
     </html>
   );
 }
-

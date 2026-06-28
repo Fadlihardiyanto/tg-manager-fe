@@ -15,6 +15,8 @@ export interface TelegramGroup {
   id: string;
   client_id: string;
   bot_id: string;
+  bot_username?: string;
+  bot_role?: string;
   telegram_chat_id: number;
   name: string;
   description: string;
@@ -25,20 +27,32 @@ export interface TelegramGroup {
   updated_at: string;
 }
 
-// ─── Create Group (POST /api/v1/tenant/groups) ─────────────────────
-
-export interface CreateGroupRequest {
-  bot_id: string;
-  telegram_chat_id: number;
-  name: string;
-}
-
 // ─── Update Group (PUT /api/v1/tenant/groups/{id}) ──────────────────
 
 export interface UpdateGroupRequest {
   bot_id?: string;
   name?: string;
 }
+
+// ─── Connect Token (POST /api/v1/tenant/bots/{bot_id}/groups/connect-token) ───
+
+export interface ConnectTokenData {
+  token: string;
+  expires_in: number;
+  bot_username: string;
+}
+
+export type ConnectTokenResponse = ApiResponse<ConnectTokenData>;
+
+// ─── Connect Status (GET /api/v1/tenant/bots/{bot_id}/groups/connect-status/{token}) ───
+
+export type ConnectStatus = 'pending' | 'success' | 'expired';
+
+export interface ConnectStatusData {
+  status: ConnectStatus;
+}
+
+export type ConnectStatusResponse = ApiResponse<ConnectStatusData>;
 
 // ─── List Response ──────────────────────────────────────────────────
 

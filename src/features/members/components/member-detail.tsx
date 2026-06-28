@@ -61,9 +61,7 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
             <h2 className='text-2xl font-bold text-foreground'>
               {member.first_name} {member.last_name}
             </h2>
-            <p className='text-sm text-primary font-medium'>
-              @{member.username}
-            </p>
+            <p className='text-sm text-primary font-medium'>@{member.username}</p>
           </div>
         </div>
 
@@ -111,16 +109,12 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
                     <p className='text-[11px] font-medium text-muted-foreground mb-1'>
                       Telegram ID
                     </p>
-                    <p className='text-sm font-bold text-foreground'>
-                      {member.telegram_user_id}
-                    </p>
+                    <p className='text-sm font-bold text-foreground'>{member.telegram_user_id}</p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardContent className='p-4'>
-                    <p className='text-[11px] font-medium text-muted-foreground mb-1'>
-                      Join Date
-                    </p>
+                    <p className='text-[11px] font-medium text-muted-foreground mb-1'>Join Date</p>
                     <p className='text-sm font-bold text-foreground'>
                       {member.created_at
                         ? format(new Date(member.created_at), 'dd MMM, yyyy')
@@ -133,19 +127,13 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
                     <p className='text-[11px] font-medium text-muted-foreground mb-1'>
                       Total Orders
                     </p>
-                    <p className='text-sm font-bold text-primary'>
-                      {member.total_orders}
-                    </p>
+                    <p className='text-sm font-bold text-primary'>{member.total_orders}</p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardContent className='p-4'>
-                    <p className='text-[11px] font-medium text-muted-foreground mb-1'>
-                      Phone
-                    </p>
-                    <p className='text-sm font-bold text-foreground'>
-                      {member.phone || '-'}
-                    </p>
+                    <p className='text-[11px] font-medium text-muted-foreground mb-1'>Phone</p>
+                    <p className='text-sm font-bold text-foreground'>{member.phone || '-'}</p>
                   </CardContent>
                 </Card>
               </div>
@@ -169,20 +157,16 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
                           <Icons.trendingUp className='size-5 text-primary' />
                         </div>
                         <div>
-                          <p className='text-sm font-bold'>
-                            {sub.package_name}
-                          </p>
+                          <p className='text-sm font-bold'>{sub.package_name}</p>
                           <p className='text-[11px] text-muted-foreground'>
-                            Renews on{' '}
+                            Expired at{' '}
                             {sub.expired_at
-                              ? format(new Date(sub.expired_at), 'MMM dd')
+                              ? format(new Date(sub.expired_at), 'dd MMMM yyyy')
                               : '-'}
                           </p>
                         </div>
                       </div>
-                      <span className='text-sm font-bold text-foreground'>
-                        Active
-                      </span>
+                      <span className='text-sm font-bold text-foreground'>Active</span>
                     </div>
                   ))
                 ) : (
@@ -197,8 +181,8 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
               <Icons.warning className='size-4' />
               <AlertTitle>Risk Analysis</AlertTitle>
               <AlertDescription>
-                This user has reported {member.total_orders} billing issues in
-                the last 6 months. High engagement rate.
+                This user has reported {member.total_orders} billing issues in the last 6 months.
+                High engagement rate.
               </AlertDescription>
             </Alert>
           </div>
@@ -234,28 +218,18 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
                     <div
                       className={cn(
                         'absolute -left-[9px] top-1 size-4 rounded-full border-2 border-background',
-                        sub.status === 'active'
-                          ? 'bg-primary'
-                          : 'bg-muted-foreground'
+                        sub.status === 'active' ? 'bg-primary' : 'bg-muted-foreground'
                       )}
                     />
                     <p className='text-[11px] font-medium text-muted-foreground'>
-                      {sub.activated_at
-                        ? format(new Date(sub.activated_at), 'MMM dd, yyyy')
-                        : '-'}
+                      {sub.activated_at ? format(new Date(sub.activated_at), 'MMM dd, yyyy') : '-'}
                     </p>
-                    <p className='text-sm font-bold capitalize'>
-                      {sub.status} Subscription
-                    </p>
-                    <p className='text-xs text-muted-foreground'>
-                      {sub.package_name}
-                    </p>
+                    <p className='text-sm font-bold capitalize'>{sub.status} Subscription</p>
+                    <p className='text-xs text-muted-foreground'>{sub.package_name}</p>
                   </div>
                 ))
               ) : (
-                <p className='text-sm text-muted-foreground pl-6'>
-                  No history found
-                </p>
+                <p className='text-sm text-muted-foreground pl-6'>No history found</p>
               )}
             </div>
           </div>

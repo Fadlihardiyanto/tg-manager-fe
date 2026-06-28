@@ -11,7 +11,8 @@ export const membersKeys = {
 export const membersQueryOptions = (filters: MemberFilters) =>
   queryOptions({
     queryKey: membersKeys.list(filters),
-    queryFn: () => getMembers(filters)
+    queryFn: () => getMembers(filters),
+    placeholderData: (prev) => prev
   });
 
 export const memberDetailQueryOptions = (id: string) =>

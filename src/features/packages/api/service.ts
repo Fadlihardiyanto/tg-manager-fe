@@ -11,6 +11,7 @@
 // GET    /api/v1/tenant/packages/{id}         — Get package details
 // PUT    /api/v1/tenant/packages/{id}         — Update package
 // DELETE /api/v1/tenant/packages/{id}         — Delete package
+// PATCH  /api/v1/tenant/packages/{id}/activate   — Toggle package status
 // POST   /api/v1/tenant/packages/{id}/groups  — Associate groups
 // ============================================================
 
@@ -58,9 +59,7 @@ export async function getPackageById(id: string): Promise<PackageResponse> {
 }
 
 // ─── Create Package ─────────────────────────────────────────────────
-export async function createPackage(
-  data: CreatePackageRequest
-): Promise<PackageResponse> {
+export async function createPackage(data: CreatePackageRequest): Promise<PackageResponse> {
   const authHeaders = await getAuthHeaders();
 
   try {
@@ -109,6 +108,22 @@ export async function deletePackage(id: string): Promise<ApiResponse<null>> {
   }
 }
 
+// ─── Toggle Package Status (PATCH) ────────────────────────────────
+export async function togglePackageStatus(id: string, isActive: boolean): Promise<PackageResponse> {
+  const action = isActive ? 'activate' : 'deactivate';
+  const authHeaders = await getAuthHeaders();
+
+  try {
+    return await apiClient<PackageResponse>(`/api/v1/tenant/packages/${id}/${action}`, {
+      method: 'PATCH',
+      headers: { ...authHeaders }
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : `Failed to ${action} package`;
+    return { success: false, code: 400, message, data: undefined as any };
+  }
+}
+
 // ─── Associate Groups to Package ────────────────────────────────────
 export async function associateGroupsToPackage(
   packageId: string,
@@ -117,17 +132,13 @@ export async function associateGroupsToPackage(
   const authHeaders = await getAuthHeaders();
 
   try {
-    return await apiClient<ApiResponse<null>>(
-      `/api/v1/tenant/packages/${packageId}/groups`,
-      {
-        method: 'POST',
-        headers: { ...authHeaders },
-        body: JSON.stringify(data)
-      }
-    );
+    return await apiClient<ApiResponse<null>>(`/api/v1/tenant/packages/${packageId}/groups`, {
+      method: 'POST',
+      headers: { ...authHeaders },
+      body: JSON.stringify(data)
+    });
   } catch (err) {
-    const message =
-      err instanceof Error ? err.message : 'Failed to associate groups';
+    const message = err instanceof Error ? err.message : 'Failed to associate groups';
     return { success: false, code: 400, message, data: null };
   }
 }

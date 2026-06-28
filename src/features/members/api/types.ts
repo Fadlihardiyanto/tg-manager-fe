@@ -15,14 +15,24 @@ export interface Member {
   first_name: string;
   last_name: string;
   phone: string;
-  subscription?: Subscription;
+  global_status: boolean;
+  active_packages: string[];
+  nearest_expiry: string | null;
   total_orders: number;
   created_at: string;
 }
 
-export interface MemberDetail extends Member {
-  subscriptions: Subscription[];
+export interface MemberDetail {
+  id: string;
+  telegram_user_id: number;
+  username: string;
+  first_name: string;
+  last_name: string;
+  phone: string;
+  total_orders: number;
+  created_at: string;
   updated_at: string;
+  subscriptions: Subscription[];
 }
 
 export interface MembersResponse {
@@ -40,7 +50,6 @@ export interface MembersResponse {
 
 export interface MemberDetailResponse {
   success: boolean;
-  code: number;
   message: string;
   data: MemberDetail;
 }

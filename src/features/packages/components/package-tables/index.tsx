@@ -26,8 +26,10 @@ export function PackageTable({ onEdit }: PackageTableProps) {
     pageCount: 1,
     shallow: true,
     debounceMs: 500,
+    manualFiltering: false,
     initialState: {
-      columnPinning: { right: ['actions'] }
+      columnPinning: { right: ['actions'] },
+      sorting: [{ id: 'created_at', desc: true }]
     }
   });
 

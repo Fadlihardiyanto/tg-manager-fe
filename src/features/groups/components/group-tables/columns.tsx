@@ -9,16 +9,18 @@ import { CellAction } from './cell-action';
 import { cn } from '@/lib/utils';
 import { formatDate } from '@/lib/format';
 
-export function getColumns(
-  onEdit?: (group: TelegramGroup) => void
-): ColumnDef<TelegramGroup>[] {
+const roleLabels: Record<string, string> = {
+  sales_only: 'Sales',
+  gatekeeper_only: 'Gatekeeper',
+  all_in_one: 'All in One'
+};
+
+export function getColumns(onEdit?: (group: TelegramGroup) => void): ColumnDef<TelegramGroup>[] {
   return [
     {
       id: 'name',
       accessorKey: 'name',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Group Name' />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Group Name' />,
       cell: ({ row }) => (
         <div className='flex items-center gap-2'>
           <Icons.teams className='size-4 text-muted-foreground' />
@@ -35,15 +37,31 @@ export function getColumns(
       enableSorting: true
     },
     {
+      id: 'bot',
+      accessorKey: 'bot_username',
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Bot' />,
+      cell: ({ row }) => {
+        const username = row.original.bot_username;
+        const role = row.original.bot_role;
+        if (!username) return <span className='text-sm text-muted-foreground'>—</span>;
+        return (
+          <div className='flex flex-col'>
+            <span className='font-mono text-sm'>@{username}</span>
+            {role && (
+              <span className='text-xs text-muted-foreground'>{roleLabels[role] ?? role}</span>
+            )}
+          </div>
+        );
+      },
+      enableSorting: false,
+      enableColumnFilter: false
+    },
+    {
       id: 'telegram_chat_id',
       accessorKey: 'telegram_chat_id',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Chat ID' />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Chat ID' />,
       cell: ({ cell }) => (
-        <span className='font-mono text-sm text-muted-foreground'>
-          {cell.getValue<number>()}
-        </span>
+        <span className='font-mono text-sm text-muted-foreground'>{cell.getValue<number>()}</span>
       ),
       enableSorting: false,
       enableColumnFilter: false
@@ -51,23 +69,15 @@ export function getColumns(
     {
       id: 'member_count',
       accessorKey: 'member_count',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Members' />
-      ),
-      cell: ({ cell }) => (
-        <Badge variant='secondary'>
-          {cell.getValue<number>()}
-        </Badge>
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Members' />,
+      cell: ({ cell }) => <Badge variant='secondary'>{cell.getValue<number>()}</Badge>,
       enableSorting: true,
       enableColumnFilter: false
     },
     {
       id: 'is_active',
       accessorKey: 'is_active',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Status' />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Status' />,
       cell: ({ cell }) => {
         const isActive = cell.getValue<boolean>();
         const Icon = isActive ? Icons.circleCheck : Icons.xCircle;
@@ -75,9 +85,7 @@ export function getColumns(
           <Badge
             variant={isActive ? 'default' : 'outline'}
             className={cn(
-              isActive
-                ? 'bg-primary/10 text-primary border-transparent'
-                : 'text-muted-foreground'
+              isActive ? 'bg-primary/10 text-primary border-transparent' : 'text-muted-foreground'
             )}
           >
             <Icon className='size-3' />
@@ -91,16 +99,12 @@ export function getColumns(
     {
       id: 'inactive_reason',
       accessorKey: 'inactive_reason',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Inactive Reason' />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Inactive Reason' />,
       cell: ({ cell, row }) => {
         const isActive = row.original.is_active;
         const reason = cell.getValue<string | null>();
         if (isActive || !reason) return null;
-        return (
-          <span className='text-sm text-destructive'>{reason}</span>
-        );
+        return <span className='text-sm text-destructive'>{reason}</span>;
       },
       enableSorting: false,
       enableColumnFilter: false
@@ -108,9 +112,7 @@ export function getColumns(
     {
       id: 'created_at',
       accessorKey: 'created_at',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Created' />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Created' />,
       cell: ({ cell }) => {
         const date = cell.getValue<string>();
         return (

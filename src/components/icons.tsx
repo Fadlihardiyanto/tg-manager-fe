@@ -263,6 +263,7 @@ export const Icons = {
   bot: IconRobot,
   shieldLock: IconShieldLock,
   clipboardList: IconClipboardList,
+  command: IconCommand,
   link: IconLink,
   tag: IconTag,
   server: IconServer,
