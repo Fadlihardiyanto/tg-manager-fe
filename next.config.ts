@@ -14,16 +14,6 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'img.clerk.com',
-        port: ''
-      },
-      {
-        protocol: 'https',
-        hostname: 'clerk.com',
-        port: ''
-      },
-      {
-        protocol: 'https',
         hostname: 'storage.urator.com',
         port: ''
       }

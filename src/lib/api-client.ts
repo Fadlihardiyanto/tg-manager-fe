@@ -18,30 +18,30 @@ export async function apiClient<T>(endpoint: string, options?: RequestInit): Pro
   }
 
   if (!res.ok) {
-    if (res.status === 401 && !endpoint.includes('/auth/refresh') && !endpoint.includes('/auth/login')) {
-      // Try to refresh token
+    if (
+      res.status === 401 &&
+      !endpoint.includes('/auth/refresh') &&
+      !endpoint.includes('/auth/login')
+    ) {
       try {
         const { refreshToken } = await import('@/features/auth/api/service');
         const refreshRes = await refreshToken();
-        
+
         if (refreshRes.success && refreshRes.data?.access_token) {
-          // Retry original request with new token
           const newHeaders = new Headers(options?.headers);
           newHeaders.set('Authorization', `Bearer ${refreshRes.data.access_token}`);
-          
+
           const retryRes = await fetch(`${BASE_URL}${endpoint}`, {
             ...options,
             headers: newHeaders
           });
-          
+
           if (retryRes.ok) {
             return retryRes.json() as Promise<T>;
           }
         }
       } catch {
-        // refreshToken() may throw during SSR if cookies().set()
-        // is called inside the render phase. Fall through —
-        // the original 401 response body will carry the reason.
+        // refreshToken() may throw during SSR
       }
     }
 
@@ -49,10 +49,7 @@ export async function apiClient<T>(endpoint: string, options?: RequestInit): Pro
     try {
       const body = await res.json();
       detail =
-        body?.message ||
-        body?.error ||
-        body?.detail ||
-        (typeof body === 'string' ? body : '');
+        body?.message || body?.error || body?.detail || (typeof body === 'string' ? body : '');
     } catch {
       // response body is not JSON — ignore
     }

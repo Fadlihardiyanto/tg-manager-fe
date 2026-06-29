@@ -1,7 +1,19 @@
 'use server';
 
 import { apiClient } from '@/lib/api-client';
-import { RegisterRequest, RegisterResponse, VerifyEmailResponse, OnboardingRequest, OnboardingResponse, ForgotPasswordRequest, ForgotPasswordResponse, LoginRequest, LoginResponse, ResendVerificationRequest, ResendVerificationResponse } from './types';
+import {
+  RegisterRequest,
+  RegisterResponse,
+  VerifyEmailResponse,
+  OnboardingRequest,
+  OnboardingResponse,
+  ForgotPasswordRequest,
+  ForgotPasswordResponse,
+  LoginRequest,
+  LoginResponse,
+  ResendVerificationRequest,
+  ResendVerificationResponse
+} from './types';
 import { cookies } from 'next/headers';
 
 export async function register(data: RegisterRequest): Promise<RegisterResponse> {
@@ -18,9 +30,12 @@ export async function register(data: RegisterRequest): Promise<RegisterResponse>
 
 export async function verifyEmail(token: string): Promise<VerifyEmailResponse> {
   try {
-    const res = await apiClient<VerifyEmailResponse>(`/api/v1/auth/verify-email?token=${encodeURIComponent(token)}`, {
-      method: 'GET'
-    });
+    const res = await apiClient<VerifyEmailResponse>(
+      `/api/v1/auth/verify-email?token=${encodeURIComponent(token)}`,
+      {
+        method: 'GET'
+      }
+    );
 
     if (res.success && res.data?.access_token) {
       const cookieStore = await cookies();
@@ -48,7 +63,7 @@ export async function verifyEmail(token: string): Promise<VerifyEmailResponse> {
       success: false,
       code: 400,
       message,
-      data: undefined as any,
+      data: undefined as any
     };
   }
 }
@@ -61,7 +76,7 @@ export async function submitOnboarding(data: OnboardingRequest): Promise<Onboard
     const res = await apiClient<OnboardingResponse>('/api/v1/clients/onboarding', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`
+        Authorization: `Bearer ${token}`
       },
       body: JSON.stringify(data)
     });
@@ -103,7 +118,9 @@ export async function forgotPassword(data: ForgotPasswordRequest): Promise<Forgo
 // ─── Resend Email Verification ────────────────────────────────────────
 // POST /api/v1/auth/resend-verification
 // Used on: (1) Check-email page after register, (2) Login 403 unverified flow
-export async function resendVerification(data: ResendVerificationRequest): Promise<ResendVerificationResponse> {
+export async function resendVerification(
+  data: ResendVerificationRequest
+): Promise<ResendVerificationResponse> {
   try {
     return await apiClient<ResendVerificationResponse>('/api/v1/auth/resend-verification', {
       method: 'POST',
@@ -153,6 +170,20 @@ export async function login(data: LoginRequest): Promise<LoginResponse> {
 // ─── Tenant Logout ───────────────────────────────────────────────────
 export async function logout(): Promise<{ success: boolean }> {
   const cookieStore = await cookies();
+  const rToken = cookieStore.get('refresh_token')?.value;
+
+  // Call backend to invalidate refresh token
+  if (rToken) {
+    try {
+      await apiClient('/api/v1/auth/logout', {
+        method: 'POST',
+        body: JSON.stringify({ refresh_token: rToken })
+      });
+    } catch {
+      // Backend logout is best-effort
+    }
+  }
+
   cookieStore.delete('access_token');
   cookieStore.delete('refresh_token');
   return { success: true };
@@ -173,7 +204,7 @@ export async function getMe() {
     const res = await apiClient<any>('/api/v1/auth/me', {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${token}`
+        Authorization: `Bearer ${token}`
       }
     });
     return res;
@@ -229,4 +260,3 @@ export async function refreshToken() {
     return { success: false, code: 400, message };
   }
 }
-

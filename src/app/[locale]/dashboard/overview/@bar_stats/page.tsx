@@ -1,8 +1,7 @@
 import { BarGraph } from '@/features/overview/components/bar-graph';
-
-const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+import { getAnalyticsOverview } from '@/features/overview/api/service';
 
 export default async function BarStats() {
-  await delay(1000);
-  return <BarGraph />;
+  const data = await getAnalyticsOverview();
+  return <BarGraph data={data.revenue_chart} />;
 }

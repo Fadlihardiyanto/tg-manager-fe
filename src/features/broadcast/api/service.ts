@@ -6,7 +6,7 @@ import type {
   PresignedUrlResponse
 } from './types';
 
-const LOGIN_URL = '/auth/sign-in';
+const LOGIN_URL = '/login';
 
 async function apiFetch(url: string, options?: RequestInit) {
   const res = await fetch(url, options);

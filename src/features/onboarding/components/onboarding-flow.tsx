@@ -26,6 +26,8 @@ import {
   useUpdateBotMutation,
   useUpdatePaymentMutation
 } from '../api/queries';
+import { logout } from '@/features/auth/api/service';
+import { useAuthStore } from '@/stores/auth-store';
 import { ONBOARDING_STEPS } from '../constants';
 import { CheckIcon } from 'lucide-react';
 import {
@@ -98,11 +100,7 @@ function OnboardingHeader({ currentStep }: { currentStep: number }) {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant='ghost'
-              size='sm'
-              className='flex items-center gap-2'
-            >
+            <Button variant='ghost' size='sm' className='flex items-center gap-2'>
               <Avatar className='size-7'>
                 <AvatarFallback className='text-xs'>AD</AvatarFallback>
               </Avatar>
@@ -112,11 +110,7 @@ function OnboardingHeader({ currentStep }: { currentStep: number }) {
               <Icons.chevronsDown className='hidden size-4 md:block' />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent
-            className='min-w-56 rounded-lg'
-            align='end'
-            sideOffset={4}
-          >
+          <DropdownMenuContent className='min-w-56 rounded-lg' align='end' sideOffset={4}>
             <DropdownMenuLabel className='p-0 font-normal'>
               <div className='flex items-center gap-2 px-1 py-1.5 text-left text-sm'>
                 <Avatar className='size-8'>
@@ -136,7 +130,13 @@ function OnboardingHeader({ currentStep }: { currentStep: number }) {
               Notifications
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => router.push('/auth/sign-in')}>
+            <DropdownMenuItem
+              onClick={async () => {
+                await logout();
+                useAuthStore.getState().clearAuth();
+                router.push('/login');
+              }}
+            >
               <Icons.logout />
               Log out
             </DropdownMenuItem>
@@ -150,15 +150,11 @@ function OnboardingHeader({ currentStep }: { currentStep: number }) {
 export default function OnboardingFlow() {
   const draft = useMemo(() => getDraft(), []);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [isStep1Submitted, setIsStep1Submitted] = useState(
-    () => draft?.isStep1Submitted ?? false
-  );
+  const [isStep1Submitted, setIsStep1Submitted] = useState(() => draft?.isStep1Submitted ?? false);
   const [createdBotId, setCreatedBotId] = useState<string | null>(
     () => draft?.createdBotId ?? null
   );
-  const [botUsername, setBotUsername] = useState<string | null>(
-    () => draft?.botUsername ?? null
-  );
+  const [botUsername, setBotUsername] = useState<string | null>(() => draft?.botUsername ?? null);
 
   const createOnboarding = useCreateOnboardingMutation();
   const updateProfile = useUpdateProfileMutation();
@@ -173,16 +169,10 @@ export default function OnboardingFlow() {
     updateBotMut.isPending ||
     updatePayment.isPending;
 
-  const {
-    currentStep,
-    step,
-    handleCancelOrBack
-  } = useFormStepper([
-    businessProfileSchema,
-    telegramBotSchema,
-    paymentGatewaySchema,
-    z.object({})
-  ], draft?.step || 1);
+  const { currentStep, step, handleCancelOrBack } = useFormStepper(
+    [businessProfileSchema, telegramBotSchema, paymentGatewaySchema, z.object({})],
+    draft?.step || 1
+  );
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -193,19 +183,21 @@ export default function OnboardingFlow() {
   }, [currentStep]);
 
   const form = useAppForm({
-    defaultValues: draft?.values || {
-      businessName: '',
-      businessSlug: '',
-      category: '',
-      botToken: '',
-      midtransEnvironment: 'sandbox',
-      sandboxMerchantId: '',
-      sandboxClientKey: '',
-      sandboxServerKey: '',
-      productionMerchantId: '',
-      productionClientKey: '',
-      productionServerKey: ''
-    } as OnboardingFormValues,
+    defaultValues:
+      draft?.values ||
+      ({
+        businessName: '',
+        businessSlug: '',
+        category: '',
+        botToken: '',
+        midtransEnvironment: 'sandbox',
+        sandboxMerchantId: '',
+        sandboxClientKey: '',
+        sandboxServerKey: '',
+        productionMerchantId: '',
+        productionClientKey: '',
+        productionServerKey: ''
+      } as OnboardingFormValues),
     onSubmit: async ({ value }) => {
       try {
         if (currentStep === 1) {
@@ -285,9 +277,7 @@ export default function OnboardingFlow() {
 
         if (currentStep === 3) {
           const isSandbox = value.midtransEnvironment === 'sandbox';
-          const serverKey = isSandbox
-            ? value.sandboxServerKey
-            : value.productionServerKey;
+          const serverKey = isSandbox ? value.sandboxServerKey : value.productionServerKey;
 
           if (!serverKey?.trim()) {
             step.goToNextStep();
@@ -318,8 +308,7 @@ export default function OnboardingFlow() {
           setIsSuccess(true);
         }
       } catch (error) {
-        const message =
-          error instanceof Error ? error.message : 'An unexpected error occurred';
+        const message = error instanceof Error ? error.message : 'An unexpected error occurred';
         toast.error(message);
       }
     }
@@ -329,13 +318,16 @@ export default function OnboardingFlow() {
     if (typeof window === 'undefined' || isSuccess) return;
 
     const saveState = () => {
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
-        step: currentStep,
-        values: form.state.values,
-        isStep1Submitted,
-        createdBotId,
-        botUsername
-      } as OnboardingDraftState));
+      sessionStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({
+          step: currentStep,
+          values: form.state.values,
+          isStep1Submitted,
+          createdBotId,
+          botUsername
+        } as OnboardingDraftState)
+      );
     };
 
     saveState();
@@ -365,9 +357,7 @@ export default function OnboardingFlow() {
           </div>
           <div>
             <h1 className='text-base font-bold text-primary'>TG-Manager</h1>
-            <p className='mt-[2px] text-xs text-muted-foreground'>
-              Onboarding Progress
-            </p>
+            <p className='mt-[2px] text-xs text-muted-foreground'>Onboarding Progress</p>
           </div>
         </div>
 
@@ -407,60 +397,52 @@ export default function OnboardingFlow() {
               </form.Form>
 
               {currentStep < 4 && (
-              <div className='sticky bottom-0 z-10 -mx-4 mt-12 flex items-center justify-between border-t border-border bg-background/90 px-4 py-4 backdrop-blur-md md:-mx-8 md:px-8'>
-                {currentStep > 1 ? (
-                  <Button
-                    type='button'
-                    variant='outline'
-                    onClick={() => handleCancelOrBack()}
-                  >
-                    <Icons.arrowLeft />
-                    Back
-                  </Button>
-                ) : (
-                  <div />
-                )}
-
-                <div className='flex items-center gap-3'>
-                  {currentStep > 1 && currentStep < 4 && (
-                    <Button
-                      type='button'
-                      variant='outline'
-                      onClick={() => step.goToNextStep()}
-                    >
-                      Skip
+                <div className='sticky bottom-0 z-10 -mx-4 mt-12 flex items-center justify-between border-t border-border bg-background/90 px-4 py-4 backdrop-blur-md md:-mx-8 md:px-8'>
+                  {currentStep > 1 ? (
+                    <Button type='button' variant='outline' onClick={() => handleCancelOrBack()}>
+                      <Icons.arrowLeft />
+                      Back
                     </Button>
+                  ) : (
+                    <div />
                   )}
 
-                  <Button
-                    type='button'
-                    size='lg'
-                    disabled={isSubmitting}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      form.handleSubmit();
-                      scrollToFirstError();
-                    }}
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <Icons.spinner className='mr-2 size-4 animate-spin' />
-                        Processing...
-                      </>
-                    ) : currentStep === 4 ? (
-                      <>
-                        Finish Setup
-                        <Icons.check />
-                      </>
-                    ) : (
-                      <>
-                        Save and continue
-                        <Icons.arrowRight />
-                      </>
+                  <div className='flex items-center gap-3'>
+                    {currentStep > 1 && currentStep < 4 && (
+                      <Button type='button' variant='outline' onClick={() => step.goToNextStep()}>
+                        Skip
+                      </Button>
                     )}
-                  </Button>
+
+                    <Button
+                      type='button'
+                      size='lg'
+                      disabled={isSubmitting}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        form.handleSubmit();
+                        scrollToFirstError();
+                      }}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Icons.spinner className='mr-2 size-4 animate-spin' />
+                          Processing...
+                        </>
+                      ) : currentStep === 4 ? (
+                        <>
+                          Finish Setup
+                          <Icons.check />
+                        </>
+                      ) : (
+                        <>
+                          Save and continue
+                          <Icons.arrowRight />
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 </div>
-              </div>
               )}
             </form.AppForm>
           </div>

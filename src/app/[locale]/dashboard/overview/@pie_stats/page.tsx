@@ -1,8 +1,7 @@
 import { PieGraph } from '@/features/overview/components/pie-graph';
-
-const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+import { getAnalyticsOverview } from '@/features/overview/api/service';
 
 export default async function Stats() {
-  await delay(1000);
-  return <PieGraph />;
+  const data = await getAnalyticsOverview();
+  return <PieGraph data={data.package_popularity} />;
 }

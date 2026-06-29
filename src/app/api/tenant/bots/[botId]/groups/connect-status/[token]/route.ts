@@ -7,17 +7,16 @@ export async function GET(
   { params }: { params: Promise<{ botId: string; token: string }> }
 ) {
   const { botId, token } = await params;
-  const cookie = (await cookies()).get('access_token')?.value;
-  if (!cookie)
-    return NextResponse.json({ success: false, code: 401, message: 'Sesi habis' }, { status: 401 });
-
+  const accessToken = (await cookies()).get('access_token')?.value;
+  const opts = accessToken ? { headers: { Authorization: `Bearer ${accessToken}` } } : undefined;
   try {
     const data = await apiClient<any>(
       `/api/v1/tenant/bots/${botId}/groups/connect-status/${token}`,
-      { headers: { Authorization: `Bearer ${cookie}` } }
+      opts
     );
     return NextResponse.json(data);
-  } catch {
+  } catch (e) {
+    if (typeof e === 'object' && e && 'digest' in e) throw e;
     return NextResponse.json({ success: false, code: 401, message: 'Sesi habis' }, { status: 401 });
   }
 }

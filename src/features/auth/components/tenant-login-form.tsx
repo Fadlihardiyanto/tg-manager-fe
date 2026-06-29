@@ -10,11 +10,9 @@ import { TextField } from '@/components/forms/fields';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import {
-  tenantLoginSchema,
-  type TenantLoginInput
-} from '../schemas/auth-schema';
+import { tenantLoginSchema, type TenantLoginInput } from '../schemas/auth-schema';
 import { useLoginMutation, useResendVerificationMutation } from '../api/queries';
+import { useAuthStore } from '@/stores/auth-store';
 import { toast } from 'sonner';
 
 const RESEND_COOLDOWN = 60;
@@ -30,14 +28,12 @@ function isUnverifiedEmailError(message: string): boolean {
   );
 }
 
-export function TenantLoginForm({
-  className,
-  ...props
-}: React.ComponentProps<'form'>) {
+export function TenantLoginForm({ className, ...props }: React.ComponentProps<'form'>) {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const loginMutation = useLoginMutation();
   const resendMutation = useResendVerificationMutation();
+  const setAuth = useAuthStore((s) => s.setAuth);
 
   // Unverified email state
   const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
@@ -81,9 +77,16 @@ export function TenantLoginForm({
         });
 
         if (res.success && res.data) {
-          // Clear any previous unverified state
           setUnverifiedEmail(null);
-          // BE guide: When needs_onboarding is true, redirect to onboarding wizard
+
+          setAuth({
+            accessToken: res.data.access_token,
+            user: res.data.user,
+            client: res.data.client,
+            role: res.data.role,
+            needsOnboarding: res.data.needs_onboarding
+          });
+
           if (res.data.needs_onboarding) {
             router.push('/onboarding');
           } else {
@@ -100,8 +103,7 @@ export function TenantLoginForm({
           }
         }
       } catch (error: unknown) {
-        const message =
-          error instanceof Error ? error.message : 'Please try again later';
+        const message = error instanceof Error ? error.message : 'Please try again later';
         toast.error('Login failed', { description: message });
       }
     }
@@ -110,14 +112,16 @@ export function TenantLoginForm({
   return (
     <div className='flex flex-col w-full'>
       {/* BEGIN: Header Section */}
-      <header className="flex flex-col items-center text-center mb-6">
-        <div className="relative flex items-center justify-center mb-4 h-16 w-full max-w-[250px]">
-          <img src="/uration-blue-version.png" alt="Uration Logo" className="relative h-full w-auto object-contain" />
+      <header className='flex flex-col items-center text-center mb-6'>
+        <div className='relative flex items-center justify-center mb-4 h-16 w-full max-w-[250px]'>
+          <img
+            src='/uration-blue-version.png'
+            alt='Uration Logo'
+            className='relative h-full w-auto object-contain'
+          />
         </div>
-        <h1 className="text-2xl font-bold text-foreground mb-2">Welcome back</h1>
-        <p className="text-muted-foreground text-sm">
-          Please enter your details to sign in.
-        </p>
+        <h1 className='text-2xl font-bold text-foreground mb-2'>Welcome back</h1>
+        <p className='text-muted-foreground text-sm'>Please enter your details to sign in.</p>
       </header>
 
       <form.AppForm>
@@ -131,8 +135,8 @@ export function TenantLoginForm({
               </AlertTitle>
               <AlertDescription className='space-y-3 text-muted-foreground'>
                 <p className='text-sm'>
-                  Please verify your email address before signing in.
-                  Check your inbox for the verification link.
+                  Please verify your email address before signing in. Check your inbox for the
+                  verification link.
                 </p>
                 <div className='flex items-center gap-2'>
                   <Button
@@ -251,12 +255,12 @@ export function TenantLoginForm({
       </form.AppForm>
 
       {/* BEGIN: Footer */}
-      <footer className="mt-6 text-center">
-        <p className="text-sm text-muted-foreground">
+      <footer className='mt-6 text-center'>
+        <p className='text-sm text-muted-foreground'>
           Don&apos;t have an account yet?{' '}
           <Link
-            href="/register-tenant"
-            className="text-foreground font-bold hover:underline transition-all"
+            href='/register-tenant'
+            className='text-foreground font-bold hover:underline transition-all'
           >
             Sign Up
           </Link>

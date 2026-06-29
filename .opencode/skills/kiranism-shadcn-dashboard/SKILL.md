@@ -1,7 +1,7 @@
 ---
 name: kiranism-shadcn-dashboard
 description: |
-  Guide for building features, pages, tables, forms, themes, and navigation in this Next.js 16 shadcn dashboard template. Use this skill whenever the user wants to add a new page, create a feature module, build a data table, add a form, configure navigation items, add a theme, set up RBAC access control, or work with the dashboard's patterns and conventions. Also triggers when adding routes under /dashboard, working with Clerk auth/orgs/billing, creating mock APIs, or modifying the sidebar. Even if the user doesn't mention "dashboard" explicitly — if they're adding UI, pages, or features to this project, use this skill.
+  Guide for building features, pages, tables, forms, themes, and navigation in this Next.js 16 shadcn dashboard template. Use this skill whenever the user wants to add a new page, create a feature module, build a data table, add a form, configure navigation items, add a theme, set up RBAC access control, or work with the dashboard's patterns and conventions. Also triggers when adding routes under /dashboard, working with auth/session/Zustand store, creating APIs, or modifying the sidebar. Even if the user doesn't mention "dashboard" explicitly — if they're adding UI, pages, or features to this project, use this skill.
 ---
 
 # Dashboard Development Guide
@@ -30,6 +30,15 @@ This skill encodes the exact patterns and conventions used in this Next.js 16 + 
 | Theme registry        | `src/components/themes/theme.config.ts` |
 | Custom hook           | `src/hooks/`                            |
 | Icons registry        | `src/components/icons.tsx`              |
+| Auth service (SSR)    | `src/features/auth/api/service.ts`      |
+| Auth queries          | `src/features/auth/api/queries.ts`      |
+| Auth store (client)   | `src/stores/auth-store.ts`              |
+| API client (server)   | `src/lib/api-client.ts`                 |
+| API client (client)   | `src/lib/auth-axios.ts`                 |
+| Auth provider         | `src/components/layout/auth-provider.tsx`|
+| Session route         | `src/app/api/auth/session/route.ts`     |
+| i18n + auth middleware| `src/proxy.ts`                          |
+| Auth headers helper   | `src/lib/auth-headers.ts`              |
 
 ---
 
@@ -576,17 +585,82 @@ See [references/query-abstractions.md](references/query-abstractions.md) for why
 
 ## Navigation & RBAC
 
-Configure in `src/config/nav-config.ts`. Items are filtered client-side in `src/hooks/use-nav.ts` using Clerk.
+Configure in `src/config/nav-config.ts`. Items are filtered server-side in `src/app/[locale]/dashboard/layout.tsx` via `getMe()` → `permissions[]` + `role` → `filterNavGroups()`.
 
-**Access control properties** on nav items:
+**Access control properties** on nav items (`src/lib/filter-nav.ts`):
 
-- `requireOrg: boolean` — requires active Clerk organization
-- `permission: string` — requires specific Clerk permission
-- `role: string` — requires specific Clerk role
-- `plan: string` — requires subscription plan (server-side)
-- `feature: string` — requires feature flag (server-side)
+- `permission: string` — user must have this permission in `permissions[]`
+- `role: string` — user must have this exact role
 
-Items without `access` are visible to everyone. All client-side checks are synchronous — no loading states.
+Items without `access` are visible to everyone. The `getMe()` call in the dashboard layout returns `permissions[]` and `role` from the backend, which are passed to `filterNavGroups()` to build the visible sidebar. If no user (unauthenticated), `permissions` is `[]` and `role` is `null` — only items without `access` are shown.
+
+See `src/features/auth/api/types.ts` for `MeResponse` shape.
+
+---
+
+## Authentication & API Client
+
+### Auth Architecture
+
+- **Access Token** — short-lived JWT sent in JSON response body. Stored in **both** httpOnly cookie (for SSR/Server Actions) and Zustand memory (for client-side API calls).
+- **Refresh Token** — long-lived, httpOnly cookie only (never accessible to JS).
+- **Server Actions** (`'use server'` in `src/features/*/api/service.ts`) read tokens from httpOnly cookies via `cookies()` from `next/headers`. They use `apiClient` from `@/lib/api-client` (native fetch wrapper).
+- **Client-side API** uses `authAxios` from `@/lib/auth-axios` (Axios instance). Request interceptor reads `accessToken` from Zustand store and sets `Authorization: Bearer` header. Response interceptor auto-refreshes on 401 by calling `/auth/refresh`, queues concurrent failed requests, and retries them with the new token.
+- **Auth Hydration** — `AuthProvider` (`src/components/layout/auth-provider.tsx`) wraps the app inside `Providers`. On navigation, it calls `/api/auth/session` which uses the `refresh_token` cookie to get a fresh `access_token` + user data, then hydrates Zustand.
+
+### Auth Flow
+
+1. **Register** → `POST /api/v1/auth/register` → redirect to `/check-email`
+2. **Verify email** → `GET /api/v1/auth/verify-email?token=...` → Server Action sets both cookies + returns `access_token` → client stores in Zustand
+3. **Login** → `POST /api/v1/auth/login` → same as verify: cookies + Zustand
+4. **Onboarding** → 4-step wizard → Step 1 creates workspace → replaces JWT with tenant-scoped token → new cookies + Zustand hydration on next navigation
+5. **Logout** → `POST /api/v1/auth/logout` (invalidate cookie) + delete cookies + `clearAuth()` in Zustand + redirect to `/login`
+
+### Zustand Auth Store (`src/stores/auth-store.ts`)
+
+```ts
+import { useAuthStore } from '@/stores/auth-store';
+
+// Read state
+const token = useAuthStore.getState().accessToken;
+const user = useAuthStore((s) => s.user);
+
+// Write state (typically from login/verify-email success handlers)
+const setAuth = useAuthStore((s) => s.setAuth);
+setAuth({ accessToken, user, client, role, needsOnboarding });
+
+// Clear on logout
+const clearAuth = useAuthStore((s) => s.clearAuth);
+```
+
+### API Client Choice
+
+| Context | Client | Auth mechanism |
+|---|---|---|
+| Server Actions / SSR | `@/lib/api-client` (native fetch) | Reads httpOnly cookies via `cookies()` |
+| Client component direct API | `@/lib/auth-axios` (Axios) | Bearer header from Zustand + auto 401 refresh |
+| Route Handlers | `@/lib/api-client` (native fetch) | Pass token via Authorization header |
+
+`api-client.ts` also auto-refreshes on 401 (for SSR) by calling `refreshToken()` Server Action from `@/features/auth/api/service`.
+
+### Middleware (`src/proxy.ts`)
+
+The project uses `src/proxy.ts` with `next-intl/middleware` for i18n routing. Auth protection (redirect unauthenticated `/dashboard` and `/onboarding` routes to `/login`) is enabled only in **production** (`process.env.NODE_ENV === 'production'`). In development, all routes pass through.
+
+### Key Files
+
+| File | Purpose |
+|---|---|
+| `src/features/auth/api/service.ts` | Server Actions: register, login, logout, verifyEmail, getMe, refreshToken |
+| `src/features/auth/api/queries.ts` | React Query hooks: useLoginMutation, useRegisterMutation, etc. |
+| `src/features/auth/api/types.ts` | Request/response type contracts |
+| `src/stores/auth-store.ts` | Zustand store for client-side tokens + user |
+| `src/lib/api-client.ts` | Native fetch wrapper for Server Actions (auto-refresh) |
+| `src/lib/auth-axios.ts` | Axios client for client-side API calls (Bearer + interceptor) |
+| `src/lib/auth-headers.ts` | Server-side helper: reads cookie, auto-refresh, redirect if no token |
+| `src/components/layout/auth-provider.tsx` | Hydrates Zustand from server on navigation |
+| `src/app/api/auth/session/route.ts` | Route handler: refresh + me → return tokens + user |
+| `src/proxy.ts` | next-intl middleware + production auth guard |
 
 ---
 
@@ -606,7 +680,7 @@ See [references/theming-guide.md](references/theming-guide.md) for the complete 
 - **`cn()`** for class merging — never concatenate className strings
 - **Server components by default** — only add `'use client'` when needed
 - **React Query** — `void prefetchQuery()` on server + `useSuspenseQuery` on client
-- **API layer** — `types.ts` → `service.ts` → `queries.ts` → `mutations.ts` per feature; `queryOptions`/`mutationOptions` as base abstractions (not custom hooks); `getQueryClient()` in mutations (not `useQueryClient()`); key factories (`entityKeys.all/list/detail`); components never import mock APIs directly
+- **API layer** — `types.ts` → `service.ts` → `queries.ts` → `mutations.ts` per feature; `queryOptions`/`mutationOptions` as base abstractions (not custom hooks); `getQueryClient()` in mutations (not `useQueryClient()`); key factories (`entityKeys.all/list/detail`); components never import mock APIs directly. Server Actions use `@/lib/api-client`, client-side use `@/lib/auth-axios`.
 - **nuqs** — `searchParamsCache` on server, `useQueryStates` on client with `shallow: true`
 - **Icons** — only from `@/components/icons`, never from `@tabler/icons-react` directly
 - **Forms** — `useAppForm` + `useFormFields<T>()` from `@/components/ui/tanstack-form`
