@@ -3,6 +3,8 @@
 import { useAppForm, useFormFields } from '@/components/ui/tanstack-form';
 import { useStore } from '@tanstack/react-form';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
   Dialog,
   DialogContent,
@@ -65,6 +67,9 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
   const router = useRouter();
   const queryClient = useQueryClient();
   const [showQuotaAlert, setShowQuotaAlert] = useState(false);
+  const [isLinkPopoverOpen, setIsLinkPopoverOpen] = useState(false);
+  const [linkUrl, setLinkUrl] = useState('');
+  const [linkSelection, setLinkSelection] = useState<{ start: number; end: number } | null>(null);
 
   const mutation = useMutation({
     mutationFn: (params: { botId: string; data: CreateBroadcastRequest }) =>
@@ -176,11 +181,11 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
   const remaining = maxChars - Array.from(messageText).length;
   const isPending = mutation.isPending;
 
-  const handleFormat = (tag: string, href?: string) => {
+  const handleFormat = (tag: string, href?: string, selection = linkSelection) => {
     const el = document.getElementById('message_text') as HTMLTextAreaElement;
     if (!el) return;
-    const start = el.selectionStart;
-    const end = el.selectionEnd;
+    const start = selection?.start ?? el.selectionStart;
+    const end = selection?.end ?? el.selectionEnd;
     const text = el.value;
     const selected = text.substring(start, end);
 
@@ -198,6 +203,16 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
       el.focus();
       el.setSelectionRange(start + wrapped.length, start + wrapped.length);
     }, 0);
+  };
+
+  const handleLinkApply = () => {
+    const trimmedUrl = linkUrl.trim();
+    if (!trimmedUrl) return;
+
+    handleFormat('a', trimmedUrl);
+    setLinkUrl('');
+    setLinkSelection(null);
+    setIsLinkPopoverOpen(false);
   };
 
   return (
@@ -275,17 +290,64 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
                     <Icons.underline className='size-4' />
                   </button>
                   <span className='text-muted-foreground mx-1'>|</span>
-                  <button
-                    type='button'
-                    className='hover:bg-muted rounded px-2 py-1 text-sm'
-                    onClick={() => {
-                      const url = window.prompt('Masukkan URL:');
-                      if (url) handleFormat('a', url);
-                    }}
-                    title='Link'
-                  >
-                    <Icons.link className='size-4' />
-                  </button>
+                  <Popover open={isLinkPopoverOpen} onOpenChange={setIsLinkPopoverOpen}>
+                    <PopoverTrigger asChild>
+                      <button
+                        type='button'
+                        className='hover:bg-muted rounded px-2 py-1 text-sm'
+                        onClick={() => {
+                          const el = document.getElementById('message_text') as HTMLTextAreaElement;
+                          if (!el) return;
+                          setLinkSelection({
+                            start: el.selectionStart,
+                            end: el.selectionEnd
+                          });
+                        }}
+                        title='Link'
+                      >
+                        <Icons.link className='size-4' />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className='w-80 space-y-3' align='start'>
+                      <div className='space-y-1'>
+                        <p className='text-sm font-medium'>Masukkan URL</p>
+                        <Input
+                          type='url'
+                          placeholder='https://example.com'
+                          value={linkUrl}
+                          onChange={(event) => setLinkUrl(event.target.value)}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter') {
+                              event.preventDefault();
+                              handleLinkApply();
+                            }
+                          }}
+                        />
+                      </div>
+                      <div className='flex justify-end gap-2'>
+                        <Button
+                          type='button'
+                          variant='outline'
+                          size='sm'
+                          onClick={() => {
+                            setIsLinkPopoverOpen(false);
+                            setLinkUrl('');
+                            setLinkSelection(null);
+                          }}
+                        >
+                          Batal
+                        </Button>
+                        <Button
+                          type='button'
+                          size='sm'
+                          disabled={!linkUrl.trim()}
+                          onClick={handleLinkApply}
+                        >
+                          Sisipkan
+                        </Button>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
                   <button
                     type='button'
                     className='hover:bg-muted rounded px-2 py-1 text-sm'

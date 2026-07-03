@@ -14,11 +14,19 @@ interface CommandTableProps {
 }
 
 export function CommandTable({ onEdit }: CommandTableProps) {
-  const columns = useMemo(() => getColumns(onEdit), [onEdit]);
-
   const { data } = useSuspenseQuery(commandsQueryOptions());
 
   const commands = data.data ?? [];
+  const botUsernameOptions = Array.from(
+    new Set(commands.map((command) => command.bot_username).filter(Boolean))
+  ).map((username) => ({
+    label: `@${username}`,
+    value: username
+  }));
+  const columns = useMemo(
+    () => getColumns(botUsernameOptions, onEdit),
+    [botUsernameOptions, onEdit]
+  );
 
   const { table } = useDataTable({
     data: commands,

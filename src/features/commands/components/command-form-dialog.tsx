@@ -3,6 +3,8 @@
 import { useAppForm, useFormFields } from '@/components/ui/tanstack-form';
 import { useStore } from '@tanstack/react-form';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
   Dialog,
   DialogContent,
@@ -20,6 +22,7 @@ import { botsQueryOptions } from '@/features/bots/api/queries';
 import type { Command, CreateCommandRequest } from '../api/types';
 import { toast } from 'sonner';
 import * as z from 'zod';
+import { useState } from 'react';
 
 const BLACKLIST = ['/start', '/packages', '/mysub', '/status', '/myorders', '/connect'];
 
@@ -28,7 +31,7 @@ type CommandFormValues = {
   command_trigger: string;
   response_type: string;
   response_text: string;
-  file: any[];
+  file: File[];
 };
 
 const commandFormSchema = z.object({
@@ -48,6 +51,9 @@ interface CommandFormDialogProps {
 export function CommandFormDialog({ command, open, onOpenChange }: CommandFormDialogProps) {
   const isEdit = !!command;
   const queryClient = useQueryClient();
+  const [isLinkPopoverOpen, setIsLinkPopoverOpen] = useState(false);
+  const [linkUrl, setLinkUrl] = useState('');
+  const [linkSelection, setLinkSelection] = useState<{ start: number; end: number } | null>(null);
 
   const { data: botsData } = useSuspenseQuery(botsQueryOptions());
   const bots = (botsData?.data ?? []).filter((b) => b.is_active);
@@ -187,6 +193,44 @@ export function CommandFormDialog({ command, open, onOpenChange }: CommandFormDi
 
   const responseType = useStore(form.store, (state) => state.values.response_type);
   const isPending = createMutation.isPending || updateMutation.isPending;
+  const maxChars = responseType === 'text' ? 4096 : 1024;
+  const responseText = useStore(form.store, (state) => state.values.response_text);
+  const remaining = maxChars - Array.from(responseText).length;
+
+  const handleFormat = (tag: string, href?: string, selection = linkSelection) => {
+    const el = document.getElementById('response_text') as HTMLTextAreaElement;
+    if (!el) return;
+
+    const start = selection?.start ?? el.selectionStart;
+    const end = selection?.end ?? el.selectionEnd;
+    const text = el.value;
+    const selected = text.substring(start, end);
+
+    let wrapped: string;
+    if (tag === 'a' && href) {
+      wrapped = selected ? `<a href="${href}">${selected}</a>` : `<a href="${href}">link</a>`;
+    } else {
+      wrapped = selected ? `<${tag}>${selected}</${tag}>` : `<${tag}></${tag}>`;
+    }
+
+    const newValue = text.substring(0, start) + wrapped + text.substring(end);
+    form.setFieldValue('response_text', newValue);
+
+    setTimeout(() => {
+      el.focus();
+      el.setSelectionRange(start + wrapped.length, start + wrapped.length);
+    }, 0);
+  };
+
+  const handleLinkApply = () => {
+    const trimmedUrl = linkUrl.trim();
+    if (!trimmedUrl) return;
+
+    handleFormat('a', trimmedUrl);
+    setLinkUrl('');
+    setLinkSelection(null);
+    setIsLinkPopoverOpen(false);
+  };
 
   return (
     <Dialog
@@ -246,27 +290,153 @@ export function CommandFormDialog({ command, open, onOpenChange }: CommandFormDi
               placeholder='Pilih tipe respon'
             />
 
-            <FormTextareaField
-              name='response_text'
-              label={
-                responseType === 'photo'
-                  ? 'Keterangan Gambar (Caption)'
-                  : responseType === 'document'
-                    ? 'Keterangan Dokumen (Caption)'
-                    : 'Isi Pesan Balasan'
-              }
-              required
-              placeholder={
-                responseType === 'photo'
-                  ? 'Tulis caption untuk gambar...'
-                  : responseType === 'document'
-                    ? 'Tulis caption untuk dokumen...'
-                    : 'Tulis pesan balasan...'
-              }
-              validators={{
-                onBlur: z.string().min(1, 'Isi pesan wajib diisi')
-              }}
-            />
+            <div className='space-y-1'>
+              <div className='flex items-center gap-1'>
+                {responseType !== 'text' && (
+                  <p className='text-xs text-muted-foreground'>
+                    Teks ini akan menjadi caption untuk{' '}
+                    {responseType === 'photo' ? 'gambar' : 'dokumen'}.
+                  </p>
+                )}
+              </div>
+
+              <div className='flex items-center gap-1 rounded-md border p-1'>
+                <button
+                  type='button'
+                  className='hover:bg-muted rounded px-2 py-1 text-sm font-bold'
+                  onClick={() => handleFormat('b')}
+                  title='Bold'
+                >
+                  <Icons.bold className='size-4' />
+                </button>
+                <button
+                  type='button'
+                  className='hover:bg-muted rounded px-2 py-1 text-sm italic'
+                  onClick={() => handleFormat('i')}
+                  title='Italic'
+                >
+                  <Icons.italic className='size-4' />
+                </button>
+                <button
+                  type='button'
+                  className='hover:bg-muted rounded px-2 py-1 text-sm underline'
+                  onClick={() => handleFormat('u')}
+                  title='Underline'
+                >
+                  <Icons.underline className='size-4' />
+                </button>
+                <span className='text-muted-foreground mx-1'>|</span>
+                <Popover open={isLinkPopoverOpen} onOpenChange={setIsLinkPopoverOpen}>
+                  <PopoverTrigger asChild>
+                    <button
+                      type='button'
+                      className='hover:bg-muted rounded px-2 py-1 text-sm'
+                      onClick={() => {
+                        const el = document.getElementById('response_text') as HTMLTextAreaElement;
+                        if (!el) return;
+                        setLinkSelection({
+                          start: el.selectionStart,
+                          end: el.selectionEnd
+                        });
+                      }}
+                      title='Link'
+                    >
+                      <Icons.link className='size-4' />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className='w-80 space-y-3' align='start'>
+                    <div className='space-y-1'>
+                      <p className='text-sm font-medium'>Masukkan URL</p>
+                      <Input
+                        type='url'
+                        placeholder='https://example.com'
+                        value={linkUrl}
+                        onChange={(event) => setLinkUrl(event.target.value)}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Enter') {
+                            event.preventDefault();
+                            handleLinkApply();
+                          }
+                        }}
+                      />
+                    </div>
+                    <div className='flex justify-end gap-2'>
+                      <Button
+                        type='button'
+                        variant='outline'
+                        size='sm'
+                        onClick={() => {
+                          setIsLinkPopoverOpen(false);
+                          setLinkUrl('');
+                          setLinkSelection(null);
+                        }}
+                      >
+                        Batal
+                      </Button>
+                      <Button
+                        type='button'
+                        size='sm'
+                        disabled={!linkUrl.trim()}
+                        onClick={handleLinkApply}
+                      >
+                        Sisipkan
+                      </Button>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+                <button
+                  type='button'
+                  className='hover:bg-muted rounded px-2 py-1 text-sm'
+                  onClick={() => handleFormat('code')}
+                  title='Code'
+                >
+                  <Icons.code className='size-4' />
+                </button>
+                <button
+                  type='button'
+                  className='hover:bg-muted rounded px-2 py-1 text-sm'
+                  onClick={() => handleFormat('s')}
+                  title='Strikethrough'
+                >
+                  <Icons.slash className='size-4' />
+                </button>
+              </div>
+
+              <FormTextareaField
+                name='response_text'
+                label={
+                  responseType === 'photo'
+                    ? 'Keterangan Gambar (Caption)'
+                    : responseType === 'document'
+                      ? 'Keterangan Dokumen (Caption)'
+                      : 'Isi Pesan Balasan'
+                }
+                required
+                placeholder={
+                  responseType === 'photo'
+                    ? 'Tulis caption untuk gambar...'
+                    : responseType === 'document'
+                      ? 'Tulis caption untuk dokumen...'
+                      : 'Tulis pesan balasan...'
+                }
+                className='min-h-[120px]'
+                validators={{
+                  onBlur: z.string().min(1, 'Isi pesan wajib diisi')
+                }}
+              />
+
+              <div
+                className={`text-right text-xs ${
+                  remaining < 0
+                    ? 'text-destructive font-medium'
+                    : remaining < 50
+                      ? 'text-yellow-600'
+                      : 'text-muted-foreground'
+                }`}
+              >
+                {remaining} karakter tersisa
+              </div>
+            </div>
 
             {(responseType === 'photo' || responseType === 'document') && (
               <div className='space-y-2'>

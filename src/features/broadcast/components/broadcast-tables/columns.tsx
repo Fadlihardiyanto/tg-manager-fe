@@ -1,6 +1,7 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-header';
 import type { Broadcast } from '../../api/types';
 import type { ColumnDef } from '@tanstack/react-table';
@@ -106,13 +107,18 @@ export const columns: ColumnDef<Broadcast>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title='Progress' />,
     cell: ({ row }) => {
       const { sent_count, failed_count, total_targets, status } = row.original;
-      if (status === 'scheduled') return <span className='text-sm text-muted-foreground'>—</span>;
-      if (total_targets === 0) return <span className='text-sm text-muted-foreground'>0</span>;
+      if (status === 'scheduled') return <span className='text-sm text-muted-foreground'>-</span>;
+      const processedCount = sent_count + failed_count;
+      const progressValue = total_targets > 0 ? (processedCount / total_targets) * 100 : 0;
       return (
-        <div className='flex items-center gap-2'>
-          <span className='text-sm tabular-nums text-muted-foreground'>
-            {sent_count + failed_count}/{total_targets}
-          </span>
+        <div className='min-w-[180px] space-y-1.5'>
+          <div className='flex items-center justify-between gap-2 text-sm'>
+            <span className='tabular-nums text-muted-foreground'>
+              {processedCount}/{total_targets}
+            </span>
+            <span className='tabular-nums text-muted-foreground'>{Math.round(progressValue)}%</span>
+          </div>
+          <Progress value={progressValue} />
           {failed_count > 0 && (
             <span className='text-xs text-destructive'>({failed_count} gagal)</span>
           )}

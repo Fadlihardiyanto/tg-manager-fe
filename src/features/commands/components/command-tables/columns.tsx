@@ -85,7 +85,15 @@ function StatusCell({ cmd }: { cmd: Command }) {
   );
 }
 
-export function getColumns(onEdit?: (cmd: Command) => void): ColumnDef<Command>[] {
+interface BotUsernameOption {
+  label: string;
+  value: string;
+}
+
+export function getColumns(
+  botUsernameOptions: BotUsernameOption[],
+  onEdit?: (cmd: Command) => void
+): ColumnDef<Command>[] {
   return [
     {
       id: 'command_trigger',
@@ -106,6 +114,28 @@ export function getColumns(onEdit?: (cmd: Command) => void): ColumnDef<Command>[
       },
       enableColumnFilter: true,
       enableSorting: true
+    },
+    {
+      id: 'bot_username',
+      accessorKey: 'bot_username',
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Bot Username' />,
+      filterFn: (row, columnId, filterValue) => {
+        if (!Array.isArray(filterValue)) return true;
+        const value = row.getValue<string>(columnId);
+        return filterValue.includes(value);
+      },
+      cell: ({ row }) => (
+        <span className='text-sm text-muted-foreground'>
+          {row.original.bot_username ? `@${row.original.bot_username}` : '-'}
+        </span>
+      ),
+      meta: {
+        label: 'Bot Username',
+        variant: 'multiSelect',
+        options: botUsernameOptions
+      },
+      enableSorting: true,
+      enableColumnFilter: true
     },
     {
       id: 'response_type',

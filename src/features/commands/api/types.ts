@@ -7,6 +7,7 @@ export type ResponseType = 'text' | 'photo' | 'document';
 export interface Command {
   id: string;
   bot_id: string;
+  bot_username?: string;
   command_trigger: string;
   response_type: ResponseType;
   response_text: string;
