@@ -18,7 +18,11 @@ export function CommandTable({ onEdit }: CommandTableProps) {
 
   const commands = data.data ?? [];
   const botUsernameOptions = Array.from(
-    new Set(commands.map((command) => command.bot_username).filter(Boolean))
+    new Set(
+      commands
+        .map((command) => command.bot_username)
+        .filter((username): username is string => Boolean(username))
+    )
   ).map((username) => ({
     label: `@${username}`,
     value: username
