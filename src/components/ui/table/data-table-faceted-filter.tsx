@@ -38,7 +38,14 @@ export function DataTableFacetedFilter<TData, TValue>({
 
   const columnFilterValue = column?.getFilterValue();
   const selectedValues = React.useMemo(
-    () => new Set(Array.isArray(columnFilterValue) ? columnFilterValue : []),
+    () =>
+      new Set(
+        Array.isArray(columnFilterValue)
+          ? columnFilterValue
+          : typeof columnFilterValue === 'string' && columnFilterValue
+            ? [columnFilterValue]
+            : []
+      ),
     [columnFilterValue]
   );
 
@@ -56,7 +63,7 @@ export function DataTableFacetedFilter<TData, TValue>({
         const filterValues = Array.from(newSelectedValues);
         column.setFilterValue(filterValues.length ? filterValues : undefined);
       } else {
-        column.setFilterValue(isSelected ? undefined : [option.value]);
+        column.setFilterValue(isSelected ? undefined : option.value);
         setOpen(false);
       }
     },

@@ -128,6 +128,29 @@ export function getColumns(onEdit?: (pkg: Package) => void): ColumnDef<Package>[
       enableColumnFilter: false
     },
     {
+      id: 'groups',
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Groups' />,
+      cell: ({ row }) => {
+        const groups = row.original.groups ?? [];
+
+        if (groups.length === 0) {
+          return <span className='text-muted-foreground text-sm'>-</span>;
+        }
+
+        return (
+          <div className='flex max-w-[320px] flex-wrap gap-1'>
+            {groups.map((group) => (
+              <Badge key={group.id} variant='secondary' className='max-w-full truncate'>
+                {group.name}
+              </Badge>
+            ))}
+          </div>
+        );
+      },
+      enableSorting: false,
+      enableColumnFilter: false
+    },
+    {
       id: 'is_all_access',
       accessorFn: (row) => (row.is_all_access ? 'true' : 'false'),
       header: ({ column }) => <DataTableColumnHeader column={column} title='All Access' />,

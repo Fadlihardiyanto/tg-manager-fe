@@ -22,7 +22,7 @@ import {
 } from '../api/mutations';
 import { packageKeys } from '../api/queries';
 import { groupsQueryOptions } from '@/features/groups/api/queries';
-import type { Package } from '../api/types';
+import type { Package, PackagesListResponse } from '../api/types';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import * as z from 'zod';
@@ -98,10 +98,37 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
 
   const isAllAccess = useStore(form.store, (state) => state.values.is_all_access);
 
+  const syncPackageList = (item: Package) => {
+    queryClient.setQueryData<PackagesListResponse | undefined>(packageKeys.list(), (old) => {
+      if (!old?.data) {
+        return {
+          success: true,
+          code: 200,
+          message: '',
+          data: [item]
+        };
+      }
+
+      const exists = old.data.some((pkg) => pkg.id === item.id);
+      const data = exists
+        ? old.data.map((pkg) => (pkg.id === item.id ? item : pkg))
+        : [item, ...old.data];
+
+      return {
+        ...old,
+        data
+      };
+    });
+  };
+
   const createMutation = useMutation({
     ...createPackageMutation,
     onSuccess: async (res) => {
       if (res.success) {
+        if (res.data) {
+          syncPackageList(res.data);
+        }
+
         // Associate groups if any selected (create mode only)
         if (!isAllAccess && selectedGroupIds.length > 0 && res.data?.id) {
           await associateMutation.mutateAsync({
@@ -125,6 +152,10 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
     ...updatePackageMutation,
     onSuccess: async (res) => {
       if (res.success) {
+        if (res.data) {
+          syncPackageList(res.data);
+        }
+
         // Associate groups if any selected
         if (!isAllAccess && selectedGroupIds.length > 0 && res.data?.id) {
           await associateMutation.mutateAsync({

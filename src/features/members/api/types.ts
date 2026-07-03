@@ -65,4 +65,11 @@ export interface MemberFilters {
 export interface ActionResponse {
   success: boolean;
   message: string;
+  code?: number;
+  errors?: string[];
+}
+
+export interface ExtendAccessPayload {
+  subscription_id: string;
+  additional_days: number;
 }

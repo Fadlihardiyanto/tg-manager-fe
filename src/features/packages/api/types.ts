@@ -11,6 +11,11 @@ export type { ApiResponse };
 
 // ─── Package Entity ─────────────────────────────────────────────────
 
+export interface PackageGroup {
+  id: string;
+  name: string;
+}
+
 export interface Package {
   id: string;
   client_id: string;
@@ -22,6 +27,7 @@ export interface Package {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  groups?: PackageGroup[];
 }
 
 // ─── Create Package (POST /api/v1/tenant/packages) ──────────────────

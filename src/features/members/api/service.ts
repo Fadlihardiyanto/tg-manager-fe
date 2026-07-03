@@ -2,7 +2,14 @@
 
 import { apiClient } from '@/lib/api-client';
 import { getAuthHeaders } from '@/lib/auth-headers';
-import type { MembersResponse, MemberDetailResponse, MemberFilters, ActionResponse } from './types';
+import type {
+  MembersResponse,
+  MemberDetailResponse,
+  MemberDetail,
+  MemberFilters,
+  ActionResponse,
+  ExtendAccessPayload
+} from './types';
 
 export async function getMembers(filters: MemberFilters): Promise<MembersResponse> {
   const authHeaders = await getAuthHeaders();
@@ -21,11 +28,12 @@ export async function getMembers(filters: MemberFilters): Promise<MembersRespons
     return await apiClient<MembersResponse>(`/api/v1/tenant/members${queryString}`, {
       headers: { ...authHeaders }
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Server Error';
     return {
       success: false,
       code: 500, // ponytail: static, not used by UI
-      message: error?.message || 'Server Error',
+      message,
       meta: { page: 1, limit: 10, total: 0, total_pages: 0 },
       data: []
     };
@@ -39,23 +47,27 @@ export async function getMember(id: string): Promise<MemberDetailResponse> {
     return await apiClient<MemberDetailResponse>(`/api/v1/tenant/members/${id}`, {
       headers: { ...authHeaders }
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Server Error';
     return {
       success: false,
-      message: error?.message || 'Server Error',
-      data: {} as any
+      message,
+      data: {} as MemberDetail
     };
   }
 }
 
-export async function extendAccess(id: string, newExpiryAt: string): Promise<ActionResponse> {
+export async function extendAccess(
+  id: string,
+  payload: ExtendAccessPayload
+): Promise<ActionResponse> {
   const authHeaders = await getAuthHeaders();
 
   try {
     return await apiClient<ActionResponse>(`/api/v1/tenant/members/${id}/extend`, {
       method: 'POST',
       headers: { ...authHeaders },
-      body: JSON.stringify({ new_expiry_at: newExpiryAt })
+      body: JSON.stringify(payload)
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to extend access';
@@ -118,27 +130,6 @@ export async function bulkKickMembers(ids: string[]): Promise<ActionResponse> {
     };
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to kick members';
-    return { success: false, message };
-  }
-}
-
-export async function bulkExtendAccess(
-  ids: string[],
-  newExpiryAt: string
-): Promise<ActionResponse> {
-  try {
-    const results = await Promise.all(ids.map((id) => extendAccess(id, newExpiryAt)));
-    const allSucceeded = results.every((r) => r.success);
-    const formattedDate = new Date(newExpiryAt).toLocaleDateString();
-
-    return {
-      success: allSucceeded,
-      message: allSucceeded
-        ? `Access extended to ${formattedDate} for ${ids.length} members`
-        : 'Failed to extend access for some members'
-    };
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to extend access';
     return { success: false, message };
   }
 }

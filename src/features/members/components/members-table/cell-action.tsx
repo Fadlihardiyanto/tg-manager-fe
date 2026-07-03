@@ -1,12 +1,11 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useQueryState } from 'nuqs';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
 import {
   Dialog,
   DialogContent,
@@ -22,7 +21,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,6 +31,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
 import { Icons } from '@/components/icons';
 import {
   kickMemberMutation,
@@ -40,7 +47,8 @@ import {
   manualSyncMutation,
   resendLinkMutation
 } from '../../api/mutations';
-import type { Member } from '../../api/types';
+import { memberDetailQueryOptions } from '../../api/queries';
+import type { Member, Subscription } from '../../api/types';
 
 interface CellActionProps {
   data: Member;
@@ -51,33 +59,28 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
 
   const [isKickOpen, setIsKickOpen] = useState(false);
   const [isExtendOpen, setIsExtendOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date>();
-  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const [selectedSubscriptionId, setSelectedSubscriptionId] = useState('');
+  const [additionalDays, setAdditionalDays] = useState('');
 
   const kickMut = useMutation(kickMemberMutation);
   const extendMut = useMutation(extendAccessMutation);
   const syncMut = useMutation(manualSyncMutation);
   const resendMut = useMutation(resendLinkMutation);
+  const { data: memberDetail, isLoading: isMemberDetailLoading } = useQuery({
+    ...memberDetailQueryOptions(data.id),
+    enabled: isExtendOpen
+  });
 
-  const minDate = useMemo(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    if (data.global_status && data.nearest_expiry) {
-      const expiry = new Date(data.nearest_expiry);
-      expiry.setHours(0, 0, 0, 0);
-      return expiry > today ? expiry : today;
-    }
-
-    return today;
-  }, [data.global_status, data.nearest_expiry]);
-
-  const defaultMonth = useMemo(() => {
-    if (data.nearest_expiry) {
-      return new Date(data.nearest_expiry);
-    }
-    return new Date();
-  }, [data.nearest_expiry]);
+  const subscriptions = useMemo(
+    () => (memberDetail?.success ? memberDetail.data.subscriptions : []),
+    [memberDetail]
+  );
+  const selectedSubscription = useMemo(
+    () => subscriptions.find((subscription) => subscription.id === selectedSubscriptionId),
+    [selectedSubscriptionId, subscriptions]
+  );
+  const parsedAdditionalDays = Number.parseInt(additionalDays, 10);
+  const isAdditionalDaysValid = Number.isInteger(parsedAdditionalDays) && parsedAdditionalDays > 0;
 
   const handleKick = async () => {
     try {
@@ -85,25 +88,33 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       if (res.success) {
         toast.success(res.message);
         setIsKickOpen(false);
+        return;
       }
+      toast.error(res.message);
     } catch {
       toast.error('Failed to kick member');
     }
   };
 
   const handleExtendConfirm = async () => {
-    if (!selectedDate) return;
+    if (!selectedSubscriptionId || !isAdditionalDaysValid) return;
 
     try {
       const res = await extendMut.mutateAsync({
         id: data.id,
-        newExpiryAt: format(selectedDate, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx")
+        payload: {
+          subscription_id: selectedSubscriptionId,
+          additional_days: parsedAdditionalDays
+        }
       });
       if (res.success) {
         toast.success(res.message);
         setIsExtendOpen(false);
-        setSelectedDate(undefined);
+        setSelectedSubscriptionId('');
+        setAdditionalDays('');
+        return;
       }
+      toast.error(res.errors?.[0] || res.message);
     } catch {
       toast.error('Failed to extend access');
     }
@@ -140,7 +151,8 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         onOpenChange={(open) => {
           setIsExtendOpen(open);
           if (!open) {
-            setSelectedDate(undefined);
+            setSelectedSubscriptionId('');
+            setAdditionalDays('');
           }
         }}
       >
@@ -148,47 +160,74 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           <DialogHeader>
             <DialogTitle>Extend Access</DialogTitle>
             <DialogDescription>
-              Select the new expiry date for {data.first_name} {data.last_name}.
-              {data.global_status && data.nearest_expiry && (
-                <> Current expiry: {format(new Date(data.nearest_expiry), 'PP')}.</>
-              )}
+              Pilih subscription yang mau diperpanjang untuk {data.first_name} {data.last_name},
+              lalu isi tambahan durasi dalam hari.
             </DialogDescription>
           </DialogHeader>
 
-          <div className='flex justify-center py-4'>
-            <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
-              <PopoverTrigger asChild>
-                <Button variant='outline' className='w-[280px] justify-start text-left font-normal'>
-                  <Icons.calendar className='mr-2 size-4' />
-                  {selectedDate ? (
-                    format(selectedDate, 'PP')
-                  ) : (
-                    <span className='text-muted-foreground'>Pick a date</span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className='w-auto p-0' align='start' side='bottom' sideOffset={4}>
-                <Calendar
-                  mode='single'
-                  selected={selectedDate}
-                  onSelect={(date) => {
-                    setSelectedDate(date);
-                    setIsDatePickerOpen(false);
-                  }}
-                  disabled={{ before: minDate }}
-                  defaultMonth={defaultMonth}
-                  fixedWeeks
-                />
-              </PopoverContent>
-            </Popover>
+          <div className='space-y-4 py-4'>
+            <div className='space-y-2'>
+              <Label htmlFor={`extend-subscription-${data.id}`}>Subscription</Label>
+              <Select
+                value={selectedSubscriptionId}
+                onValueChange={setSelectedSubscriptionId}
+                disabled={isMemberDetailLoading || subscriptions.length === 0}
+              >
+                <SelectTrigger id={`extend-subscription-${data.id}`} className='w-full'>
+                  <SelectValue
+                    placeholder={
+                      isMemberDetailLoading ? 'Loading subscriptions...' : 'Pilih subscription'
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {subscriptions.map((subscription: Subscription) => (
+                    <SelectItem key={subscription.id} value={subscription.id}>
+                      {subscription.package_name} |{' '}
+                      {subscription.expired_at
+                        ? format(new Date(subscription.expired_at), 'dd MMM yyyy')
+                        : '-'}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className='space-y-2'>
+              <Label htmlFor={`extend-days-${data.id}`}>Additional Days</Label>
+              <Input
+                id={`extend-days-${data.id}`}
+                type='number'
+                min={1}
+                inputMode='numeric'
+                placeholder='30'
+                value={additionalDays}
+                onChange={(event) => setAdditionalDays(event.target.value)}
+              />
+            </div>
+
+            {selectedSubscription && (
+              <p className='text-sm text-muted-foreground'>
+                Current expiry: {format(new Date(selectedSubscription.expired_at), 'PP')}
+              </p>
+            )}
+
+            {!isMemberDetailLoading && subscriptions.length === 0 && (
+              <p className='text-sm text-muted-foreground'>
+                Member ini belum punya subscription yang bisa diperpanjang.
+              </p>
+            )}
           </div>
 
           <DialogFooter>
             <Button variant='outline' onClick={() => setIsExtendOpen(false)}>
               Cancel
             </Button>
-            <Button disabled={!selectedDate || extendMut.isPending} onClick={handleExtendConfirm}>
-              {extendMut.isPending && <Icons.spinner className='mr-2 size-4 animate-spin' />}
+            <Button
+              isLoading={extendMut.isPending}
+              disabled={!selectedSubscriptionId || !isAdditionalDaysValid}
+              onClick={handleExtendConfirm}
+            >
               Confirm
             </Button>
           </DialogFooter>

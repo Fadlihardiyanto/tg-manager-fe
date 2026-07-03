@@ -65,6 +65,11 @@ interface UseDataTableProps<TData>
   shallow?: boolean;
   startTransition?: React.TransitionStartFunction;
   manualFiltering?: boolean;
+  queryStateKeys?: {
+    page?: string;
+    perPage?: string;
+    sort?: string;
+  };
 }
 
 export function useDataTable<TData>(props: UseDataTableProps<TData>) {
@@ -81,8 +86,13 @@ export function useDataTable<TData>(props: UseDataTableProps<TData>) {
     shallow = true,
     startTransition,
     manualFiltering = true,
+    queryStateKeys,
     ...tableProps
   } = props;
+
+  const pageKey = queryStateKeys?.page ?? PAGE_KEY;
+  const perPageKey = queryStateKeys?.perPage ?? PER_PAGE_KEY;
+  const sortKey = queryStateKeys?.sort ?? SORT_KEY;
 
   const queryStateOptions = React.useMemo<Omit<UseQueryStateOptions<string>, 'parse'>>(
     () => ({
@@ -108,11 +118,11 @@ export function useDataTable<TData>(props: UseDataTableProps<TData>) {
   );
 
   const [page, setPage] = useQueryState(
-    PAGE_KEY,
+    pageKey,
     parseAsInteger.withOptions(queryStateOptions).withDefault(1)
   );
   const [perPage, setPerPage] = useQueryState(
-    PER_PAGE_KEY,
+    perPageKey,
     parseAsInteger
       .withOptions(queryStateOptions)
       .withDefault(initialState?.pagination?.pageSize ?? 10)
@@ -144,7 +154,7 @@ export function useDataTable<TData>(props: UseDataTableProps<TData>) {
   }, [columns]);
 
   const [sorting, setSorting] = useQueryState(
-    SORT_KEY,
+    sortKey,
     getSortingStateParser<TData>(columnIds)
       .withOptions(queryStateOptions)
       .withDefault(initialState?.sorting ?? [])
@@ -173,7 +183,7 @@ export function useDataTable<TData>(props: UseDataTableProps<TData>) {
 
     return filterableColumns.reduce<Record<string, Parser<string> | Parser<string[]>>>(
       (acc, column) => {
-        if (column.meta?.options) {
+        if (column.meta?.variant === 'multiSelect') {
           acc[column.id ?? ''] = parseAsArrayOf(parseAsString, ARRAY_SEPARATOR).withOptions(
             queryStateOptions
           );
