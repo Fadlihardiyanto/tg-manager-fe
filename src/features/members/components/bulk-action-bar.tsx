@@ -1,40 +1,105 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger
-} from '@/components/ui/alert-dialog';
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from '@/components/ui/dialog';
 import { Icons } from '@/components/icons';
 import { bulkKickMembersMutation } from '../api/mutations';
+import type { Member } from '../api/types';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 
 interface BulkActionBarProps {
   selectedIds: string[];
+  selectedMembers: Member[];
   onClearSelection: () => void;
 }
 
-export function BulkActionBar({ selectedIds, onClearSelection }: BulkActionBarProps) {
+function getActiveSubscriptions(member: Member) {
+  return (member.subscriptions ?? []).filter((subscription) => subscription.status === 'active');
+}
+
+export function BulkActionBar({
+  selectedIds,
+  selectedMembers,
+  onClearSelection
+}: BulkActionBarProps) {
   const [isKickModalOpen, setIsKickModalOpen] = useState(false);
+  const [kickMode, setKickMode] = useState<'all' | 'single'>('all');
+  const [selectedPackageId, setSelectedPackageId] = useState('');
 
   const bulkKickMut = useMutation(bulkKickMembersMutation);
+
+  const packageOptions = useMemo(() => {
+    const packages = new Map<string, { id: string; name: string; memberCount: number }>();
+
+    for (const member of selectedMembers) {
+      const seenPackageIds = new Set<string>();
+
+      for (const subscription of getActiveSubscriptions(member)) {
+        if (seenPackageIds.has(subscription.package_id)) continue;
+
+        const current = packages.get(subscription.package_id);
+        packages.set(subscription.package_id, {
+          id: subscription.package_id,
+          name: subscription.package_name,
+          memberCount: (current?.memberCount ?? 0) + 1
+        });
+        seenPackageIds.add(subscription.package_id);
+      }
+    }
+
+    return Array.from(packages.values()).toSorted((a, b) => a.name.localeCompare(b.name));
+  }, [selectedMembers]);
 
   if (selectedIds.length === 0) return null;
 
   const handleBulkKick = async () => {
+    const targets =
+      kickMode === 'all'
+        ? selectedMembers.map((member) => ({ id: member.id }))
+        : selectedMembers.flatMap((member) => {
+            const subscription = getActiveSubscriptions(member).find(
+              (item) => item.package_id === selectedPackageId
+            );
+
+            return subscription ? [{ id: member.id, subscriptionId: subscription.id }] : [];
+          });
+
+    const skippedCount = kickMode === 'all' ? 0 : selectedMembers.length - targets.length;
+
+    if (kickMode === 'single' && !selectedPackageId) return;
+    if (targets.length === 0) {
+      toast.error('Tidak ada member yang punya package aktif tersebut.');
+      return;
+    }
+
     try {
-      const res = await bulkKickMut.mutateAsync(selectedIds);
+      const res = await bulkKickMut.mutateAsync(targets);
       if (res.success) {
-        toast.success(res.message);
+        const summary =
+          skippedCount > 0 ? `${res.message}. ${skippedCount} member dilewati.` : res.message;
+
+        toast.success(summary);
         onClearSelection();
         setIsKickModalOpen(false);
+        setKickMode('all');
+        setSelectedPackageId('');
       }
     } catch {
       toast.error('Failed to kick members');
@@ -51,38 +116,14 @@ export function BulkActionBar({ selectedIds, onClearSelection }: BulkActionBarPr
       </div>
 
       <div className='flex items-center gap-2'>
-        <AlertDialog open={isKickModalOpen} onOpenChange={setIsKickModalOpen}>
-          <AlertDialogTrigger asChild>
-            <Button
-              variant='outline'
-              size='sm'
-              className='h-8 hover:bg-destructive hover:text-destructive-foreground'
-            >
-              <Icons.trash /> Kick Members
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action will kick {selectedIds.length} selected members from your community.
-                This action cannot be undone.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleBulkKick();
-                }}
-                className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
-              >
-                {bulkKickMut.isPending ? 'Kicking...' : 'Kick Members'}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <Button
+          variant='outline'
+          size='sm'
+          className='h-8 hover:bg-destructive hover:text-destructive-foreground'
+          onClick={() => setIsKickModalOpen(true)}
+        >
+          <Icons.trash /> Kick Members
+        </Button>
 
         <Button
           variant='ghost'
@@ -93,6 +134,115 @@ export function BulkActionBar({ selectedIds, onClearSelection }: BulkActionBarPr
           <Icons.close />
         </Button>
       </div>
+
+      <Dialog
+        open={isKickModalOpen}
+        onOpenChange={(open) => {
+          setIsKickModalOpen(open);
+          if (!open) {
+            setKickMode('all');
+            setSelectedPackageId('');
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Kick Selected Members</DialogTitle>
+            <DialogDescription>
+              Pilih apakah {selectedIds.length} member terpilih akan dikeluarkan dari semua package
+              atau hanya dari satu package tertentu.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className='space-y-4 py-4'>
+            <div className='space-y-3'>
+              <Label>Tipe Kick</Label>
+              <RadioGroup
+                value={kickMode}
+                onValueChange={(value) => setKickMode(value as 'all' | 'single')}
+                className='gap-3'
+              >
+                <Label
+                  htmlFor='bulk-kick-all'
+                  className={cn(
+                    'border-border flex cursor-pointer items-start gap-3 rounded-lg border p-3',
+                    kickMode === 'all' && 'border-primary bg-primary/5'
+                  )}
+                >
+                  <RadioGroupItem value='all' id='bulk-kick-all' className='mt-0.5' />
+                  <div className='space-y-1'>
+                    <p className='text-sm font-medium'>Kick semua package</p>
+                    <p className='text-xs text-muted-foreground'>
+                      Semua member terpilih akan di-kick dari seluruh akses aktifnya.
+                    </p>
+                  </div>
+                </Label>
+                <Label
+                  htmlFor='bulk-kick-single'
+                  className={cn(
+                    'border-border flex cursor-pointer items-start gap-3 rounded-lg border p-3',
+                    kickMode === 'single' && 'border-primary bg-primary/5'
+                  )}
+                >
+                  <RadioGroupItem value='single' id='bulk-kick-single' className='mt-0.5' />
+                  <div className='space-y-1'>
+                    <p className='text-sm font-medium'>Kick package tertentu</p>
+                    <p className='text-xs text-muted-foreground'>
+                      Hanya member yang punya package aktif ini yang akan diproses.
+                    </p>
+                  </div>
+                </Label>
+              </RadioGroup>
+            </div>
+
+            {kickMode === 'single' && (
+              <div className='space-y-2'>
+                <Label htmlFor='bulk-kick-package'>Package</Label>
+                <Select
+                  value={selectedPackageId}
+                  onValueChange={setSelectedPackageId}
+                  disabled={packageOptions.length === 0}
+                >
+                  <SelectTrigger id='bulk-kick-package' className='w-full'>
+                    <SelectValue placeholder='Pilih package aktif' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {packageOptions.map((pkg) => (
+                      <SelectItem key={pkg.id} value={pkg.id}>
+                        {pkg.name} ({pkg.memberCount} member)
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {selectedPackageId && (
+                  <p className='text-sm text-muted-foreground'>
+                    Member yang tidak punya package ini akan otomatis dilewati.
+                  </p>
+                )}
+                {packageOptions.length === 0 && (
+                  <p className='text-sm text-muted-foreground'>
+                    Tidak ada package aktif dari member yang sedang dipilih.
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant='outline' onClick={() => setIsKickModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant='destructive'
+              isLoading={bulkKickMut.isPending}
+              disabled={kickMode === 'single' && !selectedPackageId}
+              onClick={handleBulkKick}
+            >
+              Kick Members
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

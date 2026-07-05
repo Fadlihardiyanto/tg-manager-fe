@@ -8,6 +8,9 @@ import { BroadcastTable } from './broadcast-tables';
 import { BroadcastFormDialog } from './broadcast-form-dialog';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { QuotaCard } from '@/features/billing/components/quota-card';
+import { useActivePlan } from '@/features/billing/components/active-plan-provider';
 import { botsQueryOptions } from '@/features/bots/api/queries';
 import {
   Select,
@@ -21,9 +24,11 @@ import { Label } from '@/components/ui/label';
 export function BroadcastListingContent() {
   const [botId, setBotId] = useQueryState('bot_id', parseAsString);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const { hasQuota } = useActivePlan();
 
   const { data: botsData, isPending: botsLoading } = useQuery(botsQueryOptions());
   const bots = (botsData?.data ?? []).filter((b) => b.is_active);
+  const canCreateBroadcast = hasQuota('broadcasts');
 
   const handleAdd = () => setDialogOpen(true);
 
@@ -51,10 +56,22 @@ export function BroadcastListingContent() {
             </Select>
           </div>
         </div>
-        <Button onClick={handleAdd} size='sm' disabled={!botId}>
+        <Button onClick={handleAdd} size='sm' disabled={!botId || !canCreateBroadcast}>
           <Icons.send className='mr-2 h-4 w-4' /> Buat Broadcast
         </Button>
       </div>
+
+      <QuotaCard resource='broadcasts' title='Broadcast quota' />
+
+      {!canCreateBroadcast && (
+        <Alert>
+          <Icons.warning />
+          <AlertTitle>Quota broadcast penuh</AlertTitle>
+          <AlertDescription>
+            Anda tidak bisa membuat broadcast baru sampai limit plan ditingkatkan.
+          </AlertDescription>
+        </Alert>
+      )}
 
       {botId && (
         <Suspense fallback={<Skeleton className='h-64 w-full' />}>

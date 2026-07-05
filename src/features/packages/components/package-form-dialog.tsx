@@ -12,6 +12,7 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { FieldGroup, FieldLabel, FieldDescription } from '@/components/ui/field';
 import { Icons } from '@/components/icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -22,6 +23,7 @@ import {
 } from '../api/mutations';
 import { packageKeys } from '../api/queries';
 import { groupsQueryOptions } from '@/features/groups/api/queries';
+import { useActivePlan } from '@/features/billing/components/active-plan-provider';
 import type { Package, PackagesListResponse } from '../api/types';
 import { toast } from 'sonner';
 import { useState } from 'react';
@@ -29,6 +31,7 @@ import * as z from 'zod';
 
 type PackageFormValues = {
   name: string;
+  description: string;
   price: string;
   duration_days: string;
   is_all_access: boolean;
@@ -36,6 +39,7 @@ type PackageFormValues = {
 
 const packageFormSchema = z.object({
   name: z.string().min(3, 'Package name must be at least 3 characters'),
+  description: z.string(),
   price: z
     .string()
     .min(1, 'Price is required')
@@ -59,7 +63,9 @@ interface PackageFormDialogProps {
 export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormDialogProps) {
   const isEdit = !!package_;
   const queryClient = useQueryClient();
+  const { hasQuota } = useActivePlan();
   const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
+  const canCreatePackage = isEdit || hasQuota('packages');
 
   // Fetch groups for multi-select (active groups only)
   const { data: groupsData } = useQuery(groupsQueryOptions());
@@ -68,6 +74,7 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
   const form = useAppForm({
     defaultValues: {
       name: package_?.name ?? '',
+      description: package_?.description ?? '',
       price: package_?.price?.toString() ?? '',
       duration_days: package_?.duration_days?.toString() ?? '',
       is_all_access: package_?.is_all_access ?? false
@@ -76,11 +83,17 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
       onSubmit: packageFormSchema
     },
     onSubmit: async ({ value }) => {
+      if (!isEdit && !hasQuota('packages')) {
+        toast.error('Quota package penuh. Upgrade plan untuk menambahkan package baru.');
+        return;
+      }
+
       const payload = {
         name: value.name,
         price: Number(value.price.replace(/\./g, '')),
         duration_days: Number(value.duration_days),
-        is_all_access: value.is_all_access
+        is_all_access: value.is_all_access,
+        ...(value.description.trim() ? { description: value.description.trim() } : {})
       };
 
       if (isEdit && package_) {
@@ -94,7 +107,7 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
     }
   });
 
-  const { FormTextField, FormSwitchField } = useFormFields<PackageFormValues>();
+  const { FormTextField, FormTextareaField, FormSwitchField } = useFormFields<PackageFormValues>();
 
   const isAllAccess = useStore(form.store, (state) => state.values.is_all_access);
 
@@ -222,6 +235,14 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
               }}
             />
 
+            <FormTextareaField
+              name='description'
+              label='Description'
+              placeholder='Akses VIP 30 hari untuk member grup premium.'
+              description='Opsional. Deskripsi ini akan ditampilkan ke member Telegram saat mereka melihat atau membeli package ini.'
+              rows={4}
+            />
+
             <FormTextField
               name='price'
               label='Price (IDR)'
@@ -290,6 +311,16 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
                 </div>
               </FieldGroup>
             )}
+
+            {!canCreatePackage && (
+              <Alert variant='destructive'>
+                <Icons.warning />
+                <AlertTitle>Quota package penuh</AlertTitle>
+                <AlertDescription>
+                  Upgrade plan Anda untuk menambahkan package baru.
+                </AlertDescription>
+              </Alert>
+            )}
           </form.Form>
         </form.AppForm>
 
@@ -305,7 +336,12 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
           >
             Cancel
           </Button>
-          <Button type='submit' form='package-form-dialog' isLoading={isPending}>
+          <Button
+            type='submit'
+            form='package-form-dialog'
+            isLoading={isPending}
+            disabled={!canCreatePackage}
+          >
             <Icons.check className='mr-2 h-4 w-4' />
             {isEdit ? 'Update Package' : 'Add Package'}
           </Button>

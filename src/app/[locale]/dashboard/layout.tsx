@@ -4,6 +4,7 @@ import Header from '@/components/layout/header';
 import { InfoSidebar } from '@/components/layout/info-sidebar';
 import { InfobarProvider } from '@/components/ui/infobar';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { ActivePlanProvider } from '@/features/billing/components/active-plan-provider';
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import { getMe } from '@/features/auth/api/service';
@@ -36,12 +37,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <SidebarInset>
           <Header />
           <InfobarProvider defaultOpen={false}>
-            {children}
-            <InfoSidebar side='right' />
+            <ActivePlanProvider>
+              {children}
+              <InfoSidebar side='right' />
+            </ActivePlanProvider>
           </InfobarProvider>
         </SidebarInset>
       </SidebarProvider>
     </KBar>
   );
 }
-

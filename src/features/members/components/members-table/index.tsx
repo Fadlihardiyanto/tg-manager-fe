@@ -40,12 +40,14 @@ export function MembersTable({ filters }: { filters: MemberFilters }) {
     debounceMs: 500,
     enableRowSelection: true,
     initialState: {
-      columnPinning: { right: ['actions'] }
+      columnPinning: { right: ['actions'] },
+      columnVisibility: { status: false }
     }
   });
 
   const selectedRows = table.getSelectedRowModel().rows;
   const selectedIds = selectedRows.map((row) => row.original.id);
+  const selectedMembers = selectedRows.map((row) => row.original);
 
   return (
     <>
@@ -71,6 +73,7 @@ export function MembersTable({ filters }: { filters: MemberFilters }) {
       </DataTable>
       <BulkActionBar
         selectedIds={selectedIds}
+        selectedMembers={selectedMembers}
         onClearSelection={() => table.toggleAllRowsSelected(false)}
       />
     </>

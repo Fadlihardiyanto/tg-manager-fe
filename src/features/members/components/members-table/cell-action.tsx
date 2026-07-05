@@ -21,18 +21,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle
-} from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
   Select,
   SelectContent,
@@ -49,9 +40,24 @@ import {
 } from '../../api/mutations';
 import { memberDetailQueryOptions } from '../../api/queries';
 import type { Member, Subscription } from '../../api/types';
+import { cn } from '@/lib/utils';
 
 interface CellActionProps {
   data: Member;
+}
+
+function getSubscriptionReferenceDate(subscription: Subscription) {
+  return subscription.status === 'cancelled'
+    ? (subscription.kicked_at ?? subscription.expired_at)
+    : subscription.expired_at;
+}
+
+function getSubscriptionSortTime(subscription: Subscription) {
+  const referenceDate = getSubscriptionReferenceDate(subscription) ?? subscription.activated_at;
+
+  const timestamp = referenceDate ? new Date(referenceDate).getTime() : 0;
+
+  return Number.isNaN(timestamp) ? 0 : timestamp;
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
@@ -59,6 +65,8 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
 
   const [isKickOpen, setIsKickOpen] = useState(false);
   const [isExtendOpen, setIsExtendOpen] = useState(false);
+  const [kickMode, setKickMode] = useState<'all' | 'single'>('all');
+  const [kickSubscriptionId, setKickSubscriptionId] = useState('');
   const [selectedSubscriptionId, setSelectedSubscriptionId] = useState('');
   const [additionalDays, setAdditionalDays] = useState('');
 
@@ -68,26 +76,53 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const resendMut = useMutation(resendLinkMutation);
   const { data: memberDetail, isLoading: isMemberDetailLoading } = useQuery({
     ...memberDetailQueryOptions(data.id),
-    enabled: isExtendOpen
+    enabled: isExtendOpen || isKickOpen
   });
 
   const subscriptions = useMemo(
     () => (memberDetail?.success ? memberDetail.data.subscriptions : []),
     [memberDetail]
   );
+  const kickableSubscriptions = useMemo(
+    () => subscriptions.filter((subscription) => subscription.status === 'active'),
+    [subscriptions]
+  );
+  const extendableSubscriptions = useMemo(() => {
+    const latestByPackage = new Map<string, Subscription>();
+
+    for (const subscription of subscriptions) {
+      const current = latestByPackage.get(subscription.package_id);
+
+      if (!current || getSubscriptionSortTime(subscription) > getSubscriptionSortTime(current)) {
+        latestByPackage.set(subscription.package_id, subscription);
+      }
+    }
+
+    return Array.from(latestByPackage.values()).toSorted(
+      (a, b) => getSubscriptionSortTime(b) - getSubscriptionSortTime(a)
+    );
+  }, [subscriptions]);
   const selectedSubscription = useMemo(
-    () => subscriptions.find((subscription) => subscription.id === selectedSubscriptionId),
-    [selectedSubscriptionId, subscriptions]
+    () =>
+      extendableSubscriptions.find((subscription) => subscription.id === selectedSubscriptionId),
+    [extendableSubscriptions, selectedSubscriptionId]
   );
   const parsedAdditionalDays = Number.parseInt(additionalDays, 10);
   const isAdditionalDaysValid = Number.isInteger(parsedAdditionalDays) && parsedAdditionalDays > 0;
 
   const handleKick = async () => {
+    if (kickMode === 'single' && !kickSubscriptionId) return;
+
     try {
-      const res = await kickMut.mutateAsync(data.id);
+      const res = await kickMut.mutateAsync({
+        id: data.id,
+        subscriptionId: kickMode === 'single' ? kickSubscriptionId : undefined
+      });
       if (res.success) {
         toast.success(res.message);
         setIsKickOpen(false);
+        setKickMode('all');
+        setKickSubscriptionId('');
         return;
       }
       toast.error(res.message);
@@ -122,29 +157,119 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
 
   return (
     <>
-      <AlertDialog open={isKickOpen} onOpenChange={setIsKickOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will kick {data.first_name} {data.last_name} from the community. This action
-              cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={(e) => {
-                e.preventDefault();
-                handleKick();
-              }}
-              className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
+      <Dialog
+        open={isKickOpen}
+        onOpenChange={(open) => {
+          setIsKickOpen(open);
+          if (!open) {
+            setKickMode('all');
+            setKickSubscriptionId('');
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Kick Member</DialogTitle>
+            <DialogDescription>
+              Pilih apakah {data.first_name} {data.last_name} akan dikeluarkan dari semua package
+              atau hanya salah satu package aktif.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className='space-y-4 py-4'>
+            <div className='space-y-3'>
+              <Label>Tipe Kick</Label>
+              <RadioGroup
+                value={kickMode}
+                onValueChange={(value) => setKickMode(value as 'all' | 'single')}
+                className='gap-3'
+              >
+                <Label
+                  htmlFor={`kick-all-${data.id}`}
+                  className={cn(
+                    'border-border flex cursor-pointer items-start gap-3 rounded-lg border p-3',
+                    kickMode === 'all' && 'border-primary bg-primary/5'
+                  )}
+                >
+                  <RadioGroupItem value='all' id={`kick-all-${data.id}`} className='mt-0.5' />
+                  <div className='space-y-1'>
+                    <p className='text-sm font-medium'>Kick semua package</p>
+                    <p className='text-xs text-muted-foreground'>
+                      Member akan dikeluarkan dari seluruh akses yang aktif.
+                    </p>
+                  </div>
+                </Label>
+                <Label
+                  htmlFor={`kick-single-${data.id}`}
+                  className={cn(
+                    'border-border flex cursor-pointer items-start gap-3 rounded-lg border p-3',
+                    kickMode === 'single' && 'border-primary bg-primary/5'
+                  )}
+                >
+                  <RadioGroupItem value='single' id={`kick-single-${data.id}`} className='mt-0.5' />
+                  <div className='space-y-1'>
+                    <p className='text-sm font-medium'>Kick satu package</p>
+                    <p className='text-xs text-muted-foreground'>
+                      Pilih satu package aktif yang ingin dihentikan aksesnya.
+                    </p>
+                  </div>
+                </Label>
+              </RadioGroup>
+            </div>
+
+            {kickMode === 'single' && (
+              <div className='space-y-2'>
+                <Label htmlFor={`kick-subscription-${data.id}`}>Package</Label>
+                <Select
+                  value={kickSubscriptionId}
+                  onValueChange={setKickSubscriptionId}
+                  disabled={isMemberDetailLoading || kickableSubscriptions.length === 0}
+                >
+                  <SelectTrigger id={`kick-subscription-${data.id}`} className='w-full'>
+                    <SelectValue
+                      placeholder={
+                        isMemberDetailLoading ? 'Loading packages...' : 'Pilih package aktif'
+                      }
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {kickableSubscriptions.map((subscription: Subscription) => (
+                      <SelectItem key={subscription.id} value={subscription.id}>
+                        {subscription.package_name} |{' '}
+                        {getSubscriptionReferenceDate(subscription)
+                          ? format(
+                              new Date(getSubscriptionReferenceDate(subscription) as string),
+                              'dd MMM yyyy'
+                            )
+                          : '-'}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {!isMemberDetailLoading && kickableSubscriptions.length === 0 && (
+                  <p className='text-sm text-muted-foreground'>
+                    Member ini tidak punya package aktif yang bisa di-kick satuan.
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant='outline' onClick={() => setIsKickOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant='destructive'
+              isLoading={kickMut.isPending}
+              disabled={kickMode === 'single' && !kickSubscriptionId}
+              onClick={handleKick}
             >
-              {kickMut.isPending ? 'Kicking...' : 'Kick Member'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+              Kick Member
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog
         open={isExtendOpen}
@@ -171,7 +296,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
               <Select
                 value={selectedSubscriptionId}
                 onValueChange={setSelectedSubscriptionId}
-                disabled={isMemberDetailLoading || subscriptions.length === 0}
+                disabled={isMemberDetailLoading || extendableSubscriptions.length === 0}
               >
                 <SelectTrigger id={`extend-subscription-${data.id}`} className='w-full'>
                   <SelectValue
@@ -181,11 +306,14 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
                   />
                 </SelectTrigger>
                 <SelectContent>
-                  {subscriptions.map((subscription: Subscription) => (
+                  {extendableSubscriptions.map((subscription: Subscription) => (
                     <SelectItem key={subscription.id} value={subscription.id}>
                       {subscription.package_name} |{' '}
-                      {subscription.expired_at
-                        ? format(new Date(subscription.expired_at), 'dd MMM yyyy')
+                      {getSubscriptionReferenceDate(subscription)
+                        ? format(
+                            new Date(getSubscriptionReferenceDate(subscription) as string),
+                            'dd MMM yyyy'
+                          )
                         : '-'}
                     </SelectItem>
                   ))}
@@ -208,11 +336,15 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
 
             {selectedSubscription && (
               <p className='text-sm text-muted-foreground'>
-                Current expiry: {format(new Date(selectedSubscription.expired_at), 'PP')}
+                {selectedSubscription.status === 'cancelled' ? 'Kicked at' : 'Current expiry'}:{' '}
+                {format(
+                  new Date(getSubscriptionReferenceDate(selectedSubscription) as string),
+                  'PP'
+                )}
               </p>
             )}
 
-            {!isMemberDetailLoading && subscriptions.length === 0 && (
+            {!isMemberDetailLoading && extendableSubscriptions.length === 0 && (
               <p className='text-sm text-muted-foreground'>
                 Member ini belum punya subscription yang bisa diperpanjang.
               </p>

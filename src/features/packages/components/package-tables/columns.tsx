@@ -113,6 +113,21 @@ export function getColumns(onEdit?: (pkg: Package) => void): ColumnDef<Package>[
       enableColumnFilter: false
     },
     {
+      id: 'description',
+      accessorKey: 'description',
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Description' />,
+      cell: ({ row }) => {
+        const description = row.original.description?.trim();
+        return (
+          <div className='max-w-[280px] text-sm text-muted-foreground line-clamp-2'>
+            {description || '-'}
+          </div>
+        );
+      },
+      enableSorting: false,
+      enableColumnFilter: false
+    },
+    {
       id: 'duration_days',
       accessorKey: 'duration_days',
       header: ({ column }) => <DataTableColumnHeader column={column} title='Duration' />,

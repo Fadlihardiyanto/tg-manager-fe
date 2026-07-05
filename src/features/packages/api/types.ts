@@ -34,6 +34,7 @@ export interface Package {
 
 export interface CreatePackageRequest {
   name: string;
+  description?: string;
   price: number;
   duration_days: number;
   is_all_access?: boolean;
@@ -43,6 +44,7 @@ export interface CreatePackageRequest {
 
 export interface UpdatePackageRequest {
   name?: string;
+  description?: string;
   price?: number;
   duration_days?: number;
   is_all_access?: boolean;

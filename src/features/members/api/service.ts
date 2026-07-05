@@ -11,6 +11,11 @@ import type {
   ExtendAccessPayload
 } from './types';
 
+interface BulkKickTarget {
+  id: string;
+  subscriptionId?: string;
+}
+
 export async function getMembers(filters: MemberFilters): Promise<MembersResponse> {
   const authHeaders = await getAuthHeaders();
 
@@ -75,11 +80,18 @@ export async function extendAccess(
   }
 }
 
-export async function kickMember(id: string): Promise<ActionResponse> {
+export async function kickMember(id: string, subscriptionId?: string): Promise<ActionResponse> {
   const authHeaders = await getAuthHeaders();
+  const params = new URLSearchParams();
+
+  if (subscriptionId) {
+    params.append('subscription_id', subscriptionId);
+  }
 
   try {
-    return await apiClient<ActionResponse>(`/api/v1/tenant/members/${id}/kick`, {
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+
+    return await apiClient<ActionResponse>(`/api/v1/tenant/members/${id}/kick${queryString}`, {
       method: 'POST',
       headers: { ...authHeaders }
     });
@@ -117,15 +129,17 @@ export async function resendLink(id: string): Promise<ActionResponse> {
   }
 }
 
-export async function bulkKickMembers(ids: string[]): Promise<ActionResponse> {
+export async function bulkKickMembers(targets: BulkKickTarget[]): Promise<ActionResponse> {
   try {
-    const results = await Promise.all(ids.map((id) => kickMember(id)));
+    const results = await Promise.all(
+      targets.map((target) => kickMember(target.id, target.subscriptionId))
+    );
     const allSucceeded = results.every((r) => r.success);
 
     return {
       success: allSucceeded,
       message: allSucceeded
-        ? `${ids.length} members kicked successfully`
+        ? `${targets.length} members kicked successfully`
         : 'Failed to kick some members'
     };
   } catch (err) {

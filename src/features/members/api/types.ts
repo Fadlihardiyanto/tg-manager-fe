@@ -2,10 +2,11 @@ export interface Subscription {
   id: string;
   package_id: string;
   package_name: string;
-  status: 'active' | 'expired' | string;
+  status: 'active' | 'expired' | 'cancelled' | string;
   activated_at: string;
   expired_at: string;
   auto_renew: boolean;
+  kicked_at?: string;
 }
 
 export interface Member {
@@ -18,6 +19,7 @@ export interface Member {
   global_status: boolean;
   active_packages: string[];
   nearest_expiry: string | null;
+  subscriptions?: Subscription[];
   total_orders: number;
   created_at: string;
 }

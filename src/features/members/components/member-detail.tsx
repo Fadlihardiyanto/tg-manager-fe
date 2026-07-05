@@ -18,6 +18,16 @@ interface MemberDetailProps {
   memberId: string;
 }
 
+function getSubscriptionDateText(sub: Subscription) {
+  if (sub.status === 'cancelled') {
+    return sub.kicked_at
+      ? `Kicked at ${format(new Date(sub.kicked_at), 'dd MMMM yyyy')}`
+      : 'Kicked';
+  }
+
+  return sub.expired_at ? `Expired at ${format(new Date(sub.expired_at), 'dd MMMM yyyy')}` : '-';
+}
+
 export function MemberDetail({ memberId }: MemberDetailProps) {
   const [_, setMemberId] = useQueryState('memberId');
   const [tab, setTab] = useState('overview');
@@ -159,10 +169,7 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
                         <div>
                           <p className='text-sm font-bold'>{sub.package_name}</p>
                           <p className='text-[11px] text-muted-foreground'>
-                            Expired at{' '}
-                            {sub.expired_at
-                              ? format(new Date(sub.expired_at), 'dd MMMM yyyy')
-                              : '-'}
+                            {getSubscriptionDateText(sub)}
                           </p>
                         </div>
                       </div>
@@ -222,7 +229,11 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
                       )}
                     />
                     <p className='text-[11px] font-medium text-muted-foreground'>
-                      {sub.activated_at ? format(new Date(sub.activated_at), 'MMM dd, yyyy') : '-'}
+                      {sub.status === 'cancelled' && sub.kicked_at
+                        ? format(new Date(sub.kicked_at), 'MMM dd, yyyy')
+                        : sub.activated_at
+                          ? format(new Date(sub.activated_at), 'MMM dd, yyyy')
+                          : '-'}
                     </p>
                     <p className='text-sm font-bold capitalize'>{sub.status} Subscription</p>
                     <p className='text-xs text-muted-foreground'>{sub.package_name}</p>

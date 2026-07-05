@@ -13,12 +13,14 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Icons } from '@/components/icons';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { createCommandMutation, updateCommandMutation } from '../api/mutations';
 import { getPresignedUrl } from '../api/service';
 import { commandKeys } from '../api/queries';
 import { botsQueryOptions } from '@/features/bots/api/queries';
+import { useActivePlan } from '@/features/billing/components/active-plan-provider';
 import type { Command, CreateCommandRequest } from '../api/types';
 import { toast } from 'sonner';
 import * as z from 'zod';
@@ -51,6 +53,7 @@ interface CommandFormDialogProps {
 export function CommandFormDialog({ command, open, onOpenChange }: CommandFormDialogProps) {
   const isEdit = !!command;
   const queryClient = useQueryClient();
+  const { hasQuota } = useActivePlan();
   const [isLinkPopoverOpen, setIsLinkPopoverOpen] = useState(false);
   const [linkUrl, setLinkUrl] = useState('');
   const [linkSelection, setLinkSelection] = useState<{ start: number; end: number } | null>(null);
@@ -99,6 +102,11 @@ export function CommandFormDialog({ command, open, onOpenChange }: CommandFormDi
       onSubmit: commandFormSchema
     },
     onSubmit: async ({ value }) => {
+      if (!isEdit && !hasQuota('custom_commands')) {
+        toast.error('Quota custom command penuh. Upgrade plan untuk menambahkan command baru.');
+        return;
+      }
+
       let trigger = value.command_trigger.trim().toLowerCase();
       if (!trigger.startsWith('/')) trigger = '/' + trigger;
 
@@ -193,6 +201,7 @@ export function CommandFormDialog({ command, open, onOpenChange }: CommandFormDi
 
   const responseType = useStore(form.store, (state) => state.values.response_type);
   const isPending = createMutation.isPending || updateMutation.isPending;
+  const canCreateCommand = isEdit || hasQuota('custom_commands');
   const maxChars = responseType === 'text' ? 4096 : 1024;
   const responseText = useStore(form.store, (state) => state.values.response_text);
   const remaining = maxChars - Array.from(responseText).length;
@@ -438,6 +447,16 @@ export function CommandFormDialog({ command, open, onOpenChange }: CommandFormDi
               </div>
             </div>
 
+            {!canCreateCommand && (
+              <Alert variant='destructive'>
+                <Icons.warning />
+                <AlertTitle>Quota custom command penuh</AlertTitle>
+                <AlertDescription>
+                  Upgrade plan Anda untuk menambahkan command baru.
+                </AlertDescription>
+              </Alert>
+            )}
+
             {(responseType === 'photo' || responseType === 'document') && (
               <div className='space-y-2'>
                 <FormFileUploadField
@@ -472,7 +491,12 @@ export function CommandFormDialog({ command, open, onOpenChange }: CommandFormDi
           >
             Batal
           </Button>
-          <Button type='submit' form='command-form-dialog' isLoading={isPending}>
+          <Button
+            type='submit'
+            form='command-form-dialog'
+            isLoading={isPending}
+            disabled={!canCreateCommand}
+          >
             <Icons.check className='mr-2 h-4 w-4' />
             {isEdit ? 'Perbarui' : 'Tambah'}
           </Button>

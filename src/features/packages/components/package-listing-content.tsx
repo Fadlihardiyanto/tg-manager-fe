@@ -9,6 +9,9 @@ import { PackageTable } from './package-tables';
 import { PackageFormDialog } from './package-form-dialog';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { QuotaCard } from '@/features/billing/components/quota-card';
+import { useActivePlan } from '@/features/billing/components/active-plan-provider';
 import { groupsQueryOptions } from '@/features/groups/api/queries';
 import Link from 'next/link';
 import type { Package } from '../api/types';
@@ -16,9 +19,11 @@ import type { Package } from '../api/types';
 export function PackageListingContent() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPackage, setEditingPackage] = useState<Package | null>(null);
+  const { hasQuota } = useActivePlan();
 
   const { data: groupsData } = useSuspenseQuery(groupsQueryOptions());
   const hasActiveGroups = (groupsData?.data ?? []).some((g) => g.is_active);
+  const canCreatePackage = hasQuota('packages');
 
   const handleEdit = useCallback((pkg: Package) => {
     setEditingPackage(pkg);
@@ -52,10 +57,22 @@ export function PackageListingContent() {
       )}
 
       <div className='flex justify-end'>
-        <Button onClick={handleAdd} size='sm' disabled={!hasActiveGroups}>
+        <Button onClick={handleAdd} size='sm' disabled={!hasActiveGroups || !canCreatePackage}>
           <Icons.add className='mr-2 h-4 w-4' /> Add Package
         </Button>
       </div>
+
+      <QuotaCard resource='packages' title='Package quota' />
+
+      {!canCreatePackage && (
+        <Alert>
+          <Icons.warning />
+          <AlertTitle>Quota package penuh</AlertTitle>
+          <AlertDescription>
+            Anda tidak bisa membuat package baru sampai limit plan ditingkatkan.
+          </AlertDescription>
+        </Alert>
+      )}
 
       <PackageTable onEdit={handleEdit} />
 

@@ -5,6 +5,7 @@ import { useStore } from '@tanstack/react-form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
   Dialog,
   DialogContent,
@@ -27,10 +28,10 @@ import { Icons } from '@/components/icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { getPresignedUrl, createBroadcast } from '../api/service';
 import { broadcastKeys } from '../api/queries';
+import { useActivePlan } from '@/features/billing/components/active-plan-provider';
 import { toast } from 'sonner';
 import * as z from 'zod';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import type { CreateBroadcastRequest } from '../api/types';
 
 const MAX_TEXT = 4096;
@@ -64,8 +65,8 @@ interface BroadcastFormDialogProps {
 }
 
 export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastFormDialogProps) {
-  const router = useRouter();
   const queryClient = useQueryClient();
+  const { canUseFeature, hasQuota } = useActivePlan();
   const [showQuotaAlert, setShowQuotaAlert] = useState(false);
   const [isLinkPopoverOpen, setIsLinkPopoverOpen] = useState(false);
   const [linkUrl, setLinkUrl] = useState('');
@@ -103,6 +104,16 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
       onSubmit: broadcastFormSchema
     },
     onSubmit: async ({ value }) => {
+      if (!hasQuota('broadcasts')) {
+        toast.error('Quota broadcast penuh. Upgrade plan untuk membuat broadcast baru.');
+        return;
+      }
+
+      if (!canUseFeature('allow_media_broadcast') && value.message_type !== 'text') {
+        toast.error('Plan aktif Anda hanya mengizinkan text broadcast.');
+        return;
+      }
+
       const maxChars = value.message_type === 'text' ? MAX_TEXT : MAX_CAPTION;
       if (Array.from(value.message_text).length > maxChars) {
         toast.error(`Pesan terlalu panjang! Maksimal ${maxChars} karakter.`);
@@ -175,6 +186,8 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
   const { FormTextField, FormTextareaField, FormSelectField, FormFileUploadField } =
     useFormFields<BroadcastFormValues>();
 
+  const canCreateBroadcast = hasQuota('broadcasts');
+  const allowMediaBroadcast = canUseFeature('allow_media_broadcast');
   const messageType = useStore(form.store, (s) => s.values.message_type);
   const messageText = useStore(form.store, (s) => s.values.message_text);
   const maxChars = messageType === 'text' ? MAX_TEXT : MAX_CAPTION;
@@ -247,12 +260,22 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
                 name='message_type'
                 label='Tipe Pesan'
                 required
-                options={TYPE_OPTIONS}
+                options={allowMediaBroadcast ? TYPE_OPTIONS : [TYPE_OPTIONS[0]]}
                 placeholder='Pilih tipe pesan'
                 validators={{
                   onBlur: z.string().min(1, 'Pilih tipe')
                 }}
               />
+
+              {!allowMediaBroadcast && (
+                <Alert>
+                  <Icons.lock />
+                  <AlertTitle>Media broadcast belum tersedia</AlertTitle>
+                  <AlertDescription>
+                    Plan aktif Anda hanya mengizinkan text broadcast.
+                  </AlertDescription>
+                </Alert>
+              )}
 
               <div className='space-y-1'>
                 <div className='flex items-center gap-1'>
@@ -415,6 +438,16 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
                 description='Format: YYYY-MM-DD HH:MM (waktu lokal). Minimal 1 menit dari sekarang.'
                 type='text'
               />
+
+              {!canCreateBroadcast && (
+                <Alert variant='destructive'>
+                  <Icons.warning />
+                  <AlertTitle>Quota broadcast penuh</AlertTitle>
+                  <AlertDescription>
+                    Upgrade plan Anda untuk membuat broadcast baru.
+                  </AlertDescription>
+                </Alert>
+              )}
             </form.Form>
           </form.AppForm>
 
@@ -429,7 +462,12 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
             >
               Batal
             </Button>
-            <Button type='submit' form='broadcast-form' isLoading={isPending}>
+            <Button
+              type='submit'
+              form='broadcast-form'
+              isLoading={isPending}
+              disabled={!canCreateBroadcast}
+            >
               <Icons.send className='mr-2 h-4 w-4' />
               {isPending ? 'Mengirim...' : 'Kirim Broadcast'}
             </Button>
@@ -448,9 +486,7 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Tutup</AlertDialogCancel>
-            <AlertDialogAction onClick={() => router.push('/dashboard/billing')}>
-              Upgrade Paket
-            </AlertDialogAction>
+            <AlertDialogAction onClick={() => setShowQuotaAlert(false)}>Tutup</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

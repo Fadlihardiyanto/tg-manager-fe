@@ -13,7 +13,8 @@ export const extendAccessMutation = mutationOptions({
 });
 
 export const kickMemberMutation = mutationOptions({
-  mutationFn: (id: string) => kickMember(id),
+  mutationFn: ({ id, subscriptionId }: { id: string; subscriptionId?: string }) =>
+    kickMember(id, subscriptionId),
   onSuccess: () => {
     getQueryClient().invalidateQueries({ queryKey: membersKeys.all });
   }
@@ -31,7 +32,7 @@ export const resendLinkMutation = mutationOptions({
 });
 
 export const bulkKickMembersMutation = mutationOptions({
-  mutationFn: (ids: string[]) => bulkKickMembers(ids),
+  mutationFn: (targets: { id: string; subscriptionId?: string }[]) => bulkKickMembers(targets),
   onSuccess: () => {
     getQueryClient().invalidateQueries({ queryKey: membersKeys.all });
   }

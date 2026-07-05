@@ -10,8 +10,10 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Icons } from '@/components/icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useActivePlan } from '@/features/billing/components/active-plan-provider';
 import { createBotMutation, updateBotMutation } from '../api/mutations';
 import { botKeys } from '../api/queries';
 import type { TelegramBot, BotRole } from '../api/types';
@@ -45,6 +47,8 @@ interface BotFormDialogProps {
 export function BotFormDialog({ bot, open, onOpenChange }: BotFormDialogProps) {
   const isEdit = !!bot;
   const queryClient = useQueryClient();
+  const { hasQuota } = useActivePlan();
+  const canCreateBot = isEdit || hasQuota('bots');
 
   const createMutation = useMutation({
     ...createBotMutation,
@@ -85,6 +89,11 @@ export function BotFormDialog({ bot, open, onOpenChange }: BotFormDialogProps) {
       onSubmit: botFormSchema
     },
     onSubmit: async ({ value }) => {
+      if (!isEdit && !canCreateBot) {
+        toast.error('Quota bot penuh. Upgrade plan untuk menambahkan bot baru.');
+        return;
+      }
+
       if (isEdit && bot) {
         await updateMutation.mutateAsync({
           id: bot.id,
@@ -107,10 +116,13 @@ export function BotFormDialog({ bot, open, onOpenChange }: BotFormDialogProps) {
   const isPending = createMutation.isPending || updateMutation.isPending;
 
   return (
-    <Dialog open={open} onOpenChange={(v) => {
-      if (!v) form.reset();
-      onOpenChange(v);
-    }}>
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        if (!v) form.reset();
+        onOpenChange(v);
+      }}
+    >
       <DialogContent className='sm:max-w-[480px]'>
         <DialogHeader>
           <DialogTitle>{isEdit ? 'Edit Bot' : 'Add New Bot'}</DialogTitle>
@@ -130,9 +142,7 @@ export function BotFormDialog({ bot, open, onOpenChange }: BotFormDialogProps) {
                 required
                 placeholder='123456789:ABCdefGHIjklMNOpqrSTUvwxYZ'
                 validators={{
-                  onBlur: z
-                    .string()
-                    .min(10, 'Bot token must be at least 10 characters')
+                  onBlur: z.string().min(10, 'Bot token must be at least 10 characters')
                 }}
               />
             )}
@@ -142,9 +152,7 @@ export function BotFormDialog({ bot, open, onOpenChange }: BotFormDialogProps) {
                 <div className='flex items-center gap-2 text-sm'>
                   <Icons.bot className='h-4 w-4 text-muted-foreground' />
                   <span className='font-medium'>@{bot.username}</span>
-                  <span className='text-muted-foreground'>
-                    (ID: {bot.telegram_bot_id})
-                  </span>
+                  <span className='text-muted-foreground'>(ID: {bot.telegram_bot_id})</span>
                 </div>
               </div>
             )}
@@ -172,6 +180,14 @@ export function BotFormDialog({ bot, open, onOpenChange }: BotFormDialogProps) {
                 placeholder='Select status'
               />
             )}
+
+            {!canCreateBot && (
+              <Alert variant='destructive'>
+                <Icons.warning />
+                <AlertTitle>Quota bot penuh</AlertTitle>
+                <AlertDescription>Upgrade plan Anda untuk menambahkan bot baru.</AlertDescription>
+              </Alert>
+            )}
           </form.Form>
         </form.AppForm>
 
@@ -186,7 +202,12 @@ export function BotFormDialog({ bot, open, onOpenChange }: BotFormDialogProps) {
           >
             Cancel
           </Button>
-          <Button type='submit' form='bot-form-dialog' isLoading={isPending}>
+          <Button
+            type='submit'
+            form='bot-form-dialog'
+            isLoading={isPending}
+            disabled={!canCreateBot}
+          >
             <Icons.check className='mr-2 h-4 w-4' />
             {isEdit ? 'Update Bot' : 'Add Bot'}
           </Button>
