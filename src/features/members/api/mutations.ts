@@ -28,7 +28,8 @@ export const manualSyncMutation = mutationOptions({
 });
 
 export const resendLinkMutation = mutationOptions({
-  mutationFn: (id: string) => resendLink(id)
+  mutationFn: ({ id, subscriptionId }: { id: string; subscriptionId?: string }) =>
+    resendLink(id, subscriptionId)
 });
 
 export const bulkKickMembersMutation = mutationOptions({

@@ -313,7 +313,7 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
             )}
 
             {!canCreatePackage && (
-              <Alert variant='destructive'>
+              <Alert variant='warning'>
                 <Icons.warning />
                 <AlertTitle>Quota package penuh</AlertTitle>
                 <AlertDescription>

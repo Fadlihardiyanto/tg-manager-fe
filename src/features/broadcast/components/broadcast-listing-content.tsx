@@ -61,10 +61,10 @@ export function BroadcastListingContent() {
         </Button>
       </div>
 
-      <QuotaCard resource='broadcasts' title='Broadcast quota' />
+      <QuotaCard resource='broadcasts' title='Broadcast quota' className='mt-4' />
 
       {!canCreateBroadcast && (
-        <Alert>
+        <Alert variant='warning' className='mt-4'>
           <Icons.warning />
           <AlertTitle>Quota broadcast penuh</AlertTitle>
           <AlertDescription>

@@ -41,10 +41,10 @@ export function CommandListingContent() {
         </Button>
       </div>
 
-      <QuotaCard resource='custom_commands' title='Custom command quota' />
+      <QuotaCard resource='custom_commands' title='Custom command quota' className='mt-4' />
 
       {!canCreateCommand && (
-        <Alert>
+        <Alert variant='warning' className='mt-4'>
           <Icons.warning />
           <AlertTitle>Quota custom command penuh</AlertTitle>
           <AlertDescription>

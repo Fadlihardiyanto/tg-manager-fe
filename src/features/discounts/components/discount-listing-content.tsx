@@ -44,7 +44,7 @@ export function DiscountListingContent() {
       </div>
 
       {!allowDiscountSystem && (
-        <Alert>
+        <Alert variant='warning' className='mt-4'>
           <Icons.lock />
           <AlertTitle>Discount system terkunci</AlertTitle>
           <AlertDescription>

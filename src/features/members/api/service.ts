@@ -115,14 +115,24 @@ export async function manualSync(id: string): Promise<ActionResponse> {
   }
 }
 
-export async function resendLink(id: string): Promise<ActionResponse> {
+export async function resendLink(id: string, subscriptionId?: string): Promise<ActionResponse> {
   const authHeaders = await getAuthHeaders();
+  const params = new URLSearchParams();
+
+  if (subscriptionId) {
+    params.append('subscription_id', subscriptionId);
+  }
 
   try {
-    return await apiClient<ActionResponse>(`/api/v1/tenant/members/${id}/resend-link`, {
-      method: 'POST',
-      headers: { ...authHeaders }
-    });
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+
+    return await apiClient<ActionResponse>(
+      `/api/v1/tenant/members/${id}/resend-link${queryString}`,
+      {
+        method: 'POST',
+        headers: { ...authHeaders }
+      }
+    );
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to resend link';
     return { success: false, message };

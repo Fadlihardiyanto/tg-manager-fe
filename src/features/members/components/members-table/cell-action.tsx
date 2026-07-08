@@ -64,9 +64,12 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const [_, setMemberId] = useQueryState('memberId');
 
   const [isKickOpen, setIsKickOpen] = useState(false);
+  const [isResendOpen, setIsResendOpen] = useState(false);
   const [isExtendOpen, setIsExtendOpen] = useState(false);
   const [kickMode, setKickMode] = useState<'all' | 'single'>('all');
   const [kickSubscriptionId, setKickSubscriptionId] = useState('');
+  const [resendMode, setResendMode] = useState<'all' | 'single'>('all');
+  const [resendSubscriptionId, setResendSubscriptionId] = useState('');
   const [selectedSubscriptionId, setSelectedSubscriptionId] = useState('');
   const [additionalDays, setAdditionalDays] = useState('');
 
@@ -76,7 +79,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const resendMut = useMutation(resendLinkMutation);
   const { data: memberDetail, isLoading: isMemberDetailLoading } = useQuery({
     ...memberDetailQueryOptions(data.id),
-    enabled: isExtendOpen || isKickOpen
+    enabled: isExtendOpen || isKickOpen || isResendOpen
   });
 
   const subscriptions = useMemo(
@@ -128,6 +131,27 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       toast.error(res.message);
     } catch {
       toast.error('Failed to kick member');
+    }
+  };
+
+  const handleResend = async () => {
+    if (resendMode === 'single' && !resendSubscriptionId) return;
+
+    try {
+      const res = await resendMut.mutateAsync({
+        id: data.id,
+        subscriptionId: resendMode === 'single' ? resendSubscriptionId : undefined
+      });
+      if (res.success) {
+        toast.success(res.message);
+        setIsResendOpen(false);
+        setResendMode('all');
+        setResendSubscriptionId('');
+        return;
+      }
+      toast.error(res.message);
+    } catch {
+      toast.error('Failed to resend link');
     }
   };
 
@@ -272,6 +296,123 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       </Dialog>
 
       <Dialog
+        open={isResendOpen}
+        onOpenChange={(open) => {
+          setIsResendOpen(open);
+          if (!open) {
+            setResendMode('all');
+            setResendSubscriptionId('');
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Resend Link</DialogTitle>
+            <DialogDescription>
+              Pilih apakah link undangan untuk {data.first_name} {data.last_name} akan dikirim ulang
+              ke semua package aktif atau hanya satu package aktif.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className='space-y-4 py-4'>
+            <div className='space-y-3'>
+              <Label>Tipe Resend</Label>
+              <RadioGroup
+                value={resendMode}
+                onValueChange={(value) => setResendMode(value as 'all' | 'single')}
+                className='gap-3'
+              >
+                <Label
+                  htmlFor={`resend-all-${data.id}`}
+                  className={cn(
+                    'border-border flex cursor-pointer items-start gap-3 rounded-lg border p-3',
+                    resendMode === 'all' && 'border-primary bg-primary/5'
+                  )}
+                >
+                  <RadioGroupItem value='all' id={`resend-all-${data.id}`} className='mt-0.5' />
+                  <div className='space-y-1'>
+                    <p className='text-sm font-medium'>Kirim ke semua package</p>
+                    <p className='text-xs text-muted-foreground'>
+                      Semua link undangan aktif untuk member ini akan dikirim ulang.
+                    </p>
+                  </div>
+                </Label>
+                <Label
+                  htmlFor={`resend-single-${data.id}`}
+                  className={cn(
+                    'border-border flex cursor-pointer items-start gap-3 rounded-lg border p-3',
+                    resendMode === 'single' && 'border-primary bg-primary/5'
+                  )}
+                >
+                  <RadioGroupItem
+                    value='single'
+                    id={`resend-single-${data.id}`}
+                    className='mt-0.5'
+                  />
+                  <div className='space-y-1'>
+                    <p className='text-sm font-medium'>Kirim ke satu package</p>
+                    <p className='text-xs text-muted-foreground'>
+                      Pilih satu package aktif yang ingin dikirim ulang link undangannya.
+                    </p>
+                  </div>
+                </Label>
+              </RadioGroup>
+            </div>
+
+            {resendMode === 'single' && (
+              <div className='space-y-2'>
+                <Label htmlFor={`resend-subscription-${data.id}`}>Package</Label>
+                <Select
+                  value={resendSubscriptionId}
+                  onValueChange={setResendSubscriptionId}
+                  disabled={isMemberDetailLoading || kickableSubscriptions.length === 0}
+                >
+                  <SelectTrigger id={`resend-subscription-${data.id}`} className='w-full'>
+                    <SelectValue
+                      placeholder={
+                        isMemberDetailLoading ? 'Loading packages...' : 'Pilih package aktif'
+                      }
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {kickableSubscriptions.map((subscription: Subscription) => (
+                      <SelectItem key={subscription.id} value={subscription.id}>
+                        {subscription.package_name} |{' '}
+                        {getSubscriptionReferenceDate(subscription)
+                          ? format(
+                              new Date(getSubscriptionReferenceDate(subscription) as string),
+                              'dd MMM yyyy'
+                            )
+                          : '-'}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {!isMemberDetailLoading && kickableSubscriptions.length === 0 && (
+                  <p className='text-sm text-muted-foreground'>
+                    Member ini tidak punya package aktif yang bisa dikirimi ulang link.
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant='outline' onClick={() => setIsResendOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              isLoading={resendMut.isPending}
+              disabled={resendMode === 'single' && !resendSubscriptionId}
+              onClick={handleResend}
+            >
+              Resend Link
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
         open={isExtendOpen}
         onOpenChange={(open) => {
           setIsExtendOpen(open);
@@ -392,15 +533,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           >
             <Icons.settings /> Manual Sync
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => {
-              toast.promise(resendMut.mutateAsync(data.id), {
-                loading: 'Resending...',
-                success: (res) => res.message,
-                error: 'Failed to resend'
-              });
-            }}
-          >
+          <DropdownMenuItem onClick={() => setTimeout(() => setIsResendOpen(true), 150)}>
             <Icons.send /> Resend Link
           </DropdownMenuItem>
           <DropdownMenuItem

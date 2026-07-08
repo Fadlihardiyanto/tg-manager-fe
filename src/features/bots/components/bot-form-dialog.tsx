@@ -182,7 +182,7 @@ export function BotFormDialog({ bot, open, onOpenChange }: BotFormDialogProps) {
             )}
 
             {!canCreateBot && (
-              <Alert variant='destructive'>
+              <Alert variant='warning'>
                 <Icons.warning />
                 <AlertTitle>Quota bot penuh</AlertTitle>
                 <AlertDescription>Upgrade plan Anda untuk menambahkan bot baru.</AlertDescription>

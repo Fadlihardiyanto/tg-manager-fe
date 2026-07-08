@@ -440,7 +440,7 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
               />
 
               {!canCreateBroadcast && (
-                <Alert variant='destructive'>
+                <Alert variant='warning'>
                   <Icons.warning />
                   <AlertTitle>Quota broadcast penuh</AlertTitle>
                   <AlertDescription>

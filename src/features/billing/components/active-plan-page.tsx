@@ -1,6 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import { useMemo, useState } from 'react';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { parseAsString, useQueryState } from 'nuqs';
+import { toast } from 'sonner';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -12,11 +16,24 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Icons } from '@/components/icons';
-import { formatDate } from '@/lib/format';
+import { formatDate, formatRupiah } from '@/lib/format';
+import { checkoutBillingPlan } from '../api/service';
+import { publicPlansQueryOptions } from '../api/queries';
+import type { ActivePlan, BillingCycle } from '../api/types';
 import { useActivePlan } from './active-plan-provider';
+import { BillingHistoryTab } from './billing-history-tab';
 
 const quotaItems = [
   { key: 'bots', label: 'Bots', description: 'Jumlah bot Telegram yang masih bisa dikelola.' },
@@ -42,14 +59,77 @@ const featureItems = [
   { key: 'allow_high_priority', label: 'High Priority Queue' }
 ] as const;
 
-function formatBillingCycle(cycle: string) {
+function formatBillingCycle(cycle?: BillingCycle) {
   if (cycle === 'monthly') return 'Bulanan';
   if (cycle === 'yearly') return 'Tahunan';
-  return cycle;
+  return '-';
 }
 
+function formatStatus(status?: string) {
+  if (!status) return '-';
+  if (status === 'active') return 'Aktif';
+  if (status === 'pending') return 'Menunggu Pembayaran';
+  if (status === 'expired') return 'Expired';
+  return status;
+}
+
+function formatPlanPrice(plan: ActivePlan, billingCycle: BillingCycle) {
+  const rawPrice = billingCycle === 'yearly' ? plan.price_yearly : plan.price_monthly;
+  const price = Number(rawPrice ?? 0);
+  return Number.isFinite(price) ? formatRupiah(price) : '-';
+}
+
+function formatQuotaLimit(limit: number) {
+  return limit === -1 ? 'Unlimited' : limit.toLocaleString('id-ID');
+}
+
+type BillingPageTab = 'billing' | 'upgrade' | 'history';
+
 export function ActivePlanPage() {
+  const [billingCycle, setBillingCycle] = useState<BillingCycle>('monthly');
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
+  const [tab, setTab] = useQueryState(
+    'tab',
+    parseAsString.withDefault('billing').withOptions({ shallow: false, history: 'replace' })
+  );
   const { billing, plan, usage, isLoading, canUseFeature, getQuota } = useActivePlan();
+  const publicPlansQuery = useQuery(publicPlansQueryOptions());
+
+  const publicPlans = (publicPlansQuery.data?.success ? publicPlansQuery.data.data : []).filter(
+    (item) => item.is_active ?? true
+  );
+  const selectedPlan = useMemo(
+    () => publicPlans.find((item) => item.id === selectedPlanId) ?? null,
+    [publicPlans, selectedPlanId]
+  );
+
+  const checkoutMutation = useMutation({
+    mutationFn: checkoutBillingPlan,
+    onSuccess: (response) => {
+      if (response.success && response.data?.payment_url) {
+        window.location.assign(response.data.payment_url);
+        return;
+      }
+
+      toast.error(response.message || 'Gagal memulai checkout plan.');
+    },
+    onError: () => toast.error('Gagal memulai checkout plan.')
+  });
+
+  const handleCheckout = (planId: string) => {
+    checkoutMutation.mutate({
+      plan_id: planId,
+      billing_cycle: billingCycle
+    });
+  };
+
+  const isCurrentBillingCycle = billing?.billing_cycle === billingCycle;
+
+  const openCheckoutDialog = (planId: string) => {
+    setSelectedPlanId(planId);
+    setConfirmOpen(true);
+  };
 
   if (isLoading) {
     return (
@@ -68,133 +148,404 @@ export function ActivePlanPage() {
     );
   }
 
-  if (!billing || !plan || !usage) {
-    return (
-      <Alert>
-        <Icons.warning />
-        <AlertTitle>Plan aktif belum tersedia</AlertTitle>
-        <AlertDescription>
-          Data billing tenant belum bisa ditampilkan sekarang. Coba lagi beberapa saat.
-        </AlertDescription>
-      </Alert>
-    );
-  }
-
   return (
-    <div className='space-y-6'>
-      <div className='grid gap-4 lg:grid-cols-[1.4fr_1fr]'>
-        <Card>
-          <CardHeader>
-            <div className='flex flex-wrap items-center gap-3'>
-              <CardTitle>Plan Tenant Aktif</CardTitle>
-              <Badge variant='secondary'>{plan.display_name}</Badge>
-              <Badge variant='outline'>{formatBillingCycle(billing.billing_cycle)}</Badge>
-            </div>
-            <CardDescription>
-              Ringkasan paket aktif tenant beserta masa berlaku dan fitur yang tersedia.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className='grid gap-4 md:grid-cols-2'>
-            <div className='rounded-lg border p-4'>
-              <p className='text-sm text-muted-foreground'>Status</p>
-              <p className='mt-1 text-lg font-semibold capitalize'>{billing.status}</p>
-            </div>
-            <div className='rounded-lg border p-4'>
-              <p className='text-sm text-muted-foreground'>Billing Cycle</p>
-              <p className='mt-1 text-lg font-semibold'>
-                {formatBillingCycle(billing.billing_cycle)}
-              </p>
-            </div>
-            <div className='rounded-lg border p-4'>
-              <p className='text-sm text-muted-foreground'>Mulai Aktif</p>
-              <p className='mt-1 text-lg font-semibold'>{formatDate(billing.started_at)}</p>
-            </div>
-            <div className='rounded-lg border p-4'>
-              <p className='text-sm text-muted-foreground'>Berakhir Pada</p>
-              <p className='mt-1 text-lg font-semibold'>{formatDate(billing.expired_at)}</p>
-            </div>
-          </CardContent>
-        </Card>
+    <Tabs
+      value={tab as BillingPageTab}
+      onValueChange={(value) => setTab(value)}
+      className='space-y-6'
+    >
+      <TabsList>
+        <TabsTrigger value='billing'>Billing Aktif</TabsTrigger>
+        <TabsTrigger value='upgrade'>Upgrade Plan</TabsTrigger>
+        <TabsTrigger value='history'>Riwayat Pembayaran</TabsTrigger>
+      </TabsList>
 
+      <TabsContent value='billing' className='space-y-6'>
+        {billing && plan ? (
+          <Card>
+            <CardHeader>
+              <div className='flex flex-wrap items-center gap-3'>
+                <CardTitle>Plan Tenant Aktif</CardTitle>
+                <Badge variant='secondary'>{plan.display_name}</Badge>
+                <Badge variant='outline'>{formatBillingCycle(billing.billing_cycle)}</Badge>
+              </div>
+              <CardDescription>
+                Ringkasan billing aktif tenant beserta masa berlaku, nominal, dan status pembayaran.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className='grid gap-4 md:grid-cols-2 xl:grid-cols-3'>
+              <div className='rounded-lg border p-4'>
+                <p className='text-sm text-muted-foreground'>Status</p>
+                <p className='mt-1 text-lg font-semibold'>{formatStatus(billing.status)}</p>
+              </div>
+              <div className='rounded-lg border p-4'>
+                <p className='text-sm text-muted-foreground'>Billing Cycle</p>
+                <p className='mt-1 text-lg font-semibold'>
+                  {formatBillingCycle(billing.billing_cycle)}
+                </p>
+              </div>
+              <div className='rounded-lg border p-4'>
+                <p className='text-sm text-muted-foreground'>Nominal Tagihan</p>
+                <p className='mt-1 text-lg font-semibold'>
+                  {billing.amount ? formatRupiah(Number(billing.amount)) : '-'}
+                </p>
+              </div>
+              <div className='rounded-lg border p-4'>
+                <p className='text-sm text-muted-foreground'>Mulai Aktif</p>
+                <p className='mt-1 text-lg font-semibold'>{formatDate(billing.started_at)}</p>
+              </div>
+              <div className='rounded-lg border p-4'>
+                <p className='text-sm text-muted-foreground'>Berakhir Pada</p>
+                <p className='mt-1 text-lg font-semibold'>{formatDate(billing.expired_at)}</p>
+              </div>
+              <div className='rounded-lg border p-4'>
+                <p className='text-sm text-muted-foreground'>Pembayaran Tercatat</p>
+                <p className='mt-1 text-lg font-semibold'>
+                  {billing.paid_at ? formatDate(billing.paid_at) : '-'}
+                </p>
+              </div>
+            </CardContent>
+            {billing.payment_url && billing.status !== 'active' && (
+              <CardFooter>
+                <Button asChild>
+                  <a href={billing.payment_url} target='_blank' rel='noreferrer'>
+                    <Icons.externalLink className='h-4 w-4' />
+                    Lanjutkan Pembayaran
+                  </a>
+                </Button>
+              </CardFooter>
+            )}
+          </Card>
+        ) : (
+          <Alert variant='warning'>
+            <Icons.warning />
+            <AlertTitle>Belum ada billing aktif</AlertTitle>
+            <AlertDescription>
+              Tenant ini belum memiliki langganan aktif. Buka tab upgrade untuk memilih plan.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        <div className='grid gap-4 xl:grid-cols-[1.2fr_1fr]'>
+          <Card>
+            <CardHeader>
+              <CardTitle>Quota Tersedia</CardTitle>
+              <CardDescription>
+                Detail penggunaan dan sisa kuota tenant untuk setiap resource utama.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className='grid gap-4 md:grid-cols-2'>
+              {usage && plan ? (
+                quotaItems.map((item) => {
+                  const quota = getQuota(item.key);
+                  if (!quota) return null;
+
+                  return (
+                    <div key={item.key} className='rounded-lg border p-4'>
+                      <div className='flex items-start justify-between gap-3'>
+                        <div>
+                          <h3 className='font-medium'>{item.label}</h3>
+                          <p className='mt-1 text-sm text-muted-foreground'>{item.description}</p>
+                        </div>
+                        <Badge variant={quota.hasQuota ? 'secondary' : 'destructive'}>
+                          {quota.isUnlimited ? 'Unlimited' : `${quota.remaining} tersisa`}
+                        </Badge>
+                      </div>
+                      <Separator className='my-4' />
+                      <div className='space-y-2 text-sm'>
+                        <div className='flex items-center justify-between'>
+                          <span className='text-muted-foreground'>Terpakai</span>
+                          <span className='font-medium tabular-nums'>{quota.used}</span>
+                        </div>
+                        <div className='flex items-center justify-between'>
+                          <span className='text-muted-foreground'>Limit</span>
+                          <span className='font-medium tabular-nums'>
+                            {quota.isUnlimited ? 'Unlimited' : quota.limit}
+                          </span>
+                        </div>
+                      </div>
+                      {!quota.isUnlimited && <Progress className='mt-4' value={quota.percentage} />}
+                    </div>
+                  );
+                })
+              ) : (
+                <Alert variant='warning' className='md:col-span-2'>
+                  <Icons.warning />
+                  <AlertTitle>Quota belum tersedia</AlertTitle>
+                  <AlertDescription>
+                    Data pemakaian quota akan tampil setelah tenant memiliki plan aktif.
+                  </AlertDescription>
+                </Alert>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Akses Fitur</CardTitle>
+              <CardDescription>
+                Status fitur khusus platform yang aktif atau masih terkunci di plan tenant saat ini.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className='space-y-3'>
+              {plan ? (
+                featureItems.map((feature) => (
+                  <div
+                    key={feature.key}
+                    className='flex items-center justify-between rounded-lg border p-3 text-sm'
+                  >
+                    <span className='font-medium'>{feature.label}</span>
+                    <Badge variant={canUseFeature(feature.key) ? 'secondary' : 'outline'}>
+                      {canUseFeature(feature.key) ? 'Aktif' : 'Terkunci'}
+                    </Badge>
+                  </div>
+                ))
+              ) : (
+                <Alert variant='warning'>
+                  <Icons.lock />
+                  <AlertTitle>Fitur premium belum aktif</AlertTitle>
+                  <AlertDescription>
+                    Pilih salah satu plan untuk mulai membuka fitur platform yang dibutuhkan.
+                  </AlertDescription>
+                </Alert>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </TabsContent>
+
+      <TabsContent value='upgrade'>
         <Card>
           <CardHeader>
             <CardTitle>Upgrade Plan</CardTitle>
             <CardDescription>
-              Saat kuota mulai penuh, upgrade plan supaya operasional tenant tetap jalan.
+              Pilih plan platform yang tersedia, review dulu detailnya, lalu lanjut ke checkout
+              billing tenant.
             </CardDescription>
           </CardHeader>
           <CardContent className='space-y-4'>
-            <div className='rounded-lg border bg-muted/30 p-4 text-sm text-muted-foreground'>
-              Upgrade bisa membantu menambah limit bot, member, package, command, dan broadcast.
+            <div className='flex flex-wrap items-center gap-2'>
+              <Button
+                type='button'
+                size='sm'
+                variant={billingCycle === 'monthly' ? 'default' : 'outline'}
+                onClick={() => setBillingCycle('monthly')}
+              >
+                Bulanan
+              </Button>
+              <Button
+                type='button'
+                size='sm'
+                variant={billingCycle === 'yearly' ? 'default' : 'outline'}
+                onClick={() => setBillingCycle('yearly')}
+              >
+                Tahunan
+              </Button>
             </div>
-            <div className='space-y-2'>
-              {featureItems.map((feature) => (
-                <div key={feature.key} className='flex items-center justify-between text-sm'>
-                  <span>{feature.label}</span>
-                  <Badge variant={canUseFeature(feature.key) ? 'secondary' : 'outline'}>
-                    {canUseFeature(feature.key) ? 'Aktif' : 'Belum aktif'}
-                  </Badge>
-                </div>
-              ))}
-            </div>
+
+            {publicPlansQuery.isLoading ? (
+              <div className='grid gap-4 md:grid-cols-2 xl:grid-cols-3'>
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <div key={index} className='rounded-xl border p-5'>
+                    <div className='bg-muted h-6 w-28 animate-pulse rounded' />
+                    <div className='bg-muted mt-3 h-8 w-36 animate-pulse rounded' />
+                    <div className='bg-muted mt-5 h-20 animate-pulse rounded' />
+                  </div>
+                ))}
+              </div>
+            ) : publicPlans.length > 0 ? (
+              <div className='grid gap-4 md:grid-cols-2 xl:grid-cols-3'>
+                {publicPlans.map((publicPlan) => {
+                  const isCurrentPlan =
+                    billing?.plan.id === publicPlan.id && billing?.status === 'active';
+                  const isCurrentPlanSameCycle = isCurrentPlan && isCurrentBillingCycle;
+
+                  return (
+                    <div key={publicPlan.id} className='rounded-xl border p-5'>
+                      <div className='flex items-start justify-between gap-3'>
+                        <div>
+                          <h3 className='text-lg font-semibold'>{publicPlan.display_name}</h3>
+                          <p className='mt-1 text-sm text-muted-foreground'>{publicPlan.name}</p>
+                        </div>
+                        {isCurrentPlan && <Badge variant='secondary'>Plan Aktif</Badge>}
+                      </div>
+
+                      <div className='mt-4'>
+                        <p className='text-2xl font-bold'>
+                          {formatPlanPrice(publicPlan, billingCycle)}
+                        </p>
+                        <p className='text-sm text-muted-foreground'>
+                          per {billingCycle === 'monthly' ? 'bulan' : 'tahun'}
+                        </p>
+                      </div>
+
+                      <Separator className='my-4' />
+
+                      <div className='space-y-2 text-sm'>
+                        <div className='flex items-center justify-between'>
+                          <span className='text-muted-foreground'>Bots</span>
+                          <span className='font-medium'>
+                            {formatQuotaLimit(publicPlan.max_bots)}
+                          </span>
+                        </div>
+                        <div className='flex items-center justify-between'>
+                          <span className='text-muted-foreground'>Groups</span>
+                          <span className='font-medium'>
+                            {formatQuotaLimit(publicPlan.max_groups)}
+                          </span>
+                        </div>
+                        <div className='flex items-center justify-between'>
+                          <span className='text-muted-foreground'>Packages</span>
+                          <span className='font-medium'>
+                            {formatQuotaLimit(publicPlan.max_packages)}
+                          </span>
+                        </div>
+                        <div className='flex items-center justify-between'>
+                          <span className='text-muted-foreground'>Members</span>
+                          <span className='font-medium'>
+                            {formatQuotaLimit(publicPlan.max_members)}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className='mt-4 flex flex-wrap gap-2'>
+                        <Badge variant={publicPlan.allow_discount_system ? 'secondary' : 'outline'}>
+                          Discount
+                        </Badge>
+                        <Badge variant={publicPlan.allow_media_broadcast ? 'secondary' : 'outline'}>
+                          Media Broadcast
+                        </Badge>
+                        <Badge variant={publicPlan.allow_reports_export ? 'secondary' : 'outline'}>
+                          Reports
+                        </Badge>
+                      </div>
+
+                      <Button
+                        type='button'
+                        className='mt-5 w-full'
+                        disabled={isCurrentPlanSameCycle}
+                        onClick={() => openCheckoutDialog(publicPlan.id)}
+                      >
+                        {isCurrentPlanSameCycle ? 'Sedang Aktif' : 'Pilih Plan Ini'}
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <Alert variant='warning'>
+                <Icons.warning />
+                <AlertTitle>Daftar plan belum tersedia</AlertTitle>
+                <AlertDescription>
+                  Endpoint public plans belum mengembalikan data. Untuk sementara, upgrade masih
+                  bisa dilanjutkan lewat support.
+                </AlertDescription>
+              </Alert>
+            )}
           </CardContent>
-          <CardFooter className='flex flex-col items-stretch gap-2'>
-            <Button asChild>
-              <Link href='https://t.me/UrationSupportBot' target='_blank' rel='noreferrer'>
-                <Icons.telegram className='h-4 w-4' />
-                Upgrade Plan
-              </Link>
-            </Button>
-            <p className='text-xs text-muted-foreground'>
-              Tombol ini membuka support Telegram yang sudah dipakai di project untuk proses
-              upgrade.
-            </p>
-          </CardFooter>
+          {publicPlans.length === 0 && (
+            <CardFooter>
+              <Button asChild>
+                <Link href='https://t.me/UrationSupportBot' target='_blank' rel='noreferrer'>
+                  <Icons.telegram className='h-4 w-4' />
+                  Hubungi Support
+                </Link>
+              </Button>
+            </CardFooter>
+          )}
         </Card>
-      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Quota Tersedia</CardTitle>
-          <CardDescription>
-            Detail penggunaan dan sisa kuota tenant untuk setiap resource utama.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className='grid gap-4 md:grid-cols-2 xl:grid-cols-3'>
-          {quotaItems.map((item) => {
-            const quota = getQuota(item.key);
-            if (!quota) return null;
+        <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Konfirmasi upgrade plan</DialogTitle>
+              <DialogDescription>
+                Review singkat pilihan plan sebelum lanjut ke Midtrans.
+              </DialogDescription>
+            </DialogHeader>
 
-            return (
-              <div key={item.key} className='rounded-lg border p-4'>
-                <div className='flex items-start justify-between gap-3'>
-                  <div>
-                    <h3 className='font-medium'>{item.label}</h3>
-                    <p className='mt-1 text-sm text-muted-foreground'>{item.description}</p>
+            {selectedPlan && (
+              <div className='space-y-4'>
+                <div className='rounded-lg border p-4'>
+                  <div className='flex flex-wrap items-center gap-2'>
+                    <span className='font-semibold'>{selectedPlan.display_name}</span>
+                    <Badge variant='secondary'>{formatBillingCycle(billingCycle)}</Badge>
+                    <Badge variant='outline'>{formatPlanPrice(selectedPlan, billingCycle)}</Badge>
                   </div>
-                  <Badge variant={quota.hasQuota ? 'secondary' : 'destructive'}>
-                    {quota.isUnlimited ? 'Unlimited' : `${quota.remaining} tersisa`}
-                  </Badge>
+                  {billing?.plan.id === selectedPlan.id && billing?.status === 'active' && (
+                    <p className='mt-2 text-sm text-muted-foreground'>
+                      {isCurrentBillingCycle
+                        ? 'Plan ini sudah aktif pada billing cycle yang sama.'
+                        : 'Anda sedang memilih plan yang sama dengan billing cycle berbeda.'}
+                    </p>
+                  )}
                 </div>
-                <Separator className='my-4' />
-                <div className='space-y-2 text-sm'>
-                  <div className='flex items-center justify-between'>
-                    <span className='text-muted-foreground'>Terpakai</span>
-                    <span className='font-medium tabular-nums'>{quota.used}</span>
+
+                <div className='grid gap-3 sm:grid-cols-2'>
+                  <div className='flex items-center justify-between rounded-lg border p-3 text-sm'>
+                    <span className='text-muted-foreground'>Bots</span>
+                    <span className='font-medium'>{formatQuotaLimit(selectedPlan.max_bots)}</span>
                   </div>
-                  <div className='flex items-center justify-between'>
-                    <span className='text-muted-foreground'>Limit</span>
-                    <span className='font-medium tabular-nums'>
-                      {quota.isUnlimited ? 'Unlimited' : quota.limit}
+                  <div className='flex items-center justify-between rounded-lg border p-3 text-sm'>
+                    <span className='text-muted-foreground'>Groups</span>
+                    <span className='font-medium'>{formatQuotaLimit(selectedPlan.max_groups)}</span>
+                  </div>
+                  <div className='flex items-center justify-between rounded-lg border p-3 text-sm'>
+                    <span className='text-muted-foreground'>Packages</span>
+                    <span className='font-medium'>
+                      {formatQuotaLimit(selectedPlan.max_packages)}
+                    </span>
+                  </div>
+                  <div className='flex items-center justify-between rounded-lg border p-3 text-sm'>
+                    <span className='text-muted-foreground'>Members</span>
+                    <span className='font-medium'>
+                      {formatQuotaLimit(selectedPlan.max_members)}
                     </span>
                   </div>
                 </div>
-                {!quota.isUnlimited && <Progress className='mt-4' value={quota.percentage} />}
               </div>
-            );
-          })}
-        </CardContent>
-      </Card>
-    </div>
+            )}
+
+            <DialogFooter>
+              <Button type='button' variant='outline' onClick={() => setConfirmOpen(false)}>
+                Batal
+              </Button>
+              <Button
+                type='button'
+                isLoading={checkoutMutation.isPending}
+                disabled={
+                  !selectedPlan ||
+                  (billing?.plan.id === selectedPlan.id &&
+                    billing?.status === 'active' &&
+                    isCurrentBillingCycle)
+                }
+                onClick={() => selectedPlan && handleCheckout(selectedPlan.id)}
+              >
+                {selectedPlan &&
+                billing?.plan.id === selectedPlan.id &&
+                billing?.status === 'active' &&
+                isCurrentBillingCycle
+                  ? 'Plan Ini Sudah Aktif'
+                  : 'Lanjut ke Pembayaran'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </TabsContent>
+
+      <TabsContent value='history'>
+        <Card>
+          <CardHeader>
+            <CardTitle>Riwayat Pembayaran</CardTitle>
+            <CardDescription>
+              Daftar transaksi billing tenant, termasuk kuitansi dan pembayaran yang masih pending.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <BillingHistoryTab />
+          </CardContent>
+        </Card>
+      </TabsContent>
+    </Tabs>
   );
 }

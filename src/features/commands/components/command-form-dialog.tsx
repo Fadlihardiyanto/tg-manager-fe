@@ -448,7 +448,7 @@ export function CommandFormDialog({ command, open, onOpenChange }: CommandFormDi
             </div>
 
             {!canCreateCommand && (
-              <Alert variant='destructive'>
+              <Alert variant='warning'>
                 <Icons.warning />
                 <AlertTitle>Quota custom command penuh</AlertTitle>
                 <AlertDescription>

@@ -45,10 +45,10 @@ export function BotListingContent() {
         </Button>
       </div>
 
-      <QuotaCard resource='bots' title='Bot quota' />
+      <QuotaCard resource='bots' title='Bot quota' className='mt-4' />
 
       {!canCreateBot && (
-        <Alert>
+        <Alert variant='warning' className='mt-4'>
           <Icons.warning />
           <AlertTitle>Quota bot penuh</AlertTitle>
           <AlertDescription>

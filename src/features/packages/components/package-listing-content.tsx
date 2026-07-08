@@ -62,10 +62,10 @@ export function PackageListingContent() {
         </Button>
       </div>
 
-      <QuotaCard resource='packages' title='Package quota' />
+      <QuotaCard resource='packages' title='Package quota' className='mt-4' />
 
       {!canCreatePackage && (
-        <Alert>
+        <Alert variant='warning' className='mt-4'>
           <Icons.warning />
           <AlertTitle>Quota package penuh</AlertTitle>
           <AlertDescription>
