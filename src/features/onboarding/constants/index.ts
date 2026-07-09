@@ -26,7 +26,7 @@ export const ONBOARDING_STEPS = [
   },
   {
     id: 3,
-    title: 'Payment Gateway',
+    title: 'Gateway Pembayaran',
     description: 'Set up Midtrans to accept community payments',
     icon: 'creditCard'
   },

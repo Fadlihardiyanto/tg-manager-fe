@@ -130,7 +130,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       }
       toast.error(res.message);
     } catch {
-      toast.error('Failed to kick member');
+      toast.error('Gagal mengeluarkan member');
     }
   };
 
@@ -151,7 +151,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       }
       toast.error(res.message);
     } catch {
-      toast.error('Failed to resend link');
+      toast.error('Gagal mengirim ulang tautan');
     }
   };
 
@@ -175,7 +175,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       }
       toast.error(res.errors?.[0] || res.message);
     } catch {
-      toast.error('Failed to extend access');
+      toast.error('Gagal memperpanjang akses');
     }
   };
 
@@ -193,7 +193,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Kick Member</DialogTitle>
+            <DialogTitle>Keluarkan Member</DialogTitle>
             <DialogDescription>
               Pilih apakah {data.first_name} {data.last_name} akan dikeluarkan dari semua package
               atau hanya salah satu package aktif.
@@ -202,7 +202,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
 
           <div className='space-y-4 py-4'>
             <div className='space-y-3'>
-              <Label>Tipe Kick</Label>
+              <Label>Mode Pengeluaran</Label>
               <RadioGroup
                 value={kickMode}
                 onValueChange={(value) => setKickMode(value as 'all' | 'single')}
@@ -217,7 +217,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
                 >
                   <RadioGroupItem value='all' id={`kick-all-${data.id}`} className='mt-0.5' />
                   <div className='space-y-1'>
-                    <p className='text-sm font-medium'>Kick semua package</p>
+                    <p className='text-sm font-medium'>Keluarkan dari semua paket</p>
                     <p className='text-xs text-muted-foreground'>
                       Member akan dikeluarkan dari seluruh akses yang aktif.
                     </p>
@@ -232,7 +232,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
                 >
                   <RadioGroupItem value='single' id={`kick-single-${data.id}`} className='mt-0.5' />
                   <div className='space-y-1'>
-                    <p className='text-sm font-medium'>Kick satu package</p>
+                    <p className='text-sm font-medium'>Keluarkan dari satu paket</p>
                     <p className='text-xs text-muted-foreground'>
                       Pilih satu package aktif yang ingin dihentikan aksesnya.
                     </p>
@@ -243,7 +243,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
 
             {kickMode === 'single' && (
               <div className='space-y-2'>
-                <Label htmlFor={`kick-subscription-${data.id}`}>Package</Label>
+                <Label htmlFor={`kick-subscription-${data.id}`}>Paket</Label>
                 <Select
                   value={kickSubscriptionId}
                   onValueChange={setKickSubscriptionId}
@@ -251,9 +251,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
                 >
                   <SelectTrigger id={`kick-subscription-${data.id}`} className='w-full'>
                     <SelectValue
-                      placeholder={
-                        isMemberDetailLoading ? 'Loading packages...' : 'Pilih package aktif'
-                      }
+                      placeholder={isMemberDetailLoading ? 'Memuat paket...' : 'Pilih paket aktif'}
                     />
                   </SelectTrigger>
                   <SelectContent>
@@ -272,7 +270,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
                 </Select>
                 {!isMemberDetailLoading && kickableSubscriptions.length === 0 && (
                   <p className='text-sm text-muted-foreground'>
-                    Member ini tidak punya package aktif yang bisa di-kick satuan.
+                    Member ini tidak punya paket aktif yang bisa dikeluarkan satuan.
                   </p>
                 )}
               </div>
@@ -281,7 +279,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
 
           <DialogFooter>
             <Button variant='outline' onClick={() => setIsKickOpen(false)}>
-              Cancel
+              Batal
             </Button>
             <Button
               variant='destructive'
@@ -289,7 +287,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
               disabled={kickMode === 'single' && !kickSubscriptionId}
               onClick={handleKick}
             >
-              Kick Member
+              Keluarkan Member
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -307,7 +305,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Resend Link</DialogTitle>
+            <DialogTitle>Kirim Ulang Tautan</DialogTitle>
             <DialogDescription>
               Pilih apakah link undangan untuk {data.first_name} {data.last_name} akan dikirim ulang
               ke semua package aktif atau hanya satu package aktif.
@@ -316,7 +314,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
 
           <div className='space-y-4 py-4'>
             <div className='space-y-3'>
-              <Label>Tipe Resend</Label>
+              <Label>Mode Pengiriman Ulang</Label>
               <RadioGroup
                 value={resendMode}
                 onValueChange={(value) => setResendMode(value as 'all' | 'single')}
@@ -331,7 +329,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
                 >
                   <RadioGroupItem value='all' id={`resend-all-${data.id}`} className='mt-0.5' />
                   <div className='space-y-1'>
-                    <p className='text-sm font-medium'>Kirim ke semua package</p>
+                    <p className='text-sm font-medium'>Kirim ke semua paket</p>
                     <p className='text-xs text-muted-foreground'>
                       Semua link undangan aktif untuk member ini akan dikirim ulang.
                     </p>
@@ -350,7 +348,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
                     className='mt-0.5'
                   />
                   <div className='space-y-1'>
-                    <p className='text-sm font-medium'>Kirim ke satu package</p>
+                    <p className='text-sm font-medium'>Kirim ke satu paket</p>
                     <p className='text-xs text-muted-foreground'>
                       Pilih satu package aktif yang ingin dikirim ulang link undangannya.
                     </p>
@@ -361,7 +359,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
 
             {resendMode === 'single' && (
               <div className='space-y-2'>
-                <Label htmlFor={`resend-subscription-${data.id}`}>Package</Label>
+                <Label htmlFor={`resend-subscription-${data.id}`}>Paket</Label>
                 <Select
                   value={resendSubscriptionId}
                   onValueChange={setResendSubscriptionId}
@@ -369,9 +367,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
                 >
                   <SelectTrigger id={`resend-subscription-${data.id}`} className='w-full'>
                     <SelectValue
-                      placeholder={
-                        isMemberDetailLoading ? 'Loading packages...' : 'Pilih package aktif'
-                      }
+                      placeholder={isMemberDetailLoading ? 'Memuat paket...' : 'Pilih paket aktif'}
                     />
                   </SelectTrigger>
                   <SelectContent>
@@ -390,7 +386,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
                 </Select>
                 {!isMemberDetailLoading && kickableSubscriptions.length === 0 && (
                   <p className='text-sm text-muted-foreground'>
-                    Member ini tidak punya package aktif yang bisa dikirimi ulang link.
+                    Member ini tidak punya paket aktif yang bisa dikirimi ulang tautan.
                   </p>
                 )}
               </div>
@@ -399,14 +395,14 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
 
           <DialogFooter>
             <Button variant='outline' onClick={() => setIsResendOpen(false)}>
-              Cancel
+              Batal
             </Button>
             <Button
               isLoading={resendMut.isPending}
               disabled={resendMode === 'single' && !resendSubscriptionId}
               onClick={handleResend}
             >
-              Resend Link
+              Kirim Ulang Tautan
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -424,7 +420,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Extend Access</DialogTitle>
+            <DialogTitle>Perpanjang Akses</DialogTitle>
             <DialogDescription>
               Pilih subscription yang mau diperpanjang untuk {data.first_name} {data.last_name},
               lalu isi tambahan durasi dalam hari.
@@ -433,7 +429,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
 
           <div className='space-y-4 py-4'>
             <div className='space-y-2'>
-              <Label htmlFor={`extend-subscription-${data.id}`}>Subscription</Label>
+              <Label htmlFor={`extend-subscription-${data.id}`}>Langganan</Label>
               <Select
                 value={selectedSubscriptionId}
                 onValueChange={setSelectedSubscriptionId}
@@ -441,9 +437,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
               >
                 <SelectTrigger id={`extend-subscription-${data.id}`} className='w-full'>
                   <SelectValue
-                    placeholder={
-                      isMemberDetailLoading ? 'Loading subscriptions...' : 'Pilih subscription'
-                    }
+                    placeholder={isMemberDetailLoading ? 'Memuat langganan...' : 'Pilih langganan'}
                   />
                 </SelectTrigger>
                 <SelectContent>
@@ -463,7 +457,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
             </div>
 
             <div className='space-y-2'>
-              <Label htmlFor={`extend-days-${data.id}`}>Additional Days</Label>
+              <Label htmlFor={`extend-days-${data.id}`}>Hari Tambahan</Label>
               <Input
                 id={`extend-days-${data.id}`}
                 type='number'
@@ -477,7 +471,10 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
 
             {selectedSubscription && (
               <p className='text-sm text-muted-foreground'>
-                {selectedSubscription.status === 'cancelled' ? 'Kicked at' : 'Current expiry'}:{' '}
+                {selectedSubscription.status === 'cancelled'
+                  ? 'Dikeluarkan pada'
+                  : 'Kedaluwarsa pada'}
+                :{' '}
                 {format(
                   new Date(getSubscriptionReferenceDate(selectedSubscription) as string),
                   'PP'
@@ -494,14 +491,14 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
 
           <DialogFooter>
             <Button variant='outline' onClick={() => setIsExtendOpen(false)}>
-              Cancel
+              Batal
             </Button>
             <Button
               isLoading={extendMut.isPending}
               disabled={!selectedSubscriptionId || !isAdditionalDaysValid}
               onClick={handleExtendConfirm}
             >
-              Confirm
+              Konfirmasi
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -510,37 +507,37 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant='ghost' className='size-8 p-0'>
-            <span className='sr-only'>Open menu</span>
+            <span className='sr-only'>Buka menu</span>
             <Icons.moreHorizontal />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end'>
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuLabel>Aksi</DropdownMenuLabel>
           <DropdownMenuItem onClick={() => setTimeout(() => setMemberId(data.id), 150)}>
-            <Icons.eye /> View Details
+            <Icons.eye /> Lihat Detail
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setTimeout(() => setIsExtendOpen(true), 150)}>
-            <Icons.calendar /> Extend Access
+            <Icons.calendar /> Perpanjang Akses
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => {
               toast.promise(syncMut.mutateAsync(data.id), {
-                loading: 'Syncing...',
+                loading: 'Sedang sinkron...',
                 success: (res) => res.message,
-                error: 'Failed to sync'
+                error: 'Gagal sinkron'
               });
             }}
           >
-            <Icons.settings /> Manual Sync
+            <Icons.settings /> Sinkron Manual
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setTimeout(() => setIsResendOpen(true), 150)}>
-            <Icons.send /> Resend Link
+            <Icons.send /> Kirim Ulang Tautan
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => setTimeout(() => setIsKickOpen(true), 150)}
             className='text-destructive focus:text-destructive'
           >
-            <Icons.trash /> Kick Member
+            <Icons.trash /> Keluarkan Member
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

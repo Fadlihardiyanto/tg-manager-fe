@@ -48,14 +48,14 @@ const broadcastFormSchema = z.object({
 type BroadcastFormValues = z.infer<typeof broadcastFormSchema>;
 
 const TARGET_OPTIONS = [
-  { value: 'group', label: 'Group (semua grup aktif)' },
+  { value: 'group', label: 'Grup (semua grup aktif)' },
   { value: 'member', label: 'Member (semua chat DM member)' }
 ];
 
 const TYPE_OPTIONS = [
-  { value: 'text', label: 'Text' },
-  { value: 'photo', label: 'Photo' },
-  { value: 'document', label: 'Document' }
+  { value: 'text', label: 'Teks' },
+  { value: 'photo', label: 'Foto' },
+  { value: 'document', label: 'Dokumen' }
 ];
 
 interface BroadcastFormDialogProps {
@@ -105,12 +105,12 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
     },
     onSubmit: async ({ value }) => {
       if (!hasQuota('broadcasts')) {
-        toast.error('Quota broadcast penuh. Upgrade plan untuk membuat broadcast baru.');
+        toast.error('Kuota siaran penuh. Tingkatkan paket untuk membuat siaran baru.');
         return;
       }
 
       if (!canUseFeature('allow_media_broadcast') && value.message_type !== 'text') {
-        toast.error('Plan aktif Anda hanya mengizinkan text broadcast.');
+        toast.error('Paket aktif Anda hanya mengizinkan siaran teks.');
         return;
       }
 
@@ -140,7 +140,7 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
           });
 
           if (!presignRes.success || !presignRes.data) {
-            toast.error(presignRes.message || 'Gagal mendapatkan link upload');
+            toast.error(presignRes.message || 'Gagal mendapatkan tautan unggah');
             return;
           }
 
@@ -239,7 +239,7 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
       >
         <DialogContent className='sm:max-w-[560px] max-h-[85vh] overflow-y-auto'>
           <DialogHeader>
-            <DialogTitle>Buat Broadcast Baru</DialogTitle>
+            <DialogTitle>Buat Siaran Baru</DialogTitle>
             <DialogDescription>Kirim pesan massal ke seluruh grup atau member.</DialogDescription>
           </DialogHeader>
 
@@ -247,10 +247,10 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
             <form.Form id='broadcast-form' className='space-y-4'>
               <FormSelectField
                 name='target_type'
-                label='Target Pengiriman'
+                label='Tujuan Pengiriman'
                 required
                 options={TARGET_OPTIONS}
-                placeholder='Pilih target'
+                placeholder='Pilih tujuan'
                 validators={{
                   onBlur: z.string().min(1, 'Pilih target')
                 }}
@@ -272,7 +272,7 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
                   <Icons.lock />
                   <AlertTitle>Media broadcast belum tersedia</AlertTitle>
                   <AlertDescription>
-                    Plan aktif Anda hanya mengizinkan text broadcast.
+                    Paket aktif Anda hanya mengizinkan siaran teks.
                   </AlertDescription>
                 </Alert>
               )}
@@ -292,7 +292,7 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
                     type='button'
                     className='hover:bg-muted rounded px-2 py-1 text-sm font-bold'
                     onClick={() => handleFormat('b')}
-                    title='Bold'
+                    title='Tebal'
                   >
                     <Icons.bold className='size-4' />
                   </button>
@@ -300,7 +300,7 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
                     type='button'
                     className='hover:bg-muted rounded px-2 py-1 text-sm italic'
                     onClick={() => handleFormat('i')}
-                    title='Italic'
+                    title='Miring'
                   >
                     <Icons.italic className='size-4' />
                   </button>
@@ -308,7 +308,7 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
                     type='button'
                     className='hover:bg-muted rounded px-2 py-1 text-sm underline'
                     onClick={() => handleFormat('u')}
-                    title='Underline'
+                    title='Garis Bawah'
                   >
                     <Icons.underline className='size-4' />
                   </button>
@@ -326,7 +326,7 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
                             end: el.selectionEnd
                           });
                         }}
-                        title='Link'
+                        title='Tautan'
                       >
                         <Icons.link className='size-4' />
                       </button>
@@ -375,7 +375,7 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
                     type='button'
                     className='hover:bg-muted rounded px-2 py-1 text-sm'
                     onClick={() => handleFormat('code')}
-                    title='Code'
+                    title='Kode'
                   >
                     <Icons.code className='size-4' />
                   </button>
@@ -383,7 +383,7 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
                     type='button'
                     className='hover:bg-muted rounded px-2 py-1 text-sm'
                     onClick={() => handleFormat('s')}
-                    title='Strikethrough'
+                    title='Coret'
                   >
                     <Icons.slash className='size-4' />
                   </button>
@@ -392,12 +392,12 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
                 <FormTextareaField
                   name='message_text'
                   label={
-                    messageType === 'photo' || messageType === 'document' ? 'Caption' : 'Isi Pesan'
+                    messageType === 'photo' || messageType === 'document'
+                      ? 'Keterangan'
+                      : 'Isi Pesan'
                   }
                   required
-                  placeholder={
-                    messageType === 'text' ? 'Tulis pesan broadcast...' : 'Tulis caption...'
-                  }
+                  placeholder={messageType === 'text' ? 'Tulis siaran...' : 'Tulis keterangan...'}
                   className='min-h-[120px]'
                   validators={{
                     onBlur: z.string().min(1, 'Isi pesan wajib diisi')
@@ -442,9 +442,9 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
               {!canCreateBroadcast && (
                 <Alert variant='warning'>
                   <Icons.warning />
-                  <AlertTitle>Quota broadcast penuh</AlertTitle>
+                  <AlertTitle>Kuota siaran penuh</AlertTitle>
                   <AlertDescription>
-                    Upgrade plan Anda untuk membuat broadcast baru.
+                    Tingkatkan paket Anda untuk membuat siaran baru.
                   </AlertDescription>
                 </Alert>
               )}
@@ -469,7 +469,7 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
               disabled={!canCreateBroadcast}
             >
               <Icons.send className='mr-2 h-4 w-4' />
-              {isPending ? 'Mengirim...' : 'Kirim Broadcast'}
+              {isPending ? 'Mengirim...' : 'Kirim Siaran'}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -478,9 +478,9 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
       <AlertDialog open={showQuotaAlert} onOpenChange={setShowQuotaAlert}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Kuota Broadcast Penuh</AlertDialogTitle>
+            <AlertDialogTitle>Kuota Siaran Penuh</AlertDialogTitle>
             <AlertDialogDescription>
-              Kuota broadcast bulanan Anda sudah habis. Silakan upgrade paket platform untuk
+              Kuota siaran bulanan Anda sudah habis. Silakan tingkatkan paket platform untuk
               mendapatkan kuota lebih besar.
             </AlertDialogDescription>
           </AlertDialogHeader>

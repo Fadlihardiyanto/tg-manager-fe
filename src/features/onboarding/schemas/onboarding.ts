@@ -4,16 +4,13 @@ import { z } from 'zod';
 export const businessProfileSchema = z.object({
   businessName: z
     .string()
-    .min(2, 'Business name must be at least 2 characters')
-    .max(100, 'Business name must be at most 100 characters'),
+    .min(2, 'Nama bisnis harus minimal 2 karakter')
+    .max(100, 'Nama bisnis harus maksimal 100 karakter'),
   businessSlug: z
     .string()
-    .min(3, 'Slug must be at least 3 characters')
-    .regex(
-      /^[a-z0-9-]+$/,
-      'Slug can only contain lowercase letters, numbers, and hyphens'
-    ),
-  category: z.string().min(1, 'Please select a community category')
+    .min(3, 'Slug harus minimal 3 karakter')
+    .regex(/^[a-z0-9-]+$/, 'Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung'),
+  category: z.string().min(1, 'Silakan pilih kategori komunitas')
 });
 
 export type BusinessProfileValues = z.infer<typeof businessProfileSchema>;
@@ -22,10 +19,10 @@ export type BusinessProfileValues = z.infer<typeof businessProfileSchema>;
 export const telegramBotSchema = z.object({
   botToken: z
     .string()
-    .min(1, 'Bot token is required')
+    .min(1, 'Token bot wajib diisi')
     .regex(
       /^\d+:[A-Za-z0-9_-]{35,}$/,
-      'Invalid bot token format (e.g., 123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11)'
+      'Format token bot tidak valid (mis. 123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11)'
     )
 });
 
@@ -42,7 +39,7 @@ export const paymentGatewaySchema = z.object({
   productionServerKey: z.string().optional()
 });
 
-export const requiredKeySchema = z.string().min(1, 'This field is required');
+export const requiredKeySchema = z.string().min(1, 'Kolom ini wajib diisi');
 
 export type PaymentGatewayValues = z.infer<typeof paymentGatewaySchema>;
 

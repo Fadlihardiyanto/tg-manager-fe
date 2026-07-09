@@ -21,11 +21,13 @@ interface MemberDetailProps {
 function getSubscriptionDateText(sub: Subscription) {
   if (sub.status === 'cancelled') {
     return sub.kicked_at
-      ? `Kicked at ${format(new Date(sub.kicked_at), 'dd MMMM yyyy')}`
-      : 'Kicked';
+      ? `Dikeluarkan pada ${format(new Date(sub.kicked_at), 'dd MMMM yyyy')}`
+      : 'Dikeluarkan';
   }
 
-  return sub.expired_at ? `Expired at ${format(new Date(sub.expired_at), 'dd MMMM yyyy')}` : '-';
+  return sub.expired_at
+    ? `Kedaluwarsa pada ${format(new Date(sub.expired_at), 'dd MMMM yyyy')}`
+    : '-';
 }
 
 export function MemberDetail({ memberId }: MemberDetailProps) {
@@ -44,7 +46,7 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
     return (
       <div className='flex flex-1 flex-col items-center justify-center h-full p-6 text-muted-foreground'>
         <Icons.user className='size-12 mb-4 opacity-20' />
-        <p>Member not found</p>
+        <p>Member tidak ditemukan</p>
       </div>
     );
   }
@@ -83,7 +85,7 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
               'text-muted-foreground hover:text-foreground'
             )}
           >
-            Overview
+            Ikhtisar
           </TabsTrigger>
           <TabsTrigger
             value='groups'
@@ -92,7 +94,7 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
               'text-muted-foreground hover:text-foreground'
             )}
           >
-            Active Groups
+            Grup Aktif
           </TabsTrigger>
           <TabsTrigger
             value='history'
@@ -101,7 +103,7 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
               'text-muted-foreground hover:text-foreground'
             )}
           >
-            History
+            Riwayat
           </TabsTrigger>
         </TabsList>
       </div>
@@ -111,7 +113,7 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
           <div className='flex flex-col gap-6'>
             <section>
               <h3 className='text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-4'>
-                Member Information
+                Informasi Member
               </h3>
               <div className='grid grid-cols-2 gap-4'>
                 <Card>
@@ -124,7 +126,9 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
                 </Card>
                 <Card>
                   <CardContent className='p-4'>
-                    <p className='text-[11px] font-medium text-muted-foreground mb-1'>Join Date</p>
+                    <p className='text-[11px] font-medium text-muted-foreground mb-1'>
+                      Tanggal Bergabung
+                    </p>
                     <p className='text-sm font-bold text-foreground'>
                       {member.created_at
                         ? format(new Date(member.created_at), 'dd MMM, yyyy')
@@ -135,14 +139,14 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
                 <Card>
                   <CardContent className='p-4'>
                     <p className='text-[11px] font-medium text-muted-foreground mb-1'>
-                      Total Orders
+                      Total Pesanan
                     </p>
                     <p className='text-sm font-bold text-primary'>{member.total_orders}</p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardContent className='p-4'>
-                    <p className='text-[11px] font-medium text-muted-foreground mb-1'>Phone</p>
+                    <p className='text-[11px] font-medium text-muted-foreground mb-1'>Telepon</p>
                     <p className='text-sm font-bold text-foreground'>{member.phone || '-'}</p>
                   </CardContent>
                 </Card>
@@ -153,7 +157,7 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
 
             <section>
               <h3 className='text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-4'>
-                Current Subscriptions
+                Langganan Aktif
               </h3>
               <div className='flex flex-col gap-3'>
                 {activeSubs.length > 0 ? (
@@ -173,12 +177,12 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
                           </p>
                         </div>
                       </div>
-                      <span className='text-sm font-bold text-foreground'>Active</span>
+                      <span className='text-sm font-bold text-foreground'>Aktif</span>
                     </div>
                   ))
                 ) : (
                   <div className='text-center p-4 border border-dashed rounded-xl text-muted-foreground text-sm'>
-                    No active subscriptions
+                    Belum ada langganan aktif
                   </div>
                 )}
               </div>
@@ -186,10 +190,10 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
 
             <Alert>
               <Icons.warning className='size-4' />
-              <AlertTitle>Risk Analysis</AlertTitle>
+              <AlertTitle>Analisis Risiko</AlertTitle>
               <AlertDescription>
-                This user has reported {member.total_orders} billing issues in the last 6 months.
-                High engagement rate.
+                Member ini tercatat memiliki {member.total_orders} masalah penagihan dalam 6 bulan
+                terakhir. Tingkat keterlibatan tinggi.
               </AlertDescription>
             </Alert>
           </div>
@@ -198,16 +202,16 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
         <TabsContent value='groups' className='mt-0'>
           <div className='flex flex-col gap-4'>
             <h3 className='text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-4'>
-              Active Telegram Groups
+              Grup Telegram Aktif
             </h3>
             <div className='flex flex-col gap-2'>
               <div className='flex items-center p-3 bg-muted/40 rounded-lg border border-border'>
                 <Icons.chat className='size-5 mr-3 text-primary' />
-                <span className='text-sm font-medium'>VIP Signals</span>
+                <span className='text-sm font-medium'>Sinyal VIP</span>
               </div>
               <div className='flex items-center p-3 bg-muted/40 rounded-lg border border-border'>
                 <Icons.user className='size-5 mr-3 text-primary' />
-                <span className='text-sm font-medium'>Main Discussion</span>
+                <span className='text-sm font-medium'>Diskusi Utama</span>
               </div>
             </div>
           </div>
@@ -216,7 +220,7 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
         <TabsContent value='history' className='mt-0'>
           <div className='flex flex-col gap-4'>
             <h3 className='text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-4'>
-              Subscription History
+              Riwayat Langganan
             </h3>
             <div className='relative border-l-2 border-border ml-3 flex flex-col gap-6 pb-4'>
               {historySubs.length > 0 ? (
@@ -235,12 +239,12 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
                           ? format(new Date(sub.activated_at), 'MMM dd, yyyy')
                           : '-'}
                     </p>
-                    <p className='text-sm font-bold capitalize'>{sub.status} Subscription</p>
+                    <p className='text-sm font-bold capitalize'>Langganan {sub.status}</p>
                     <p className='text-xs text-muted-foreground'>{sub.package_name}</p>
                   </div>
                 ))
               ) : (
-                <p className='text-sm text-muted-foreground pl-6'>No history found</p>
+                <p className='text-sm text-muted-foreground pl-6'>Riwayat tidak ditemukan</p>
               )}
             </div>
           </div>
@@ -250,7 +254,7 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
       <Separator />
       <div className='p-6 bg-muted/20 flex gap-3 shrink-0'>
         <button className='flex-1 py-3 bg-primary text-primary-foreground rounded-xl text-[13px] font-bold hover:shadow-lg transition-all active:scale-[0.98]'>
-          Send Message
+          Kirim Pesan
         </button>
         <button className='p-3 border border-border rounded-xl hover:bg-muted transition-colors'>
           <Icons.close className='size-5 text-foreground' />

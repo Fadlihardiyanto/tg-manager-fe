@@ -4,7 +4,7 @@ import PageContainer from '@/components/layout/page-container';
 import { Suspense } from 'react';
 
 export const metadata = {
-  title: 'Member Detail | Dashboard'
+  title: 'Detail Member | Dashboard'
 };
 
 type PageProps = { params: Promise<{ id: string }> };
@@ -14,8 +14,8 @@ export default async function MemberDetailPage(props: PageProps) {
 
   return (
     <PageContainer
-      pageTitle='Member Detail'
-      pageDescription="View member's full information and subscription history."
+      pageTitle='Detail Member'
+      pageDescription='Lihat informasi lengkap member dan riwayat langganannya.'
     >
       <Suspense fallback={<MemberDetailSkeleton />}>
         <MemberDetail memberId={id} />

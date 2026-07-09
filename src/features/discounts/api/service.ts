@@ -34,16 +34,13 @@ export async function getDiscounts(): Promise<DiscountsListResponse> {
       headers: { ...authHeaders }
     });
   } catch (err) {
-    const message =
-      err instanceof Error ? err.message : 'Failed to fetch discounts';
+    const message = err instanceof Error ? err.message : 'Gagal mengambil diskon';
     return { success: false, code: 400, message, data: [] };
   }
 }
 
 // ─── Create Discount ────────────────────────────────────────────────
-export async function createDiscount(
-  data: CreateMemberDiscountRequest
-): Promise<DiscountResponse> {
+export async function createDiscount(data: CreateMemberDiscountRequest): Promise<DiscountResponse> {
   const authHeaders = await getAuthHeaders();
 
   try {
@@ -53,8 +50,7 @@ export async function createDiscount(
       body: JSON.stringify(data)
     });
   } catch (err) {
-    const message =
-      err instanceof Error ? err.message : 'Failed to create discount';
+    const message = err instanceof Error ? err.message : 'Gagal membuat diskon';
     return { success: false, code: 400, message, data: undefined as any };
   }
 }
@@ -67,38 +63,28 @@ export async function updateDiscount(
   const authHeaders = await getAuthHeaders();
 
   try {
-    return await apiClient<DiscountResponse>(
-      `/api/v1/tenant/discounts/${id}`,
-      {
-        method: 'PUT',
-        headers: { ...authHeaders },
-        body: JSON.stringify(data)
-      }
-    );
+    return await apiClient<DiscountResponse>(`/api/v1/tenant/discounts/${id}`, {
+      method: 'PUT',
+      headers: { ...authHeaders },
+      body: JSON.stringify(data)
+    });
   } catch (err) {
-    const message =
-      err instanceof Error ? err.message : 'Failed to update discount';
+    const message = err instanceof Error ? err.message : 'Gagal memperbarui diskon';
     return { success: false, code: 400, message, data: undefined as any };
   }
 }
 
 // ─── Delete Discount ────────────────────────────────────────────────
-export async function deleteDiscount(
-  id: string
-): Promise<ApiResponse<null>> {
+export async function deleteDiscount(id: string): Promise<ApiResponse<null>> {
   const authHeaders = await getAuthHeaders();
 
   try {
-    return await apiClient<ApiResponse<null>>(
-      `/api/v1/tenant/discounts/${id}`,
-      {
-        method: 'DELETE',
-        headers: { ...authHeaders }
-      }
-    );
+    return await apiClient<ApiResponse<null>>(`/api/v1/tenant/discounts/${id}`, {
+      method: 'DELETE',
+      headers: { ...authHeaders }
+    });
   } catch (err) {
-    const message =
-      err instanceof Error ? err.message : 'Failed to delete discount';
+    const message = err instanceof Error ? err.message : 'Gagal menghapus diskon';
     return { success: false, code: 400, message, data: null };
   }
 }

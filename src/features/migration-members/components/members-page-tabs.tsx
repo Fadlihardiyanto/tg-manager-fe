@@ -12,7 +12,7 @@ export function MembersPageTabs() {
   return (
     <Tabs value={tab} onValueChange={setTab} className='space-y-4'>
       <TabsList>
-        <TabsTrigger value='active'>Active Members</TabsTrigger>
+        <TabsTrigger value='active'>Member Aktif</TabsTrigger>
         <TabsTrigger value='migration'>Migration & Import</TabsTrigger>
       </TabsList>
     </Tabs>

@@ -28,7 +28,7 @@ function formatBillingStatus(status?: BillingStatus) {
   if (status === 'pending') return 'Menunggu Pembayaran';
   if (status === 'upgraded') return 'Telah Di-upgrade';
   if (status === 'cancelled') return 'Dibatalkan';
-  if (status === 'expired') return 'Expired';
+  if (status === 'expired') return 'Kedaluwarsa';
   if (status === 'past_due') return 'Lewat Jatuh Tempo';
   if (status === 'failed') return 'Gagal';
   return status || '-';

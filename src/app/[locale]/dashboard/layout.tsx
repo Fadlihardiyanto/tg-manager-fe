@@ -12,8 +12,8 @@ import { navGroups } from '@/config/nav-config';
 import { filterNavGroups } from '@/lib/filter-nav';
 
 export const metadata: Metadata = {
-  title: 'Next Shadcn Dashboard Starter',
-  description: 'Basic dashboard with Next.js and Shadcn',
+  title: 'Dashboard TG-Manager',
+  description: 'Dashboard dasar untuk TG-Manager',
   robots: {
     index: false,
     follow: false

@@ -36,27 +36,27 @@ import { useActivePlan } from './active-plan-provider';
 import { BillingHistoryTab } from './billing-history-tab';
 
 const quotaItems = [
-  { key: 'bots', label: 'Bots', description: 'Jumlah bot Telegram yang masih bisa dikelola.' },
-  { key: 'groups', label: 'Groups', description: 'Jumlah grup Telegram yang bisa dihubungkan.' },
-  { key: 'packages', label: 'Packages', description: 'Jumlah package yang bisa dibuat.' },
-  { key: 'members', label: 'Members', description: 'Total member aktif yang bisa disimpan.' },
+  { key: 'bots', label: 'Bot', description: 'Jumlah bot Telegram yang masih bisa dikelola.' },
+  { key: 'groups', label: 'Grup', description: 'Jumlah grup Telegram yang bisa dihubungkan.' },
+  { key: 'packages', label: 'Paket', description: 'Jumlah paket yang bisa dibuat.' },
+  { key: 'members', label: 'Member', description: 'Total member aktif yang bisa disimpan.' },
   {
     key: 'custom_commands',
-    label: 'Custom Commands',
+    label: 'Perintah Kustom',
     description: 'Jumlah command kustom yang bisa dipakai.'
   },
   {
     key: 'broadcasts',
-    label: 'Broadcasts',
-    description: 'Kuota broadcast yang tersedia pada periode aktif.'
+    label: 'Siaran',
+    description: 'Kuota siaran yang tersedia pada periode aktif.'
   }
 ] as const;
 
 const featureItems = [
-  { key: 'allow_media_broadcast', label: 'Media Broadcast' },
-  { key: 'allow_discount_system', label: 'Discount System' },
-  { key: 'allow_reports_export', label: 'Reports Export' },
-  { key: 'allow_high_priority', label: 'High Priority Queue' }
+  { key: 'allow_media_broadcast', label: 'Siaran Media' },
+  { key: 'allow_discount_system', label: 'Sistem Diskon' },
+  { key: 'allow_reports_export', label: 'Ekspor Laporan' },
+  { key: 'allow_high_priority', label: 'Antrian Prioritas Tinggi' }
 ] as const;
 
 function formatBillingCycle(cycle?: BillingCycle) {
@@ -69,7 +69,7 @@ function formatStatus(status?: string) {
   if (!status) return '-';
   if (status === 'active') return 'Aktif';
   if (status === 'pending') return 'Menunggu Pembayaran';
-  if (status === 'expired') return 'Expired';
+  if (status === 'expired') return 'Kedaluwarsa';
   return status;
 }
 
@@ -80,7 +80,7 @@ function formatPlanPrice(plan: ActivePlan, billingCycle: BillingCycle) {
 }
 
 function formatQuotaLimit(limit: number) {
-  return limit === -1 ? 'Unlimited' : limit.toLocaleString('id-ID');
+  return limit === -1 ? 'Tak terbatas' : limit.toLocaleString('id-ID');
 }
 
 type BillingPageTab = 'billing' | 'upgrade' | 'history';
@@ -155,8 +155,8 @@ export function ActivePlanPage() {
       className='space-y-6'
     >
       <TabsList>
-        <TabsTrigger value='billing'>Billing Aktif</TabsTrigger>
-        <TabsTrigger value='upgrade'>Upgrade Plan</TabsTrigger>
+        <TabsTrigger value='billing'>Penagihan Aktif</TabsTrigger>
+        <TabsTrigger value='upgrade'>Tingkatkan Paket</TabsTrigger>
         <TabsTrigger value='history'>Riwayat Pembayaran</TabsTrigger>
       </TabsList>
 
@@ -165,12 +165,13 @@ export function ActivePlanPage() {
           <Card>
             <CardHeader>
               <div className='flex flex-wrap items-center gap-3'>
-                <CardTitle>Plan Tenant Aktif</CardTitle>
+                <CardTitle>Paket Tenant Aktif</CardTitle>
                 <Badge variant='secondary'>{plan.display_name}</Badge>
                 <Badge variant='outline'>{formatBillingCycle(billing.billing_cycle)}</Badge>
               </div>
               <CardDescription>
-                Ringkasan billing aktif tenant beserta masa berlaku, nominal, dan status pembayaran.
+                Ringkasan penagihan aktif tenant beserta masa berlaku, nominal, dan status
+                pembayaran.
               </CardDescription>
             </CardHeader>
             <CardContent className='grid gap-4 md:grid-cols-2 xl:grid-cols-3'>
@@ -179,7 +180,7 @@ export function ActivePlanPage() {
                 <p className='mt-1 text-lg font-semibold'>{formatStatus(billing.status)}</p>
               </div>
               <div className='rounded-lg border p-4'>
-                <p className='text-sm text-muted-foreground'>Billing Cycle</p>
+                <p className='text-sm text-muted-foreground'>Siklus Penagihan</p>
                 <p className='mt-1 text-lg font-semibold'>
                   {formatBillingCycle(billing.billing_cycle)}
                 </p>
@@ -219,9 +220,10 @@ export function ActivePlanPage() {
         ) : (
           <Alert variant='warning'>
             <Icons.warning />
-            <AlertTitle>Belum ada billing aktif</AlertTitle>
+            <AlertTitle>Belum ada penagihan aktif</AlertTitle>
             <AlertDescription>
-              Tenant ini belum memiliki langganan aktif. Buka tab upgrade untuk memilih plan.
+              Tenant ini belum memiliki langganan aktif. Buka tab tingkatkan paket untuk memilih
+              paket.
             </AlertDescription>
           </Alert>
         )}
@@ -229,7 +231,7 @@ export function ActivePlanPage() {
         <div className='grid gap-4 xl:grid-cols-[1.2fr_1fr]'>
           <Card>
             <CardHeader>
-              <CardTitle>Quota Tersedia</CardTitle>
+              <CardTitle>Kuota Tersedia</CardTitle>
               <CardDescription>
                 Detail penggunaan dan sisa kuota tenant untuk setiap resource utama.
               </CardDescription>
@@ -248,7 +250,7 @@ export function ActivePlanPage() {
                           <p className='mt-1 text-sm text-muted-foreground'>{item.description}</p>
                         </div>
                         <Badge variant={quota.hasQuota ? 'secondary' : 'destructive'}>
-                          {quota.isUnlimited ? 'Unlimited' : `${quota.remaining} tersisa`}
+                          {quota.isUnlimited ? 'Tak terbatas' : `${quota.remaining} tersisa`}
                         </Badge>
                       </div>
                       <Separator className='my-4' />
@@ -258,9 +260,9 @@ export function ActivePlanPage() {
                           <span className='font-medium tabular-nums'>{quota.used}</span>
                         </div>
                         <div className='flex items-center justify-between'>
-                          <span className='text-muted-foreground'>Limit</span>
+                          <span className='text-muted-foreground'>Batas</span>
                           <span className='font-medium tabular-nums'>
-                            {quota.isUnlimited ? 'Unlimited' : quota.limit}
+                            {quota.isUnlimited ? 'Tak terbatas' : quota.limit}
                           </span>
                         </div>
                       </div>
@@ -271,9 +273,9 @@ export function ActivePlanPage() {
               ) : (
                 <Alert variant='warning' className='md:col-span-2'>
                   <Icons.warning />
-                  <AlertTitle>Quota belum tersedia</AlertTitle>
+                  <AlertTitle>Kuota belum tersedia</AlertTitle>
                   <AlertDescription>
-                    Data pemakaian quota akan tampil setelah tenant memiliki plan aktif.
+                    Data pemakaian kuota akan tampil setelah tenant memiliki paket aktif.
                   </AlertDescription>
                 </Alert>
               )}
@@ -284,7 +286,8 @@ export function ActivePlanPage() {
             <CardHeader>
               <CardTitle>Akses Fitur</CardTitle>
               <CardDescription>
-                Status fitur khusus platform yang aktif atau masih terkunci di plan tenant saat ini.
+                Status fitur khusus platform yang aktif atau masih terkunci di paket tenant saat
+                ini.
               </CardDescription>
             </CardHeader>
             <CardContent className='space-y-3'>
@@ -317,10 +320,10 @@ export function ActivePlanPage() {
       <TabsContent value='upgrade'>
         <Card>
           <CardHeader>
-            <CardTitle>Upgrade Plan</CardTitle>
+            <CardTitle>Tingkatkan Paket</CardTitle>
             <CardDescription>
-              Pilih plan platform yang tersedia, review dulu detailnya, lalu lanjut ke checkout
-              billing tenant.
+              Pilih paket platform yang tersedia, tinjau dulu detailnya, lalu lanjut ke checkout
+              penagihan tenant.
             </CardDescription>
           </CardHeader>
           <CardContent className='space-y-4'>
@@ -367,7 +370,7 @@ export function ActivePlanPage() {
                           <h3 className='text-lg font-semibold'>{publicPlan.display_name}</h3>
                           <p className='mt-1 text-sm text-muted-foreground'>{publicPlan.name}</p>
                         </div>
-                        {isCurrentPlan && <Badge variant='secondary'>Plan Aktif</Badge>}
+                        {isCurrentPlan && <Badge variant='secondary'>Paket Aktif</Badge>}
                       </div>
 
                       <div className='mt-4'>
@@ -383,25 +386,25 @@ export function ActivePlanPage() {
 
                       <div className='space-y-2 text-sm'>
                         <div className='flex items-center justify-between'>
-                          <span className='text-muted-foreground'>Bots</span>
+                          <span className='text-muted-foreground'>Bot</span>
                           <span className='font-medium'>
                             {formatQuotaLimit(publicPlan.max_bots)}
                           </span>
                         </div>
                         <div className='flex items-center justify-between'>
-                          <span className='text-muted-foreground'>Groups</span>
+                          <span className='text-muted-foreground'>Grup</span>
                           <span className='font-medium'>
                             {formatQuotaLimit(publicPlan.max_groups)}
                           </span>
                         </div>
                         <div className='flex items-center justify-between'>
-                          <span className='text-muted-foreground'>Packages</span>
+                          <span className='text-muted-foreground'>Paket</span>
                           <span className='font-medium'>
                             {formatQuotaLimit(publicPlan.max_packages)}
                           </span>
                         </div>
                         <div className='flex items-center justify-between'>
-                          <span className='text-muted-foreground'>Members</span>
+                          <span className='text-muted-foreground'>Member</span>
                           <span className='font-medium'>
                             {formatQuotaLimit(publicPlan.max_members)}
                           </span>
@@ -410,13 +413,13 @@ export function ActivePlanPage() {
 
                       <div className='mt-4 flex flex-wrap gap-2'>
                         <Badge variant={publicPlan.allow_discount_system ? 'secondary' : 'outline'}>
-                          Discount
+                          Diskon
                         </Badge>
                         <Badge variant={publicPlan.allow_media_broadcast ? 'secondary' : 'outline'}>
-                          Media Broadcast
+                          Siaran Media
                         </Badge>
                         <Badge variant={publicPlan.allow_reports_export ? 'secondary' : 'outline'}>
-                          Reports
+                          Laporan
                         </Badge>
                       </div>
 
@@ -426,7 +429,7 @@ export function ActivePlanPage() {
                         disabled={isCurrentPlanSameCycle}
                         onClick={() => openCheckoutDialog(publicPlan.id)}
                       >
-                        {isCurrentPlanSameCycle ? 'Sedang Aktif' : 'Pilih Plan Ini'}
+                        {isCurrentPlanSameCycle ? 'Sedang Aktif' : 'Pilih Paket Ini'}
                       </Button>
                     </div>
                   );
@@ -435,10 +438,10 @@ export function ActivePlanPage() {
             ) : (
               <Alert variant='warning'>
                 <Icons.warning />
-                <AlertTitle>Daftar plan belum tersedia</AlertTitle>
+                <AlertTitle>Daftar paket belum tersedia</AlertTitle>
                 <AlertDescription>
-                  Endpoint public plans belum mengembalikan data. Untuk sementara, upgrade masih
-                  bisa dilanjutkan lewat support.
+                  Endpoint paket publik belum mengembalikan data. Untuk sementara, peningkatan masih
+                  bisa dilanjutkan lewat dukungan.
                 </AlertDescription>
               </Alert>
             )}
@@ -458,9 +461,9 @@ export function ActivePlanPage() {
         <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Konfirmasi upgrade plan</DialogTitle>
+              <DialogTitle>Konfirmasi peningkatan paket</DialogTitle>
               <DialogDescription>
-                Review singkat pilihan plan sebelum lanjut ke Midtrans.
+                Tinjau singkat pilihan paket sebelum lanjut ke Midtrans.
               </DialogDescription>
             </DialogHeader>
 
@@ -475,29 +478,29 @@ export function ActivePlanPage() {
                   {billing?.plan.id === selectedPlan.id && billing?.status === 'active' && (
                     <p className='mt-2 text-sm text-muted-foreground'>
                       {isCurrentBillingCycle
-                        ? 'Plan ini sudah aktif pada billing cycle yang sama.'
-                        : 'Anda sedang memilih plan yang sama dengan billing cycle berbeda.'}
+                        ? 'Paket ini sudah aktif pada siklus penagihan yang sama.'
+                        : 'Anda sedang memilih paket yang sama dengan siklus penagihan berbeda.'}
                     </p>
                   )}
                 </div>
 
                 <div className='grid gap-3 sm:grid-cols-2'>
                   <div className='flex items-center justify-between rounded-lg border p-3 text-sm'>
-                    <span className='text-muted-foreground'>Bots</span>
+                    <span className='text-muted-foreground'>Bot</span>
                     <span className='font-medium'>{formatQuotaLimit(selectedPlan.max_bots)}</span>
                   </div>
                   <div className='flex items-center justify-between rounded-lg border p-3 text-sm'>
-                    <span className='text-muted-foreground'>Groups</span>
+                    <span className='text-muted-foreground'>Grup</span>
                     <span className='font-medium'>{formatQuotaLimit(selectedPlan.max_groups)}</span>
                   </div>
                   <div className='flex items-center justify-between rounded-lg border p-3 text-sm'>
-                    <span className='text-muted-foreground'>Packages</span>
+                    <span className='text-muted-foreground'>Paket</span>
                     <span className='font-medium'>
                       {formatQuotaLimit(selectedPlan.max_packages)}
                     </span>
                   </div>
                   <div className='flex items-center justify-between rounded-lg border p-3 text-sm'>
-                    <span className='text-muted-foreground'>Members</span>
+                    <span className='text-muted-foreground'>Member</span>
                     <span className='font-medium'>
                       {formatQuotaLimit(selectedPlan.max_members)}
                     </span>
@@ -525,7 +528,7 @@ export function ActivePlanPage() {
                 billing?.plan.id === selectedPlan.id &&
                 billing?.status === 'active' &&
                 isCurrentBillingCycle
-                  ? 'Plan Ini Sudah Aktif'
+                  ? 'Paket Ini Sudah Aktif'
                   : 'Lanjut ke Pembayaran'}
               </Button>
             </DialogFooter>
@@ -538,7 +541,8 @@ export function ActivePlanPage() {
           <CardHeader>
             <CardTitle>Riwayat Pembayaran</CardTitle>
             <CardDescription>
-              Daftar transaksi billing tenant, termasuk kuitansi dan pembayaran yang masih pending.
+              Daftar transaksi penagihan tenant, termasuk kuitansi dan pembayaran yang masih
+              menunggu.
             </CardDescription>
           </CardHeader>
           <CardContent>

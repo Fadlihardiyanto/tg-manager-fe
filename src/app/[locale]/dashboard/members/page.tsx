@@ -6,7 +6,7 @@ import { searchParamsCache } from '@/lib/searchparams';
 import type { SearchParams } from 'nuqs/server';
 
 export const metadata = {
-  title: 'Members | Dashboard'
+  title: 'Member | Dashboard'
 };
 
 type PageProps = { searchParams: Promise<SearchParams> };
@@ -18,8 +18,8 @@ export default async function MembersPage(props: PageProps) {
 
   return (
     <PageContainer
-      pageTitle='Members'
-      pageDescription='Manage and view your tenant members and their subscriptions.'
+      pageTitle='Member'
+      pageDescription='Kelola dan lihat member tenant beserta langganannya.'
     >
       <div className='flex flex-1 flex-col gap-4 min-h-0'>
         <MembersPageTabs />

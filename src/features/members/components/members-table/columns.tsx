@@ -24,9 +24,9 @@ function getSubscriptionBadgeClass(status: Subscription['status']) {
 }
 
 function getSubscriptionStatusLabel(status: Subscription['status']) {
-  if (status === 'active') return 'Active';
-  if (status === 'cancelled') return 'Kicked';
-  return 'Expired';
+  if (status === 'active') return 'Aktif';
+  if (status === 'cancelled') return 'Dikeluarkan';
+  return 'Kedaluwarsa';
 }
 
 function getSubscriptionDateLabel(subscription: Subscription) {
@@ -75,7 +75,7 @@ export const columns: ColumnDef<Member>[] = [
     id: 'name',
     accessorFn: (row) => `${row.first_name} ${row.last_name}`,
     header: ({ column }: { column: Column<Member, unknown> }) => (
-      <DataTableColumnHeader column={column} title='Name' />
+      <DataTableColumnHeader column={column} title='Nama' />
     ),
     cell: ({ row }) => {
       const initials =
@@ -99,8 +99,8 @@ export const columns: ColumnDef<Member>[] = [
       );
     },
     meta: {
-      label: 'Name',
-      placeholder: 'Search members...',
+      label: 'Nama',
+      placeholder: 'Cari member...',
       variant: 'text' as const,
       icon: Icons.text
     },
@@ -108,7 +108,7 @@ export const columns: ColumnDef<Member>[] = [
   },
   {
     accessorKey: 'phone',
-    header: 'PHONE',
+    header: 'TELEPON',
     cell: ({ row }) => row.original.phone || '-'
   },
   {
@@ -117,7 +117,7 @@ export const columns: ColumnDef<Member>[] = [
       row.subscriptions?.map((subscription) => subscription.package_name).join(', ') ??
       row.active_packages.join(', '),
     enableSorting: false,
-    header: 'SUBSCRIPTION',
+    header: 'LANGGANAN',
     cell: ({ row }) => {
       const subscriptions = row.original.subscriptions;
 
@@ -181,7 +181,7 @@ export const columns: ColumnDef<Member>[] = [
   {
     id: 'joined',
     accessorKey: 'created_at',
-    header: 'JOINED',
+    header: 'BERGABUNG',
     cell: ({ cell }) => {
       const date = cell.getValue<string | undefined>();
       return date ? format(new Date(date), 'dd MMMM yyyy', { locale: idLocale }) : '-';
@@ -195,7 +195,7 @@ export const columns: ColumnDef<Member>[] = [
     },
     enableColumnFilter: true,
     meta: {
-      label: 'Joined',
+      label: 'Bergabung',
       variant: 'dateRange' as const
     }
   },

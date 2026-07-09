@@ -16,18 +16,18 @@ export function PaymentConfigStep({ form }: StepProps) {
   return (
     <div className='flex flex-col gap-8'>
       <Heading
-        title='Payment Gateway'
-        description='Connect your Midtrans account to start accepting payments from your community members securely.'
+        title='Gateway Pembayaran'
+        description='Hubungkan akun Midtrans Anda untuk mulai menerima pembayaran dari member komunitas secara aman.'
       />
 
       <Alert className='bg-muted/40 [&>svg]:mt-0.5'>
         <Icons.info className='text-primary' />
-        <AlertTitle>Where to find your API keys?</AlertTitle>
+        <AlertTitle>Di mana menemukan API key?</AlertTitle>
         <AlertDescription className='flex flex-col gap-4'>
           <div>
             <p className='mb-2'>
-              Log in to your Midtrans dashboard, select your environment, and
-              navigate to <strong>Settings &rarr; Access Keys</strong>.
+              Masuk ke dashboard Midtrans, pilih lingkungan Anda, lalu buka
+              <strong>Setelan &rarr; Kunci Akses</strong>.
             </p>
             <a
               href='https://dashboard.midtrans.com'
@@ -35,7 +35,7 @@ export function PaymentConfigStep({ form }: StepProps) {
               rel='noopener noreferrer'
               className='inline-flex items-center gap-1 font-medium text-primary hover:underline'
             >
-              Open Midtrans Dashboard
+              Buka Dashboard Midtrans
               <Icons.externalLink className='size-3.5' />
             </a>
           </div>
@@ -50,17 +50,17 @@ export function PaymentConfigStep({ form }: StepProps) {
               0:15
             </span>
             <p className='absolute left-3 top-3 text-xs font-medium text-muted-foreground'>
-              [Video/GIF: Midtrans API Keys]
+              [Video/GIF: Kunci API Midtrans]
             </p>
           </div>
         </AlertDescription>
       </Alert>
 
       <div className='flex flex-col gap-5'>
-        <h4 className='text-lg font-semibold'>Midtrans API Keys</h4>
+        <h4 className='text-lg font-semibold'>Kunci API Midtrans</h4>
         <p className='text-sm text-muted-foreground'>
-          Provide your Midtrans sandbox or production keys to enable payment
-          processing.
+          Masukkan kunci sandbox atau produksi Midtrans Anda untuk mengaktifkan pemrosesan
+          pembayaran.
         </p>
 
         <form.AppField
@@ -71,11 +71,11 @@ export function PaymentConfigStep({ form }: StepProps) {
         >
           {(field: any) => (
             <div className='flex flex-col gap-2'>
-              <Label className='text-sm font-medium'>Environment</Label>
+              <Label className='text-sm font-medium'>Lingkungan</Label>
               <Tabs value={field.state.value} onValueChange={(v) => field.handleChange(v)}>
                 <TabsList>
-                  <TabsTrigger value='sandbox'>Sandbox</TabsTrigger>
-                  <TabsTrigger value='production'>Production (Live)</TabsTrigger>
+                  <TabsTrigger value='sandbox'>Uji Coba</TabsTrigger>
+                  <TabsTrigger value='production'>Produksi (Langsung)</TabsTrigger>
                 </TabsList>
               </Tabs>
             </div>
@@ -83,62 +83,66 @@ export function PaymentConfigStep({ form }: StepProps) {
         </form.AppField>
 
         <form.Subscribe selector={(state: any) => state.values.midtransEnvironment}>
-          {(env: 'sandbox' | 'production') => (
-            <div className='mt-6 flex flex-col gap-4 rounded-lg border border-border p-5'>
-              <h5 className='mb-2 text-sm font-semibold capitalize text-foreground'>
-                {env} Credentials
-              </h5>
+          {(env: 'sandbox' | 'production') => {
+            const envLabel = env === 'sandbox' ? 'Uji Coba' : 'Produksi';
 
-              {env === 'sandbox' ? (
-                <>
-                  <FormTextField
-                    name='sandboxMerchantId'
-                    label='Merchant ID (Sandbox)'
-                    placeholder='e.g. G-xxxx...'
-                    validators={{ onChange: requiredKeySchema }}
-                  />
-                  <FormTextField
-                    name='sandboxClientKey'
-                    label='Client Key (Sandbox)'
-                    placeholder='e.g. SB-Mid-client-...'
-                    validators={{ onChange: requiredKeySchema }}
-                  />
-                  <FormTextField
-                    name='sandboxServerKey'
-                    label='Server Key (Sandbox)'
-                    placeholder='e.g. SB-Mid-server-...'
-                    validators={{ onChange: requiredKeySchema }}
-                  />
-                </>
-              ) : (
-                <>
-                  <FormTextField
-                    name='productionMerchantId'
-                    label='Merchant ID (Production)'
-                    placeholder='e.g. G-xxxx...'
-                    validators={{ onChange: requiredKeySchema }}
-                  />
-                  <FormTextField
-                    name='productionClientKey'
-                    label='Client Key (Production)'
-                    placeholder='e.g. Mid-client-...'
-                    validators={{ onChange: requiredKeySchema }}
-                  />
-                  <FormTextField
-                    name='productionServerKey'
-                    label='Server Key (Production)'
-                    placeholder='e.g. Mid-server-...'
-                    validators={{ onChange: requiredKeySchema }}
-                  />
-                </>
-              )}
-            </div>
-          )}
+            return (
+              <div className='mt-6 flex flex-col gap-4 rounded-lg border border-border p-5'>
+                <h5 className='mb-2 text-sm font-semibold capitalize text-foreground'>
+                  Kredensial {envLabel}
+                </h5>
+
+                {env === 'sandbox' ? (
+                  <>
+                    <FormTextField
+                      name='sandboxMerchantId'
+                      label='Merchant ID (Uji Coba)'
+                      placeholder='mis. G-xxxx...'
+                      validators={{ onChange: requiredKeySchema }}
+                    />
+                    <FormTextField
+                      name='sandboxClientKey'
+                      label='Client Key (Uji Coba)'
+                      placeholder='mis. SB-Mid-client-...'
+                      validators={{ onChange: requiredKeySchema }}
+                    />
+                    <FormTextField
+                      name='sandboxServerKey'
+                      label='Server Key (Uji Coba)'
+                      placeholder='mis. SB-Mid-server-...'
+                      validators={{ onChange: requiredKeySchema }}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <FormTextField
+                      name='productionMerchantId'
+                      label='Merchant ID (Produksi)'
+                      placeholder='mis. G-xxxx...'
+                      validators={{ onChange: requiredKeySchema }}
+                    />
+                    <FormTextField
+                      name='productionClientKey'
+                      label='Client Key (Produksi)'
+                      placeholder='mis. Mid-client-...'
+                      validators={{ onChange: requiredKeySchema }}
+                    />
+                    <FormTextField
+                      name='productionServerKey'
+                      label='Server Key (Produksi)'
+                      placeholder='mis. Mid-server-...'
+                      validators={{ onChange: requiredKeySchema }}
+                    />
+                  </>
+                )}
+              </div>
+            );
+          }}
         </form.Subscribe>
 
         <div className='flex items-center gap-1 px-1 text-xs text-muted-foreground'>
           <Icons.lock className='size-3.5' />
-          <span>Keys are encrypted and stored securely</span>
+          <span>Key dienkripsi dan disimpan dengan aman</span>
         </div>
       </div>
     </div>

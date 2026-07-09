@@ -196,7 +196,7 @@ export function ConnectGroupModal({ open, onOpenChange }: ConnectGroupModalProps
 
           {!token && selectedBotId && (
             <Button onClick={handleGenerate} isLoading={loading} className='w-full'>
-              <Icons.add className='mr-2 h-4 w-4' /> Generate Kode Koneksi
+              <Icons.add className='mr-2 h-4 w-4' /> Buat Kode Koneksi
             </Button>
           )}
 

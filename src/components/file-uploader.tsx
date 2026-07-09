@@ -57,7 +57,7 @@ export interface FileUploaderProps extends React.HTMLAttributes<HTMLDivElement> 
   accept?: DropzoneProps['accept'];
 
   /**
-   * Maximum file size for the uploader.
+   * Ukuran file maksimum untuk uploader.
    * @type number | undefined
    * @default 1024 * 1024 * 2 // 2MB
    * @example maxSize={1024 * 1024 * 2} // 2MB
@@ -65,7 +65,7 @@ export interface FileUploaderProps extends React.HTMLAttributes<HTMLDivElement> 
   maxSize?: DropzoneProps['maxSize'];
 
   /**
-   * Maximum number of files for the uploader.
+   * Jumlah file maksimum untuk uploader.
    * @type number | undefined
    * @default 1
    * @example maxFiles={5}
@@ -112,12 +112,12 @@ export function FileUploader(props: FileUploaderProps) {
   const onDrop = React.useCallback(
     (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
       if (!multiple && maxFiles === 1 && acceptedFiles.length > 1) {
-        toast.error('Cannot upload more than 1 file at a time');
+        toast.error('Tidak bisa mengunggah lebih dari 1 file sekaligus');
         return;
       }
 
       if ((files?.length ?? 0) + acceptedFiles.length > maxFiles) {
-        toast.error(`Cannot upload more than ${maxFiles} files`);
+        toast.error(`Tidak bisa mengunggah lebih dari ${maxFiles} file`);
         return;
       }
 
@@ -133,7 +133,7 @@ export function FileUploader(props: FileUploaderProps) {
 
       if (rejectedFiles.length > 0) {
         rejectedFiles.forEach(({ file }) => {
-          toast.error(`File ${file.name} was rejected`);
+          toast.error(`File ${file.name} ditolak`);
         });
       }
 
@@ -141,12 +141,12 @@ export function FileUploader(props: FileUploaderProps) {
         const target = updatedFiles.length > 0 ? `${updatedFiles.length} files` : `file`;
 
         toast.promise(onUpload(updatedFiles), {
-          loading: `Uploading ${target}...`,
+          loading: `Mengunggah ${target}...`,
           success: () => {
             setFiles([]);
-            return `${target} uploaded`;
+            return `${target} berhasil diunggah`;
           },
-          error: `Failed to upload ${target}`
+          error: `Gagal mengunggah ${target}`
         });
       }
     },
@@ -204,7 +204,7 @@ export function FileUploader(props: FileUploaderProps) {
                 <div className='rounded-full border border-dashed p-3'>
                   <Icons.upload className='text-muted-foreground size-7' aria-hidden='true' />
                 </div>
-                <p className='text-muted-foreground font-medium'>Drop the files here</p>
+                <p className='text-muted-foreground font-medium'>Lepaskan file di sini</p>
               </div>
             ) : (
               <div className='flex flex-col items-center justify-center gap-4 sm:px-5'>
@@ -213,14 +213,13 @@ export function FileUploader(props: FileUploaderProps) {
                 </div>
                 <div className='space-y-px'>
                   <p className='text-muted-foreground font-medium'>
-                    Drag {`'n'`} drop files here, or click to select files
+                    Seret {`'n'`} lepas file di sini, atau klik untuk memilih file
                   </p>
                   <p className='text-muted-foreground/70 text-sm'>
-                    You can upload
+                    Anda dapat mengunggah
                     {maxFiles > 1
-                      ? ` ${maxFiles === Infinity ? 'multiple' : maxFiles}
-                      files (up to ${formatBytes(maxSize)} each)`
-                      : ` a file with ${formatBytes(maxSize)}`}
+                      ? ` ${maxFiles === Infinity ? 'beberapa' : maxFiles} file (maks. ${formatBytes(maxSize)} per file)`
+                      : ` satu file dengan ukuran maks. ${formatBytes(maxSize)}`}
                   </p>
                 </div>
               </div>
@@ -288,7 +287,7 @@ function FileCard({ file, progress, onRemove }: FileCardProps) {
           className='size-8 rounded-full'
         >
           <Icons.close className='text-muted-foreground' />
-          <span className='sr-only'>Remove file</span>
+          <span className='sr-only'>Hapus file</span>
         </Button>
       </div>
     </div>

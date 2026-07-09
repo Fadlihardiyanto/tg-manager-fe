@@ -41,14 +41,14 @@ export function CommandListingContent() {
         </Button>
       </div>
 
-      <QuotaCard resource='custom_commands' title='Custom command quota' className='mt-4' />
+      <QuotaCard resource='custom_commands' title='Kuota perintah kustom' className='mt-4' />
 
       {!canCreateCommand && (
         <Alert variant='warning' className='mt-4'>
           <Icons.warning />
-          <AlertTitle>Quota custom command penuh</AlertTitle>
+          <AlertTitle>Kuota perintah kustom penuh</AlertTitle>
           <AlertDescription>
-            Anda tidak bisa membuat command baru sampai limit plan ditingkatkan.
+            Anda tidak bisa membuat perintah baru sampai batas plan ditingkatkan.
           </AlertDescription>
         </Alert>
       )}

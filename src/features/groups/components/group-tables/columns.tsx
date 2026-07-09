@@ -10,9 +10,9 @@ import { cn } from '@/lib/utils';
 import { formatDate } from '@/lib/format';
 
 const roleLabels: Record<string, string> = {
-  sales_only: 'Sales',
-  gatekeeper_only: 'Gatekeeper',
-  all_in_one: 'All in One'
+  sales_only: 'Penjualan',
+  gatekeeper_only: 'Penjaga',
+  all_in_one: 'Semua dalam Satu'
 };
 
 export function getColumns(onEdit?: (group: TelegramGroup) => void): ColumnDef<TelegramGroup>[] {
@@ -20,7 +20,7 @@ export function getColumns(onEdit?: (group: TelegramGroup) => void): ColumnDef<T
     {
       id: 'name',
       accessorKey: 'name',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Group Name' />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Nama Grup' />,
       cell: ({ row }) => (
         <div className='flex items-center gap-2'>
           <Icons.teams className='size-4 text-muted-foreground' />
@@ -28,8 +28,8 @@ export function getColumns(onEdit?: (group: TelegramGroup) => void): ColumnDef<T
         </div>
       ),
       meta: {
-        label: 'Group Name',
-        placeholder: 'Search groups...',
+        label: 'Nama Grup',
+        placeholder: 'Cari grup...',
         variant: 'text',
         icon: Icons.text
       },
@@ -59,7 +59,7 @@ export function getColumns(onEdit?: (group: TelegramGroup) => void): ColumnDef<T
     {
       id: 'telegram_chat_id',
       accessorKey: 'telegram_chat_id',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Chat ID' />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title='ID Chat' />,
       cell: ({ cell }) => (
         <span className='font-mono text-sm text-muted-foreground'>{cell.getValue<number>()}</span>
       ),
@@ -69,7 +69,7 @@ export function getColumns(onEdit?: (group: TelegramGroup) => void): ColumnDef<T
     {
       id: 'member_count',
       accessorKey: 'member_count',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Members' />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Member' />,
       cell: ({ cell }) => <Badge variant='secondary'>{cell.getValue<number>()}</Badge>,
       enableSorting: true,
       enableColumnFilter: false
@@ -89,7 +89,7 @@ export function getColumns(onEdit?: (group: TelegramGroup) => void): ColumnDef<T
             )}
           >
             <Icon className='size-3' />
-            {isActive ? 'Active' : 'Inactive'}
+            {isActive ? 'Aktif' : 'Nonaktif'}
           </Badge>
         );
       },
@@ -99,7 +99,7 @@ export function getColumns(onEdit?: (group: TelegramGroup) => void): ColumnDef<T
     {
       id: 'inactive_reason',
       accessorKey: 'inactive_reason',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Inactive Reason' />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Alasan Nonaktif' />,
       cell: ({ cell, row }) => {
         const isActive = row.original.is_active;
         const reason = cell.getValue<string | null>();
@@ -112,7 +112,7 @@ export function getColumns(onEdit?: (group: TelegramGroup) => void): ColumnDef<T
     {
       id: 'created_at',
       accessorKey: 'created_at',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Created' />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Dibuat' />,
       cell: ({ cell }) => {
         const date = cell.getValue<string>();
         return (

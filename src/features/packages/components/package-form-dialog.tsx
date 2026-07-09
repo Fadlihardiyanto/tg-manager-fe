@@ -38,18 +38,18 @@ type PackageFormValues = {
 };
 
 const packageFormSchema = z.object({
-  name: z.string().min(3, 'Package name must be at least 3 characters'),
+  name: z.string().min(3, 'Nama paket harus minimal 3 karakter'),
   description: z.string(),
   price: z
     .string()
-    .min(1, 'Price is required')
-    .refine((val) => !isNaN(Number(val)) && Number(val) > 0, 'Price must be a positive number'),
+    .min(1, 'Harga wajib diisi')
+    .refine((val) => !isNaN(Number(val)) && Number(val) > 0, 'Harga harus berupa angka positif'),
   duration_days: z
     .string()
-    .min(1, 'Duration is required')
+    .min(1, 'Durasi wajib diisi')
     .refine(
       (val) => !isNaN(Number(val)) && Number.isInteger(Number(val)) && Number(val) >= 1,
-      'Duration must be a whole number ≥ 1'
+      'Durasi harus berupa bilangan bulat >= 1'
     ),
   is_all_access: z.boolean()
 });
@@ -84,7 +84,7 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
     },
     onSubmit: async ({ value }) => {
       if (!isEdit && !hasQuota('packages')) {
-        toast.error('Quota package penuh. Upgrade plan untuk menambahkan package baru.');
+        toast.error('Kuota paket penuh. Upgrade paket untuk menambahkan paket baru.');
         return;
       }
 
@@ -149,16 +149,16 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
             data: { group_ids: selectedGroupIds }
           });
         }
-        toast.success('Package created successfully');
+        toast.success('Paket berhasil dibuat');
         onOpenChange(false);
         form.reset();
         setSelectedGroupIds([]);
         void queryClient.invalidateQueries({ queryKey: packageKeys.all });
       } else {
-        toast.error(res.message || 'Failed to create package');
+        toast.error(res.message || 'Gagal membuat paket');
       }
     },
-    onError: () => toast.error('Failed to create package')
+    onError: () => toast.error('Gagal membuat paket')
   });
 
   const updateMutation = useMutation({
@@ -176,21 +176,21 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
             data: { group_ids: selectedGroupIds }
           });
         }
-        toast.success('Package updated successfully');
+        toast.success('Paket berhasil diperbarui');
         onOpenChange(false);
         form.reset();
         setSelectedGroupIds([]);
         void queryClient.invalidateQueries({ queryKey: packageKeys.all });
       } else {
-        toast.error(res.message || 'Failed to update package');
+        toast.error(res.message || 'Gagal memperbarui paket');
       }
     },
-    onError: () => toast.error('Failed to update package')
+    onError: () => toast.error('Gagal memperbarui paket')
   });
 
   const associateMutation = useMutation({
     ...associateGroupsMutation,
-    onError: () => toast.error('Failed to associate groups to package')
+    onError: () => toast.error('Gagal menghubungkan grup ke paket')
   });
 
   const isPending =
@@ -215,11 +215,9 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
     >
       <DialogContent className='sm:max-w-[520px] max-h-[85vh] overflow-y-auto'>
         <DialogHeader>
-          <DialogTitle>{isEdit ? 'Edit Package' : 'Add New Package'}</DialogTitle>
+          <DialogTitle>{isEdit ? 'Ubah Paket' : 'Tambah Paket Baru'}</DialogTitle>
           <DialogDescription>
-            {isEdit
-              ? 'Update the package details.'
-              : 'Create a new subscription package for group access.'}
+            {isEdit ? 'Perbarui detail paket.' : 'Buat paket langganan baru untuk akses grup.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -227,28 +225,28 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
           <form.Form id='package-form-dialog' className='space-y-4'>
             <FormTextField
               name='name'
-              label='Package Name'
+              label='Nama Paket'
               required
               placeholder='1 Month VIP'
               validators={{
-                onBlur: z.string().min(3, 'Package name must be at least 3 characters')
+                onBlur: z.string().min(3, 'Nama paket harus minimal 3 karakter')
               }}
             />
 
             <FormTextareaField
               name='description'
-              label='Description'
+              label='Deskripsi'
               placeholder='Akses VIP 30 hari untuk member grup premium.'
-              description='Opsional. Deskripsi ini akan ditampilkan ke member Telegram saat mereka melihat atau membeli package ini.'
+              description='Opsional. Deskripsi ini akan ditampilkan ke member Telegram saat mereka melihat atau membeli paket ini.'
               rows={4}
             />
 
             <FormTextField
               name='price'
-              label='Price (IDR)'
+              label='Harga (IDR)'
               required
               placeholder='150000'
-              description='Amount in Indonesian Rupiah (e.g. 150.000)'
+              description='Nominal dalam Rupiah Indonesia (mis. 150.000)'
               formatDisplay={(val) => {
                 const digits = String(val).replace(/\D/g, '');
                 return digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
@@ -256,43 +254,43 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
               validators={{
                 onBlur: z
                   .string()
-                  .min(1, 'Price is required')
+                  .min(1, 'Harga wajib diisi')
                   .refine(
                     (val) => !isNaN(Number(val)) && Number(val) > 0,
-                    'Must be a positive number'
+                    'Harus berupa angka positif'
                   )
               }}
             />
 
             <FormTextField
               name='duration_days'
-              label='Duration (Days)'
+              label='Durasi (Hari)'
               required
               placeholder='30'
               validators={{
                 onBlur: z
                   .string()
-                  .min(1, 'Duration is required')
+                  .min(1, 'Durasi wajib diisi')
                   .refine(
                     (val) =>
                       !isNaN(Number(val)) && Number.isInteger(Number(val)) && Number(val) >= 1,
-                    'Must be a whole number ≥ 1'
+                    'Harus berupa bilangan bulat >= 1'
                   )
               }}
             />
 
             <FormSwitchField
               name='is_all_access'
-              label='All Access'
-              description='Grant access to all groups without restriction.'
+              label='Akses Penuh'
+              description='Berikan akses ke semua grup tanpa batasan.'
             />
 
             {/* Group multi-select: show only when !is_all_access */}
             {!isAllAccess && activeGroups.length > 0 && (
               <FieldGroup>
-                <FieldLabel>Associate Groups</FieldLabel>
+                <FieldLabel>Hubungkan Grup</FieldLabel>
                 <FieldDescription>
-                  Select which Telegram groups this package grants access to.
+                  Pilih grup Telegram mana yang bisa diakses oleh paket ini.
                 </FieldDescription>
                 <div className='flex flex-col gap-2 rounded-md border p-3 max-h-[160px] overflow-y-auto'>
                   {activeGroups.map((group) => (
@@ -304,7 +302,7 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
                       />
                       <span className='text-sm font-medium'>{group.name}</span>
                       <span className='text-xs text-muted-foreground'>
-                        ({group.member_count} members)
+                        ({group.member_count} anggota)
                       </span>
                     </label>
                   ))}
@@ -315,9 +313,9 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
             {!canCreatePackage && (
               <Alert variant='warning'>
                 <Icons.warning />
-                <AlertTitle>Quota package penuh</AlertTitle>
+                <AlertTitle>Kuota paket penuh</AlertTitle>
                 <AlertDescription>
-                  Upgrade plan Anda untuk menambahkan package baru.
+                  Upgrade paket Anda untuk menambahkan paket baru.
                 </AlertDescription>
               </Alert>
             )}
@@ -334,7 +332,7 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
               onOpenChange(false);
             }}
           >
-            Cancel
+            Batal
           </Button>
           <Button
             type='submit'
@@ -343,7 +341,7 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
             disabled={!canCreatePackage}
           >
             <Icons.check className='mr-2 h-4 w-4' />
-            {isEdit ? 'Update Package' : 'Add Package'}
+            {isEdit ? 'Perbarui Paket' : 'Tambah Paket'}
           </Button>
         </DialogFooter>
       </DialogContent>

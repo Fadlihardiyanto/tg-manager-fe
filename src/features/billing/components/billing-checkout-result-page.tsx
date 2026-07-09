@@ -31,7 +31,7 @@ function formatStatus(status?: string) {
   if (!status) return '-';
   if (status === 'active') return 'Aktif';
   if (status === 'pending') return 'Menunggu Pembayaran';
-  if (status === 'expired') return 'Expired';
+  if (status === 'expired') return 'Kedaluwarsa';
   if (status === 'failed') return 'Gagal';
   return status;
 }
@@ -119,7 +119,7 @@ export function BillingCheckoutResultPage() {
               <p className='mt-1 text-lg font-semibold'>{billing.plan.display_name}</p>
             </div>
             <div className='rounded-lg border p-4'>
-              <p className='text-sm text-muted-foreground'>Billing Cycle</p>
+              <p className='text-sm text-muted-foreground'>Siklus Billing</p>
               <p className='mt-1 text-lg font-semibold'>
                 {formatBillingCycle(billing.billing_cycle)}
               </p>
@@ -155,7 +155,7 @@ export function BillingCheckoutResultPage() {
               <p className='mt-1 text-lg font-semibold'>{billing.plan.display_name}</p>
             </div>
             <div className='rounded-lg border p-4'>
-              <p className='text-sm text-muted-foreground'>Billing Cycle</p>
+              <p className='text-sm text-muted-foreground'>Siklus Billing</p>
               <p className='mt-1 text-lg font-semibold'>
                 {formatBillingCycle(billing.billing_cycle)}
               </p>

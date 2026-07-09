@@ -33,7 +33,7 @@ export async function getMigrationMembers(
       }
     );
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to fetch migration members';
+    const message = error instanceof Error ? error.message : 'Gagal mengambil member migrasi';
     return {
       success: false,
       code: 500,
@@ -61,7 +61,7 @@ export async function importMigrationMembers(
       body: JSON.stringify(payload)
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to import migration members';
+    const message = error instanceof Error ? error.message : 'Gagal mengimpor member migrasi';
     return {
       success: false,
       code: 500,

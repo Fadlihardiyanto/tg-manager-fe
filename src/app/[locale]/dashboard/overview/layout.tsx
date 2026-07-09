@@ -21,7 +21,7 @@ export default async function OverViewLayout({
     <PageContainer>
       <div className='flex flex-1 flex-col space-y-2'>
         <div className='flex items-center justify-between'>
-          <h2 className='text-2xl font-bold tracking-tight'>Dashboard Overview</h2>
+          <h2 className='text-2xl font-bold tracking-tight'>Ikhtisar Dashboard</h2>
         </div>
 
         <StatsCards data={data} />

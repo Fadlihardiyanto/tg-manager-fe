@@ -41,11 +41,11 @@ export function BotListingContent() {
     <>
       <div className='flex justify-end'>
         <Button onClick={handleAdd} size='sm' disabled={!canCreateBot}>
-          <Icons.add className='mr-2 h-4 w-4' /> Add Bot
+          <Icons.add className='mr-2 h-4 w-4' /> Tambah Bot
         </Button>
       </div>
 
-      <QuotaCard resource='bots' title='Bot quota' className='mt-4' />
+      <QuotaCard resource='bots' title='Kuota bot' className='mt-4' />
 
       {!canCreateBot && (
         <Alert variant='warning' className='mt-4'>

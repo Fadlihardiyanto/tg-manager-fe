@@ -84,7 +84,7 @@ function OnboardingHeader({ currentStep }: { currentStep: number }) {
     <header className='fixed right-0 top-0 z-10 flex h-16 w-full items-center justify-between border-b border-border bg-background/80 px-4 backdrop-blur-md md:w-[calc(100%-16rem)] md:px-8'>
       <div className='flex items-center gap-2'>
         <span className='text-sm font-medium text-muted-foreground'>
-          Step {currentStep} of {ONBOARDING_STEPS.length}
+          Langkah {currentStep} dari {ONBOARDING_STEPS.length}
         </span>
       </div>
 
@@ -95,7 +95,7 @@ function OnboardingHeader({ currentStep }: { currentStep: number }) {
           className='hidden text-muted-foreground hover:text-primary sm:flex'
         >
           <Icons.help />
-          Need Help?
+          Butuh Bantuan?
         </Button>
 
         <DropdownMenu>
@@ -127,7 +127,7 @@ function OnboardingHeader({ currentStep }: { currentStep: number }) {
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <Icons.notification />
-              Notifications
+              Notifikasi
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
@@ -138,7 +138,7 @@ function OnboardingHeader({ currentStep }: { currentStep: number }) {
               }}
             >
               <Icons.logout />
-              Log out
+              Keluar
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -209,11 +209,11 @@ export default function OnboardingFlow() {
             });
             if (res.success) {
               setIsStep1Submitted(true);
-              toast.success('Workspace created successfully!');
+              toast.success('Workspace berhasil dibuat!');
               step.goToNextStep();
             } else {
-              toast.error('Failed to create workspace', {
-                description: res.message || 'Please try again.'
+              toast.error('Gagal membuat workspace', {
+                description: res.message || 'Silakan coba lagi.'
               });
             }
           } else {
@@ -223,11 +223,11 @@ export default function OnboardingFlow() {
               category: value.category
             });
             if (res.success) {
-              toast.success('Profile updated!');
+              toast.success('Profil berhasil diperbarui!');
               step.goToNextStep();
             } else {
-              toast.error('Failed to update profile', {
-                description: res.message || 'Please try again.'
+              toast.error('Gagal memperbarui profil', {
+                description: res.message || 'Silakan coba lagi.'
               });
             }
           }
@@ -248,11 +248,11 @@ export default function OnboardingFlow() {
             if (res.success && res.data) {
               setCreatedBotId(res.data.id);
               setBotUsername(res.data.username || res.data.bot_username || null);
-              toast.success('Bot connected successfully!');
+              toast.success('Bot berhasil terhubung!');
               step.goToNextStep();
             } else {
-              toast.error('Failed to connect bot', {
-                description: res.message || 'Invalid bot token or server error.'
+              toast.error('Gagal menghubungkan bot', {
+                description: res.message || 'Token bot tidak valid atau terjadi error server.'
               });
             }
           } else {
@@ -264,11 +264,11 @@ export default function OnboardingFlow() {
               if (res.data) {
                 setBotUsername(res.data.username || res.data.bot_username || null);
               }
-              toast.success('Bot token updated!');
+              toast.success('Token bot berhasil diperbarui!');
               step.goToNextStep();
             } else {
-              toast.error('Failed to update bot', {
-                description: res.message || 'Please try again.'
+              toast.error('Gagal memperbarui bot', {
+                description: res.message || 'Silakan coba lagi.'
               });
             }
           }
@@ -293,11 +293,11 @@ export default function OnboardingFlow() {
           });
 
           if (res.success) {
-            toast.success('Payment gateway configured!');
+            toast.success('Gateway pembayaran berhasil dikonfigurasi!');
             step.goToNextStep();
           } else {
-            toast.error('Payment verification failed', {
-              description: res.message || 'Invalid server key or Midtrans error.'
+            toast.error('Verifikasi pembayaran gagal', {
+              description: res.message || 'Server key tidak valid atau terjadi error Midtrans.'
             });
           }
           return;
@@ -308,7 +308,7 @@ export default function OnboardingFlow() {
           setIsSuccess(true);
         }
       } catch (error) {
-        const message = error instanceof Error ? error.message : 'An unexpected error occurred';
+        const message = error instanceof Error ? error.message : 'Terjadi kesalahan tak terduga';
         toast.error(message);
       }
     }
@@ -357,7 +357,7 @@ export default function OnboardingFlow() {
           </div>
           <div>
             <h1 className='text-base font-bold text-primary'>TG-Manager</h1>
-            <p className='mt-[2px] text-xs text-muted-foreground'>Onboarding Progress</p>
+            <p className='mt-[2px] text-xs text-muted-foreground'>Progres Onboarding</p>
           </div>
         </div>
 
@@ -401,7 +401,7 @@ export default function OnboardingFlow() {
                   {currentStep > 1 ? (
                     <Button type='button' variant='outline' onClick={() => handleCancelOrBack()}>
                       <Icons.arrowLeft />
-                      Back
+                      Kembali
                     </Button>
                   ) : (
                     <div />

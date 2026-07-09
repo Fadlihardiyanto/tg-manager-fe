@@ -102,7 +102,7 @@ export function BulkActionBar({
         setSelectedPackageId('');
       }
     } catch {
-      toast.error('Failed to kick members');
+      toast.error('Gagal mengeluarkan member');
     }
   };
 
@@ -112,7 +112,7 @@ export function BulkActionBar({
         <div className='flex size-6 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary'>
           {selectedIds.length}
         </div>
-        <span className='text-sm font-medium'>selected</span>
+        <span className='text-sm font-medium'>terpilih</span>
       </div>
 
       <div className='flex items-center gap-2'>
@@ -122,7 +122,7 @@ export function BulkActionBar({
           className='h-8 hover:bg-destructive hover:text-destructive-foreground'
           onClick={() => setIsKickModalOpen(true)}
         >
-          <Icons.trash /> Kick Members
+          <Icons.trash /> Keluarkan Member
         </Button>
 
         <Button
@@ -147,7 +147,7 @@ export function BulkActionBar({
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Kick Selected Members</DialogTitle>
+            <DialogTitle>Keluarkan Member Terpilih</DialogTitle>
             <DialogDescription>
               Pilih apakah {selectedIds.length} member terpilih akan dikeluarkan dari semua package
               atau hanya dari satu package tertentu.
@@ -156,7 +156,7 @@ export function BulkActionBar({
 
           <div className='space-y-4 py-4'>
             <div className='space-y-3'>
-              <Label>Tipe Kick</Label>
+              <Label>Mode Pengeluaran</Label>
               <RadioGroup
                 value={kickMode}
                 onValueChange={(value) => setKickMode(value as 'all' | 'single')}
@@ -171,7 +171,7 @@ export function BulkActionBar({
                 >
                   <RadioGroupItem value='all' id='bulk-kick-all' className='mt-0.5' />
                   <div className='space-y-1'>
-                    <p className='text-sm font-medium'>Kick semua package</p>
+                    <p className='text-sm font-medium'>Keluarkan dari semua paket</p>
                     <p className='text-xs text-muted-foreground'>
                       Semua member terpilih akan di-kick dari seluruh akses aktifnya.
                     </p>
@@ -186,7 +186,7 @@ export function BulkActionBar({
                 >
                   <RadioGroupItem value='single' id='bulk-kick-single' className='mt-0.5' />
                   <div className='space-y-1'>
-                    <p className='text-sm font-medium'>Kick package tertentu</p>
+                    <p className='text-sm font-medium'>Keluarkan dari paket tertentu</p>
                     <p className='text-xs text-muted-foreground'>
                       Hanya member yang punya package aktif ini yang akan diproses.
                     </p>
@@ -197,14 +197,14 @@ export function BulkActionBar({
 
             {kickMode === 'single' && (
               <div className='space-y-2'>
-                <Label htmlFor='bulk-kick-package'>Package</Label>
+                <Label htmlFor='bulk-kick-package'>Paket</Label>
                 <Select
                   value={selectedPackageId}
                   onValueChange={setSelectedPackageId}
                   disabled={packageOptions.length === 0}
                 >
                   <SelectTrigger id='bulk-kick-package' className='w-full'>
-                    <SelectValue placeholder='Pilih package aktif' />
+                    <SelectValue placeholder='Pilih paket aktif' />
                   </SelectTrigger>
                   <SelectContent>
                     {packageOptions.map((pkg) => (
@@ -216,12 +216,12 @@ export function BulkActionBar({
                 </Select>
                 {selectedPackageId && (
                   <p className='text-sm text-muted-foreground'>
-                    Member yang tidak punya package ini akan otomatis dilewati.
+                    Member yang tidak punya paket ini akan otomatis dilewati.
                   </p>
                 )}
                 {packageOptions.length === 0 && (
                   <p className='text-sm text-muted-foreground'>
-                    Tidak ada package aktif dari member yang sedang dipilih.
+                    Tidak ada paket aktif dari member yang sedang dipilih.
                   </p>
                 )}
               </div>
@@ -230,7 +230,7 @@ export function BulkActionBar({
 
           <DialogFooter>
             <Button variant='outline' onClick={() => setIsKickModalOpen(false)}>
-              Cancel
+              Batal
             </Button>
             <Button
               variant='destructive'
@@ -238,7 +238,7 @@ export function BulkActionBar({
               disabled={kickMode === 'single' && !selectedPackageId}
               onClick={handleBulkKick}
             >
-              Kick Members
+              Keluarkan Member
             </Button>
           </DialogFooter>
         </DialogContent>

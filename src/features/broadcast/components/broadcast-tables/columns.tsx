@@ -32,21 +32,21 @@ const statusConfig: Record<string, { label: string; className: string }> = {
 };
 
 const targetLabels: Record<string, string> = {
-  group: 'Group',
+  group: 'Grup',
   member: 'Member'
 };
 
 const typeLabels: Record<string, string> = {
-  text: 'Text',
-  photo: 'Photo',
-  document: 'Document'
+  text: 'Teks',
+  photo: 'Foto',
+  document: 'Dokumen'
 };
 
 export const columns: ColumnDef<Broadcast>[] = [
   {
     id: 'target_type',
     accessorKey: 'target_type',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Target' />,
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Tujuan' />,
     cell: ({ cell }) => (
       <Badge variant='outline' className='capitalize'>
         {targetLabels[cell.getValue<string>()] ?? cell.getValue<string>()}
@@ -104,7 +104,7 @@ export const columns: ColumnDef<Broadcast>[] = [
   },
   {
     id: 'progress',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Progress' />,
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Progres' />,
     cell: ({ row }) => {
       const { sent_count, failed_count, total_targets, status } = row.original;
       if (status === 'scheduled') return <span className='text-sm text-muted-foreground'>-</span>;

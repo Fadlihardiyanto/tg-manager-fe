@@ -58,18 +58,18 @@ export function PackageListingContent() {
 
       <div className='flex justify-end'>
         <Button onClick={handleAdd} size='sm' disabled={!hasActiveGroups || !canCreatePackage}>
-          <Icons.add className='mr-2 h-4 w-4' /> Add Package
+          <Icons.add className='mr-2 h-4 w-4' /> Tambah Paket
         </Button>
       </div>
 
-      <QuotaCard resource='packages' title='Package quota' className='mt-4' />
+      <QuotaCard resource='packages' title='Kuota paket' className='mt-4' />
 
       {!canCreatePackage && (
         <Alert variant='warning' className='mt-4'>
           <Icons.warning />
-          <AlertTitle>Quota package penuh</AlertTitle>
+          <AlertTitle>Kuota paket penuh</AlertTitle>
           <AlertDescription>
-            Anda tidak bisa membuat package baru sampai limit plan ditingkatkan.
+            Anda tidak bisa membuat paket baru sampai batas plan ditingkatkan.
           </AlertDescription>
         </Alert>
       )}

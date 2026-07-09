@@ -35,7 +35,7 @@ export async function getBots(): Promise<BotsListResponse> {
       headers: { ...authHeaders }
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to fetch bots';
+    const message = err instanceof Error ? err.message : 'Gagal mengambil data bot';
     return { success: false, code: 400, message, data: [] };
   }
 }
@@ -50,7 +50,7 @@ export async function getBotById(id: string): Promise<BotResponse> {
       headers: { ...authHeaders }
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to fetch bot';
+    const message = err instanceof Error ? err.message : 'Gagal mengambil data bot';
     return { success: false, code: 400, message, data: undefined as any };
   }
 }
@@ -66,16 +66,13 @@ export async function createBot(data: CreateBotRequest): Promise<BotResponse> {
       body: JSON.stringify(data)
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to create bot';
+    const message = err instanceof Error ? err.message : 'Gagal membuat bot';
     return { success: false, code: 400, message, data: undefined as any };
   }
 }
 
 // ─── Update Bot ─────────────────────────────────────────────────────
-export async function updateBot(
-  id: string,
-  data: UpdateBotRequest
-): Promise<BotResponse> {
+export async function updateBot(id: string, data: UpdateBotRequest): Promise<BotResponse> {
   const authHeaders = await getAuthHeaders();
 
   try {
@@ -85,7 +82,7 @@ export async function updateBot(
       body: JSON.stringify(data)
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to update bot';
+    const message = err instanceof Error ? err.message : 'Gagal memperbarui bot';
     return { success: false, code: 400, message, data: undefined as any };
   }
 }
@@ -100,7 +97,7 @@ export async function deleteBot(id: string): Promise<ApiResponse<null>> {
       headers: { ...authHeaders }
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to delete bot';
+    const message = err instanceof Error ? err.message : 'Gagal menghapus bot';
     return { success: false, code: 400, message, data: null };
   }
 }

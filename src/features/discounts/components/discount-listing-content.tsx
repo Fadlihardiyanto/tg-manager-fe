@@ -39,16 +39,16 @@ export function DiscountListingContent() {
     <>
       <div className='flex justify-end'>
         <Button onClick={handleAdd} size='sm' disabled={!allowDiscountSystem}>
-          <Icons.add className='mr-2 h-4 w-4' /> Add Discount
+          <Icons.add className='mr-2 h-4 w-4' /> Tambah Diskon
         </Button>
       </div>
 
       {!allowDiscountSystem && (
         <Alert variant='warning' className='mt-4'>
           <Icons.lock />
-          <AlertTitle>Discount system terkunci</AlertTitle>
+          <AlertTitle>Sistem diskon terkunci</AlertTitle>
           <AlertDescription>
-            Upgrade plan Anda untuk membuat dan mengelola discount.
+            Tingkatkan plan Anda untuk membuat dan mengelola diskon.
           </AlertDescription>
         </Alert>
       )}

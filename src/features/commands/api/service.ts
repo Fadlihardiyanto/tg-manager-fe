@@ -22,7 +22,7 @@ export async function getPresignedUrl(data: PresignedUrlRequest): Promise<Presig
       body: JSON.stringify(data)
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to get presigned URL';
+    const message = err instanceof Error ? err.message : 'Gagal mendapatkan URL pra-tanda tangan';
     return { success: false, code: 400, message, data: undefined as any };
   }
 }
@@ -36,7 +36,7 @@ export async function getCommands(): Promise<CommandsListResponse> {
       headers: { ...authHeaders }
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to fetch commands';
+    const message = err instanceof Error ? err.message : 'Gagal mengambil perintah';
     return { success: false, code: 400, message, data: [] };
   }
 }
@@ -51,7 +51,7 @@ export async function createCommand(data: CreateCommandRequest): Promise<Command
       body: JSON.stringify(data)
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to create command';
+    const message = err instanceof Error ? err.message : 'Gagal membuat perintah';
     return { success: false, code: 400, message, data: undefined as any };
   }
 }
@@ -69,7 +69,7 @@ export async function updateCommand(
       body: JSON.stringify(data)
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to update command';
+    const message = err instanceof Error ? err.message : 'Gagal memperbarui perintah';
     return { success: false, code: 400, message, data: undefined as any };
   }
 }
@@ -83,7 +83,7 @@ export async function deleteCommand(id: string): Promise<ApiResponse<null>> {
       headers: { ...authHeaders }
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to delete command';
+    const message = err instanceof Error ? err.message : 'Gagal menghapus perintah';
     return { success: false, code: 400, message, data: null };
   }
 }

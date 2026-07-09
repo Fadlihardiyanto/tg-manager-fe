@@ -45,11 +45,7 @@ async function getAuthHeaders(): Promise<HeadersInit> {
  * Persist new JWT pair to httpOnly cookies after backend returns
  * a refreshed token (e.g. after Step 1 onboarding creates a new tenant-scoped JWT).
  */
-async function persistTokens(
-  accessToken: string,
-  refreshToken: string,
-  expiresIn: number
-) {
+async function persistTokens(accessToken: string, refreshToken: string, expiresIn: number) {
   const cookieStore = await cookies();
   const isProd = process.env.NODE_ENV === 'production';
 
@@ -70,31 +66,26 @@ async function persistTokens(
 // ─── Step 1: Create Onboarding ───────────────────────────────────────
 // Called the FIRST time user submits Step 1.
 // Returns a new JWT containing the Client ID and Owner role.
-export async function createOnboarding(data: CreateOnboardingRequest): Promise<CreateOnboardingResponse> {
+export async function createOnboarding(
+  data: CreateOnboardingRequest
+): Promise<CreateOnboardingResponse> {
   const authHeaders = await getAuthHeaders();
 
   try {
-    const res = await apiClient<CreateOnboardingResponse>(
-      '/api/v1/clients/onboarding',
-      {
-        method: 'POST',
-        headers: { ...authHeaders },
-        body: JSON.stringify(data)
-      }
-    );
+    const res = await apiClient<CreateOnboardingResponse>('/api/v1/clients/onboarding', {
+      method: 'POST',
+      headers: { ...authHeaders },
+      body: JSON.stringify(data)
+    });
 
     // IMPORTANT: Replace old token with the new tenant-scoped JWT
     if (res.success && res.data?.access_token) {
-      await persistTokens(
-        res.data.access_token,
-        res.data.refresh_token,
-        res.data.expires_in
-      );
+      await persistTokens(res.data.access_token, res.data.refresh_token, res.data.expires_in);
     }
 
     return res;
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to create workspace';
+    const message = err instanceof Error ? err.message : 'Gagal membuat workspace';
     return { success: false, code: 400, message, data: undefined as any };
   }
 }
@@ -105,16 +96,13 @@ export async function updateProfile(data: UpdateProfileRequest): Promise<UpdateP
   const authHeaders = await getAuthHeaders();
 
   try {
-    return await apiClient<UpdateProfileResponse>(
-      '/api/v1/tenant/settings/profile',
-      {
-        method: 'PUT',
-        headers: { ...authHeaders },
-        body: JSON.stringify(data)
-      }
-    );
+    return await apiClient<UpdateProfileResponse>('/api/v1/tenant/settings/profile', {
+      method: 'PUT',
+      headers: { ...authHeaders },
+      body: JSON.stringify(data)
+    });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to update profile';
+    const message = err instanceof Error ? err.message : 'Gagal memperbarui profil';
     return { success: false, code: 400, message };
   }
 }
@@ -131,7 +119,7 @@ export async function createBot(data: CreateBotRequest): Promise<CreateBotRespon
       body: JSON.stringify(data)
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to create bot';
+    const message = err instanceof Error ? err.message : 'Gagal membuat bot';
     return { success: false, code: 400, message, data: undefined as any };
   }
 }
@@ -148,27 +136,26 @@ export async function updateBot(botId: string, data: UpdateBotRequest): Promise<
       body: JSON.stringify(data)
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to update bot';
+    const message = err instanceof Error ? err.message : 'Gagal memperbarui bot';
     return { success: false, code: 400, message };
   }
 }
 
 // ─── Step 3: Update Payment Settings ────────────────────────────────
 // Called when user submits Step 3 (Finish).
-export async function updatePaymentSettings(data: UpdatePaymentRequest): Promise<UpdatePaymentResponse> {
+export async function updatePaymentSettings(
+  data: UpdatePaymentRequest
+): Promise<UpdatePaymentResponse> {
   const authHeaders = await getAuthHeaders();
 
   try {
-    return await apiClient<UpdatePaymentResponse>(
-      '/api/v1/tenant/settings/payment',
-      {
-        method: 'PUT',
-        headers: { ...authHeaders },
-        body: JSON.stringify(data)
-      }
-    );
+    return await apiClient<UpdatePaymentResponse>('/api/v1/tenant/settings/payment', {
+      method: 'PUT',
+      headers: { ...authHeaders },
+      body: JSON.stringify(data)
+    });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to update payment settings';
+    const message = err instanceof Error ? err.message : 'Gagal memperbarui pengaturan pembayaran';
     return { success: false, code: 400, message };
   }
 }

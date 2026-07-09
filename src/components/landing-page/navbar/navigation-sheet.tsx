@@ -12,7 +12,7 @@ export const NavigationSheet = () => {
   return (
     <Sheet>
       <VisuallyHiddenPrimitive.Root>
-        <SheetTitle>Navigation Drawer</SheetTitle>
+        <SheetTitle>Laci Navigasi</SheetTitle>
       </VisuallyHiddenPrimitive.Root>
       <SheetTrigger asChild>
         <Button variant='outline' size='icon'>
@@ -25,10 +25,10 @@ export const NavigationSheet = () => {
 
         <div className='mt-8 space-y-4'>
           <Button variant='outline' className='w-full sm:hidden' asChild>
-            <Link href='/login'>Sign In</Link>
+            <Link href='/login'>Masuk</Link>
           </Button>
           <Button className='w-full xs:hidden' asChild>
-            <Link href='/dashboard/overview'>Get Started</Link>
+            <Link href='/dashboard/overview'>Mulai Sekarang</Link>
           </Button>
         </div>
       </SheetContent>
