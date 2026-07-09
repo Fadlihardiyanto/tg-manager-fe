@@ -12,6 +12,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
+import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 
 interface MemberDetailProps {
@@ -31,6 +32,7 @@ function getSubscriptionDateText(sub: Subscription) {
 export function MemberDetail({ memberId }: MemberDetailProps) {
   const [_, setMemberId] = useQueryState('memberId');
   const [tab, setTab] = useState('overview');
+  const [groupState, setGroupState] = useState<Record<string, boolean>>({});
 
   const { data, isLoading } = useQuery(memberDetailQueryOptions(memberId));
 
@@ -52,6 +54,7 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
   const initials = `${member.first_name?.[0] || ''}${member.last_name?.[0] || ''}`.toUpperCase();
   const activeSubs = member.subscriptions?.filter((s: Subscription) => s.status === 'active') || [];
   const historySubs = member.subscriptions || [];
+  const groups = member.subscriptions || [];
 
   return (
     <Tabs value={tab} onValueChange={setTab} className='flex flex-col h-full bg-background'>
@@ -198,17 +201,47 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
         <TabsContent value='groups' className='mt-0'>
           <div className='flex flex-col gap-4'>
             <h3 className='text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-4'>
-              Active Telegram Groups
+              Telegram Groups
             </h3>
             <div className='flex flex-col gap-2'>
-              <div className='flex items-center p-3 bg-muted/40 rounded-lg border border-border'>
-                <Icons.chat className='size-5 mr-3 text-primary' />
-                <span className='text-sm font-medium'>VIP Signals</span>
-              </div>
-              <div className='flex items-center p-3 bg-muted/40 rounded-lg border border-border'>
-                <Icons.user className='size-5 mr-3 text-primary' />
-                <span className='text-sm font-medium'>Main Discussion</span>
-              </div>
+              {groups.length > 0 ? (
+                groups.map((group) => {
+                  const isActive = groupState[group.id] ?? group.status === 'active';
+
+                  return (
+                    <div
+                      key={group.id}
+                      className={cn(
+                        'flex items-center justify-between gap-3 rounded-lg border p-3 transition-colors',
+                        isActive
+                          ? 'bg-muted/40 border-border'
+                          : 'bg-muted/20 border-dashed opacity-60'
+                      )}
+                    >
+                      <div className='flex items-center min-w-0 gap-3'>
+                        <Icons.chat className='size-5 shrink-0 text-primary' />
+                        <div className='min-w-0'>
+                          <p className='truncate text-sm font-medium'>{group.package_name}</p>
+                          <p className='text-xs text-muted-foreground'>
+                            {isActive ? 'Active' : 'Inactive'}
+                          </p>
+                        </div>
+                      </div>
+                      <Switch
+                        checked={isActive}
+                        onCheckedChange={(checked) =>
+                          setGroupState((prev) => ({ ...prev, [group.id]: checked }))
+                        }
+                        aria-label={`${isActive ? 'Deactivate' : 'Activate'} ${group.package_name}`}
+                      />
+                    </div>
+                  );
+                })
+              ) : (
+                <div className='text-center p-4 border border-dashed rounded-xl text-muted-foreground text-sm'>
+                  No groups found
+                </div>
+              )}
             </div>
           </div>
         </TabsContent>

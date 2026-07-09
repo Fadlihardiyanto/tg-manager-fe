@@ -27,9 +27,30 @@ import type { NavGroup } from '@/types';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { logout } from '@/features/auth/api/service';
+import { routing } from '@/i18n/routing';
 import { useAuthStore } from '@/stores/auth-store';
 import * as React from 'react';
 import { Icons } from '../icons';
+
+function normalizePathname(pathname: string) {
+  const normalized = pathname.replace(/\/$/, '');
+
+  if (normalized === '') return '/';
+
+  const localePrefix = new RegExp(`^/(${routing.locales.join('|')})(?=/|$)`);
+  const withoutLocale = normalized.replace(localePrefix, '') || '/';
+
+  return withoutLocale === '' ? '/' : withoutLocale;
+}
+
+function isActivePath(pathname: string, url: string) {
+  if (!url || url === '#') return false;
+
+  const currentPath = normalizePathname(pathname);
+  const targetPath = normalizePathname(url);
+
+  return currentPath === targetPath || currentPath.startsWith(`${targetPath}/`);
+}
 
 export default function AppSidebar({ navGroups }: { navGroups: NavGroup[] }) {
   const pathname = usePathname();
@@ -45,16 +66,23 @@ export default function AppSidebar({ navGroups }: { navGroups: NavGroup[] }) {
             <SidebarMenu>
               {group.items.map((item) => {
                 const Icon = item.icon ? Icons[item.icon] : Icons.logo;
+                const isItemActive = isActivePath(pathname, item.url);
+                const hasActiveChild = item.items?.some((subItem) =>
+                  isActivePath(pathname, subItem.url)
+                );
                 return item?.items && item?.items?.length > 0 ? (
                   <Collapsible
                     key={item.title}
                     asChild
-                    defaultOpen={item.isActive}
+                    defaultOpen={item.isActive || hasActiveChild}
                     className='group/collapsible'
                   >
                     <SidebarMenuItem>
                       <CollapsibleTrigger asChild>
-                        <SidebarMenuButton tooltip={item.title} isActive={pathname === item.url}>
+                        <SidebarMenuButton
+                          tooltip={item.title}
+                          isActive={isItemActive || hasActiveChild}
+                        >
                           {item.icon && <Icon />}
                           <span className='group-data-[collapsible=icon]:hidden'>{item.title}</span>
                           <Icons.chevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 group-data-[collapsible=icon]:hidden' />
@@ -64,7 +92,10 @@ export default function AppSidebar({ navGroups }: { navGroups: NavGroup[] }) {
                         <SidebarMenuSub>
                           {item.items?.map((subItem) => (
                             <SidebarMenuSubItem key={subItem.title}>
-                              <SidebarMenuSubButton asChild isActive={pathname === subItem.url}>
+                              <SidebarMenuSubButton
+                                asChild
+                                isActive={isActivePath(pathname, subItem.url)}
+                              >
                                 <Link href={subItem.url}>
                                   <span>{subItem.title}</span>
                                 </Link>
@@ -77,11 +108,7 @@ export default function AppSidebar({ navGroups }: { navGroups: NavGroup[] }) {
                   </Collapsible>
                 ) : (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      asChild
-                      tooltip={item.title}
-                      isActive={pathname === item.url}
-                    >
+                    <SidebarMenuButton asChild tooltip={item.title} isActive={isItemActive}>
                       <Link href={item.url}>
                         <Icon />
                         <span className='group-data-[collapsible=icon]:hidden'>{item.title}</span>

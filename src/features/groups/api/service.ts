@@ -87,6 +87,20 @@ export async function deleteGroup(id: string): Promise<ApiResponse<null>> {
 }
 
 // ─── Generate Connect Token ────────────────────────────────────────
+export async function syncGroups(): Promise<ApiResponse<null>> {
+  const authHeaders = await getAuthHeaders();
+
+  try {
+    return await apiClient<ApiResponse<null>>('/api/v1/tenant/groups/sync', {
+      method: 'POST',
+      headers: { ...authHeaders }
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Failed to sync groups';
+    return { success: false, code: 400, message, data: null };
+  }
+}
+
 export async function generateConnectToken(botId: string): Promise<ConnectTokenResponse> {
   const authHeaders = await getAuthHeaders();
 

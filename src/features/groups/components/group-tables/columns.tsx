@@ -97,19 +97,6 @@ export function getColumns(onEdit?: (group: TelegramGroup) => void): ColumnDef<T
       enableColumnFilter: false
     },
     {
-      id: 'inactive_reason',
-      accessorKey: 'inactive_reason',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Inactive Reason' />,
-      cell: ({ cell, row }) => {
-        const isActive = row.original.is_active;
-        const reason = cell.getValue<string | null>();
-        if (isActive || !reason) return null;
-        return <span className='text-sm text-destructive'>{reason}</span>;
-      },
-      enableSorting: false,
-      enableColumnFilter: false
-    },
-    {
       id: 'created_at',
       accessorKey: 'created_at',
       header: ({ column }) => <DataTableColumnHeader column={column} title='Created' />,
