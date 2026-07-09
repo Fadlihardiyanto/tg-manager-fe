@@ -125,7 +125,7 @@ const TestimonialCard = ({ testimonial }: { testimonial: (typeof testimonials)[n
     <div className='flex items-center justify-between gap-20'>
       <div className='hidden lg:block relative shrink-0 aspect-3/4 max-w-[18rem] w-full bg-muted-foreground/20 rounded-xl'>
         <video
-          src='/Uration.mp4'
+          src='/Urator.mp4'
           autoPlay
           loop
           muted

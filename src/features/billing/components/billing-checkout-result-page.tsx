@@ -15,6 +15,7 @@ import {
   CardTitle
 } from '@/components/ui/card';
 import { Icons } from '@/components/icons';
+import { MidtransSnapCheckout } from '@/components/payments/midtrans-snap-checkout';
 import { formatDate, formatRupiah } from '@/lib/format';
 import { activeBillingQueryOptions } from '../api/queries';
 import type { ActiveBilling, BillingCycle } from '../api/types';
@@ -175,13 +176,18 @@ export function BillingCheckoutResultPage() {
             </AlertDescription>
           </Alert>
 
-          {billing?.payment_url && billing.status !== 'active' && (
-            <Button asChild variant='outline'>
-              <a href={billing.payment_url} target='_blank' rel='noreferrer'>
-                <Icons.externalLink className='h-4 w-4' />
-                Lanjutkan Pembayaran
-              </a>
-            </Button>
+          {(billing?.snap_token || billing?.payment_url) && billing.status !== 'active' && (
+            <MidtransSnapCheckout
+              snapToken={billing.snap_token}
+              paymentUrl={billing.payment_url}
+              clientKey={billing.client_key}
+              orderId={billing.order_id || billing.id}
+              successRedirectUrl='/dashboard/billing/checkout-result'
+              fallbackLabel='Lanjutkan Pembayaran'
+              variant='outline'
+            >
+              Lanjutkan Pembayaran
+            </MidtransSnapCheckout>
           )}
         </CardContent>
       )}

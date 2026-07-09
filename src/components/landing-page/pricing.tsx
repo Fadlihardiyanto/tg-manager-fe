@@ -70,7 +70,7 @@ const Pricing = async () => {
       {
         id: '1',
         name: 'free',
-        display_name: 'Gratis',
+        display_name: 'Free',
         price_monthly: 0,
         price_yearly: 0,
         max_bots: 1,

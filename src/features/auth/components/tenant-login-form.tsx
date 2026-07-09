@@ -116,7 +116,7 @@ export function TenantLoginForm({ className, ...props }: React.ComponentProps<'f
         <div className='relative flex items-center justify-center mb-4 h-16 w-full max-w-[250px]'>
           <img
             src='/uration-blue-version.png'
-            alt='Uration Logo'
+            alt='Urator Logo'
             className='relative h-full w-auto object-contain'
           />
         </div>

@@ -28,10 +28,11 @@ import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Icons } from '@/components/icons';
+import { MidtransSnapCheckout } from '@/components/payments/midtrans-snap-checkout';
 import { formatDate, formatRupiah } from '@/lib/format';
 import { checkoutBillingPlan } from '../api/service';
 import { publicPlansQueryOptions } from '../api/queries';
-import type { ActivePlan, BillingCycle } from '../api/types';
+import type { ActivePlan, BillingCycle, CheckoutBillingData } from '../api/types';
 import { useActivePlan } from './active-plan-provider';
 import { BillingHistoryTab } from './billing-history-tab';
 
@@ -89,6 +90,7 @@ export function ActivePlanPage() {
   const [billingCycle, setBillingCycle] = useState<BillingCycle>('monthly');
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
+  const [checkoutPayment, setCheckoutPayment] = useState<CheckoutBillingData | null>(null);
   const [tab, setTab] = useQueryState(
     'tab',
     parseAsString.withDefault('billing').withOptions({ shallow: false, history: 'replace' })
@@ -107,8 +109,8 @@ export function ActivePlanPage() {
   const checkoutMutation = useMutation({
     mutationFn: checkoutBillingPlan,
     onSuccess: (response) => {
-      if (response.success && response.data?.payment_url) {
-        window.location.assign(response.data.payment_url);
+      if (response.success && (response.data?.snap_token || response.data?.payment_url)) {
+        setCheckoutPayment(response.data);
         return;
       }
 
@@ -128,6 +130,7 @@ export function ActivePlanPage() {
 
   const openCheckoutDialog = (planId: string) => {
     setSelectedPlanId(planId);
+    setCheckoutPayment(null);
     setConfirmOpen(true);
   };
 
@@ -206,14 +209,18 @@ export function ActivePlanPage() {
                 </p>
               </div>
             </CardContent>
-            {billing.payment_url && billing.status !== 'active' && (
+            {(billing.snap_token || billing.payment_url) && billing.status !== 'active' && (
               <CardFooter>
-                <Button asChild>
-                  <a href={billing.payment_url} target='_blank' rel='noreferrer'>
-                    <Icons.externalLink className='h-4 w-4' />
-                    Lanjutkan Pembayaran
-                  </a>
-                </Button>
+                <MidtransSnapCheckout
+                  snapToken={billing.snap_token}
+                  paymentUrl={billing.payment_url}
+                  clientKey={billing.client_key}
+                  orderId={billing.order_id || billing.id}
+                  successRedirectUrl='/dashboard/billing/checkout-result'
+                  fallbackLabel='Lanjutkan Pembayaran'
+                >
+                  Lanjutkan Pembayaran
+                </MidtransSnapCheckout>
               </CardFooter>
             )}
           </Card>
@@ -463,9 +470,20 @@ export function ActivePlanPage() {
             <DialogHeader>
               <DialogTitle>Konfirmasi peningkatan paket</DialogTitle>
               <DialogDescription>
-                Tinjau singkat pilihan paket sebelum lanjut ke Midtrans.
+                Tinjau singkat pilihan paket sebelum membuka pembayaran Midtrans.
               </DialogDescription>
             </DialogHeader>
+
+            {checkoutPayment ? (
+              <Alert>
+                <Icons.creditCard className='h-4 w-4' />
+                <AlertTitle>Checkout siap dibuka</AlertTitle>
+                <AlertDescription>
+                  Pembayaran akan dibuka di website ini. Jika popup belum muncul, klik tombol bayar
+                  di bawah.
+                </AlertDescription>
+              </Alert>
+            ) : null}
 
             {selectedPlan && (
               <div className='space-y-4'>
@@ -513,24 +531,38 @@ export function ActivePlanPage() {
               <Button type='button' variant='outline' onClick={() => setConfirmOpen(false)}>
                 Batal
               </Button>
-              <Button
-                type='button'
-                isLoading={checkoutMutation.isPending}
-                disabled={
-                  !selectedPlan ||
-                  (billing?.plan.id === selectedPlan.id &&
-                    billing?.status === 'active' &&
-                    isCurrentBillingCycle)
-                }
-                onClick={() => selectedPlan && handleCheckout(selectedPlan.id)}
-              >
-                {selectedPlan &&
-                billing?.plan.id === selectedPlan.id &&
-                billing?.status === 'active' &&
-                isCurrentBillingCycle
-                  ? 'Paket Ini Sudah Aktif'
-                  : 'Lanjut ke Pembayaran'}
-              </Button>
+              {checkoutPayment ? (
+                <MidtransSnapCheckout
+                  snapToken={checkoutPayment.snap_token}
+                  paymentUrl={checkoutPayment.payment_url}
+                  clientKey={checkoutPayment.client_key}
+                  orderId={checkoutPayment.order_id}
+                  successRedirectUrl='/dashboard/billing/checkout-result'
+                  fallbackLabel='Buka Pembayaran'
+                  autoOpen
+                >
+                  Bayar dengan Midtrans
+                </MidtransSnapCheckout>
+              ) : (
+                <Button
+                  type='button'
+                  isLoading={checkoutMutation.isPending}
+                  disabled={
+                    !selectedPlan ||
+                    (billing?.plan.id === selectedPlan.id &&
+                      billing?.status === 'active' &&
+                      isCurrentBillingCycle)
+                  }
+                  onClick={() => selectedPlan && handleCheckout(selectedPlan.id)}
+                >
+                  {selectedPlan &&
+                  billing?.plan.id === selectedPlan.id &&
+                  billing?.status === 'active' &&
+                  isCurrentBillingCycle
+                    ? 'Paket Ini Sudah Aktif'
+                    : 'Lanjut ke Pembayaran'}
+                </Button>
+              )}
             </DialogFooter>
           </DialogContent>
         </Dialog>
