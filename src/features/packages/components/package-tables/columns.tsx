@@ -74,7 +74,7 @@ function StatusCell({ pkg }: { pkg: Package }) {
         checked={pkg.is_active}
         onCheckedChange={handleToggle}
         disabled={activateMutation.isPending || deactivateMutation.isPending}
-        aria-label={pkg.is_active ? 'Deactivate package' : 'Activate package'}
+        aria-label={pkg.is_active ? 'Nonaktifkan paket' : 'Aktifkan paket'}
       />
     </>
   );
@@ -85,7 +85,7 @@ export function getColumns(onEdit?: (pkg: Package) => void): ColumnDef<Package>[
     {
       id: 'name',
       accessorKey: 'name',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Name' />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Nama' />,
       cell: ({ row }) => (
         <div className={cn('flex items-center gap-2', !row.original.is_active && 'opacity-60')}>
           <Icons.product className='size-4 text-muted-foreground' />
@@ -93,8 +93,8 @@ export function getColumns(onEdit?: (pkg: Package) => void): ColumnDef<Package>[
         </div>
       ),
       meta: {
-        label: 'Name',
-        placeholder: 'Search packages...',
+        label: 'Nama',
+        placeholder: 'Cari paket...',
         variant: 'text',
         icon: Icons.text
       },
@@ -104,7 +104,7 @@ export function getColumns(onEdit?: (pkg: Package) => void): ColumnDef<Package>[
     {
       id: 'price',
       accessorKey: 'price',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Price' />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Harga' />,
       cell: ({ cell }) => {
         const price = cell.getValue<number>();
         return <span className='font-semibold tabular-nums'>{formatRupiah(price)}</span>;
@@ -115,7 +115,7 @@ export function getColumns(onEdit?: (pkg: Package) => void): ColumnDef<Package>[
     {
       id: 'description',
       accessorKey: 'description',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Description' />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Deskripsi' />,
       cell: ({ row }) => {
         const description = row.original.description?.trim();
         return (
@@ -130,21 +130,17 @@ export function getColumns(onEdit?: (pkg: Package) => void): ColumnDef<Package>[
     {
       id: 'duration_days',
       accessorKey: 'duration_days',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Duration' />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Durasi' />,
       cell: ({ cell }) => {
         const days = cell.getValue<number>();
-        return (
-          <span className='text-sm'>
-            {days} day{days !== 1 ? 's' : ''}
-          </span>
-        );
+        return <span className='text-sm'>{days} hari</span>;
       },
       enableSorting: true,
       enableColumnFilter: false
     },
     {
       id: 'groups',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Groups' />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Grup' />,
       cell: ({ row }) => {
         const groups = row.original.groups ?? [];
 
@@ -168,7 +164,7 @@ export function getColumns(onEdit?: (pkg: Package) => void): ColumnDef<Package>[
     {
       id: 'is_all_access',
       accessorFn: (row) => (row.is_all_access ? 'true' : 'false'),
-      header: ({ column }) => <DataTableColumnHeader column={column} title='All Access' />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Akses Penuh' />,
       filterFn: (row, columnId, filterValue) => {
         if (!Array.isArray(filterValue)) return true;
         const value = row.getValue<string>(columnId);
@@ -185,18 +181,18 @@ export function getColumns(onEdit?: (pkg: Package) => void): ColumnDef<Package>[
                 : 'text-muted-foreground'
             )}
           >
-            {isAllAccess ? 'Yes' : 'No'}
+            {isAllAccess ? 'Ya' : 'Tidak'}
           </Badge>
         );
       },
       enableSorting: false,
       enableColumnFilter: true,
       meta: {
-        label: 'all access',
+        label: 'akses penuh',
         variant: 'multiSelect' as const,
         options: [
-          { label: 'Yes', value: 'true' },
-          { label: 'No', value: 'false' }
+          { label: 'Ya', value: 'true' },
+          { label: 'Tidak', value: 'false' }
         ]
       }
     },
@@ -216,15 +212,15 @@ export function getColumns(onEdit?: (pkg: Package) => void): ColumnDef<Package>[
         label: 'status',
         variant: 'multiSelect' as const,
         options: [
-          { label: 'Active', value: 'true' },
-          { label: 'Inactive', value: 'false' }
+          { label: 'Aktif', value: 'true' },
+          { label: 'Nonaktif', value: 'false' }
         ]
       }
     },
     {
       id: 'created_at',
       accessorKey: 'created_at',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Created' />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Dibuat' />,
       cell: ({ cell }) => {
         const date = cell.getValue<string>();
         return (

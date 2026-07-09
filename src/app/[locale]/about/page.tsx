@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'About'
+  title: 'Tentang'
 };
 
 export default function AboutPage() {
@@ -10,39 +10,40 @@ export default function AboutPage() {
       <div className='mx-auto max-w-3xl'>
         {/* Header */}
         <div className='mb-12 text-center'>
-          <h1 className='text-foreground text-3xl font-bold tracking-tight sm:text-4xl'>About</h1>
-          <p className='text-muted-foreground mt-4 text-lg'>Learn more about this project</p>
+          <h1 className='text-foreground text-3xl font-bold tracking-tight sm:text-4xl'>Tentang</h1>
+          <p className='text-muted-foreground mt-4 text-lg'>
+            Pelajari lebih lanjut tentang proyek ini
+          </p>
         </div>
 
         {/* Content Sections */}
         <div className='space-y-8'>
           {/* Open Source Section */}
           <section className='bg-card rounded-2xl border p-8 shadow-sm'>
-            <h2 className='text-foreground mb-4 text-xl font-semibold'>Open-Source Project</h2>
+            <h2 className='text-foreground mb-4 text-xl font-semibold'>Proyek Open Source</h2>
             <p className='text-muted-foreground text-lg leading-relaxed'>
-              This is an open-source Next.js admin dashboard starter built with modern web
-              technologies. It provides a solid foundation for building powerful admin interfaces
-              and dashboards. The source code is freely available for developers to use, modify, and
-              distribute.
+              Ini adalah starter dashboard admin Next.js open source yang dibangun dengan teknologi
+              web modern. Proyek ini menyediakan fondasi yang solid untuk membangun antarmuka admin
+              dan dashboard yang kuat. Kode sumbernya tersedia bebas untuk digunakan, dimodifikasi,
+              dan didistribusikan.
             </p>
           </section>
 
           {/* Demo Purpose Section */}
           <section className='bg-card rounded-2xl border p-8 shadow-sm'>
-            <h2 className='text-foreground mb-4 text-xl font-semibold'>Demo Purpose</h2>
+            <h2 className='text-foreground mb-4 text-xl font-semibold'>Tujuan Demo</h2>
             <p className='text-muted-foreground text-lg leading-relaxed'>
-              This application serves as a demo for demonstration purposes. It showcases the
-              features, components, and capabilities of the admin dashboard starter. Feel free to
-              explore the interface, test the functionality, and evaluate if it meets your project
-              requirements.
+              Aplikasi ini berfungsi sebagai demo untuk tujuan demonstrasi. Di sini ditampilkan
+              fitur, komponen, dan kemampuan starter dashboard admin. Silakan jelajahi antarmuka,
+              uji fungsinya, dan nilai apakah sesuai dengan kebutuhan proyek Anda.
             </p>
           </section>
 
           {/* Auth Section */}
           <section className='bg-card rounded-2xl border p-8 shadow-sm'>
-            <h2 className='text-foreground mb-4 text-xl font-semibold'>Authentication by Clerk</h2>
+            <h2 className='text-foreground mb-4 text-xl font-semibold'>Autentikasi oleh Clerk</h2>
             <p className='text-muted-foreground text-lg leading-relaxed'>
-              Authentication for this application is securely handled by{' '}
+              Autentikasi untuk aplikasi ini ditangani secara aman oleh{' '}
               <a
                 href='https://clerk.com'
                 target='_blank'
@@ -51,19 +52,19 @@ export default function AboutPage() {
               >
                 Clerk
               </a>
-              , a modern authentication and user management platform. Clerk provides secure sign-in,
-              session management, and user data protection out of the box.
+              , platform autentikasi dan manajemen pengguna modern. Clerk menyediakan masuk aman,
+              pengelolaan sesi, dan perlindungan data pengguna secara bawaan.
             </p>
           </section>
 
           {/* Data Privacy Section */}
           <section className='bg-card rounded-2xl border p-8 shadow-sm'>
-            <h2 className='text-foreground mb-4 text-xl font-semibold'>Data Privacy</h2>
+            <h2 className='text-foreground mb-4 text-xl font-semibold'>Privasi Data</h2>
             <p className='text-muted-foreground text-lg leading-relaxed'>
-              We take your privacy seriously. No personal data is misused, shared, or sold to third
-              parties. Any information collected during your use of this demo application is used
-              solely for the purpose of providing the demonstration experience and is handled in
-              accordance with best practices for data protection.
+              Kami serius menjaga privasi Anda. Tidak ada data pribadi yang disalahgunakan,
+              dibagikan, atau dijual ke pihak ketiga. Informasi apa pun yang dikumpulkan selama
+              penggunaan aplikasi demo ini hanya dipakai untuk keperluan demonstrasi dan ditangani
+              sesuai praktik terbaik perlindungan data.
             </p>
           </section>
         </div>
@@ -71,7 +72,7 @@ export default function AboutPage() {
         {/* Footer Note */}
         <div className='mt-12 text-center'>
           <p className='text-muted-foreground text-sm'>
-            Built with Next.js, Tailwind CSS, and shadcn/ui
+            Dibangun dengan Next.js, Tailwind CSS, dan shadcn/ui
           </p>
         </div>
       </div>

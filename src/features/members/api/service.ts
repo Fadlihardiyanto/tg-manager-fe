@@ -75,7 +75,7 @@ export async function extendAccess(
       body: JSON.stringify(payload)
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to extend access';
+    const message = err instanceof Error ? err.message : 'Gagal memperpanjang akses';
     return { success: false, message };
   }
 }
@@ -96,7 +96,7 @@ export async function kickMember(id: string, subscriptionId?: string): Promise<A
       headers: { ...authHeaders }
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to kick member';
+    const message = err instanceof Error ? err.message : 'Gagal mengeluarkan member';
     return { success: false, message };
   }
 }
@@ -110,7 +110,7 @@ export async function manualSync(id: string): Promise<ActionResponse> {
       headers: { ...authHeaders }
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to sync member';
+    const message = err instanceof Error ? err.message : 'Gagal menyinkronkan member';
     return { success: false, message };
   }
 }
@@ -134,7 +134,7 @@ export async function resendLink(id: string, subscriptionId?: string): Promise<A
       }
     );
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to resend link';
+    const message = err instanceof Error ? err.message : 'Gagal mengirim ulang tautan';
     return { success: false, message };
   }
 }
@@ -150,10 +150,10 @@ export async function bulkKickMembers(targets: BulkKickTarget[]): Promise<Action
       success: allSucceeded,
       message: allSucceeded
         ? `${targets.length} members kicked successfully`
-        : 'Failed to kick some members'
+        : 'Gagal mengeluarkan sebagian member'
     };
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to kick members';
+    const message = err instanceof Error ? err.message : 'Gagal mengeluarkan member';
     return { success: false, message };
   }
 }

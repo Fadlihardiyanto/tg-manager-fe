@@ -17,12 +17,9 @@ export function ReviewStep({ form, onBack, botUsername }: StepProps) {
         <div className='mb-4 inline-flex size-14 items-center justify-center rounded-full bg-emerald-500/10 ring-4 ring-emerald-500/5'>
           <Icons.circleCheck className='size-7' />
         </div>
-        <h2 className='text-2xl font-bold tracking-tight sm:text-3xl'>
-          Review Your Configuration
-        </h2>
+        <h2 className='text-2xl font-bold tracking-tight sm:text-3xl'>Tinjau Konfigurasi Anda</h2>
         <p className='mt-1 max-w-md text-sm text-muted-foreground'>
-          Everything looks good! Review your setup below before heading to
-          the dashboard.
+          Semuanya sudah siap. Tinjau pengaturan Anda di bawah ini sebelum masuk ke dashboard.
         </p>
       </div>
 
@@ -51,9 +48,7 @@ export function ReviewStep({ form, onBack, botUsername }: StepProps) {
                   <div className='flex size-8 items-center justify-center rounded-lg bg-primary/10'>
                     <Icons.building className='size-4 text-primary' />
                   </div>
-                  <CardTitle className='text-sm font-semibold'>
-                    Workspace Details
-                  </CardTitle>
+                  <CardTitle className='text-sm font-semibold'>Detail Ruang Kerja</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className='flex flex-col gap-3'>
@@ -62,12 +57,8 @@ export function ReviewStep({ form, onBack, botUsername }: StepProps) {
                     <Icons.building className='size-4 text-muted-foreground' />
                   </div>
                   <div className='min-w-0'>
-                    <p className='text-xs text-muted-foreground'>
-                      Business Name
-                    </p>
-                    <p className='truncate text-sm font-medium'>
-                      {values.businessName || '—'}
-                    </p>
+                    <p className='text-xs text-muted-foreground'>Nama Bisnis</p>
+                    <p className='truncate text-sm font-medium'>{values.businessName || '—'}</p>
                   </div>
                 </div>
                 <div className='flex items-center gap-3'>
@@ -75,7 +66,7 @@ export function ReviewStep({ form, onBack, botUsername }: StepProps) {
                     <Icons.link className='size-4 text-muted-foreground' />
                   </div>
                   <div className='min-w-0'>
-                    <p className='text-xs text-muted-foreground'>URL Slug</p>
+                    <p className='text-xs text-muted-foreground'>Slug Tautan</p>
                     <p className='truncate font-mono text-xs font-medium'>
                       tg.app/{values.businessSlug || '—'}
                     </p>
@@ -86,11 +77,9 @@ export function ReviewStep({ form, onBack, botUsername }: StepProps) {
                     <Icons.tag className='size-4 text-muted-foreground' />
                   </div>
                   <div className='min-w-0'>
-                    <p className='text-xs text-muted-foreground'>Category</p>
+                    <p className='text-xs text-muted-foreground'>Kategori</p>
                     <p className='truncate text-sm font-medium capitalize'>
-                      {values.category
-                        ? values.category.replace(/_/g, ' ')
-                        : '—'}
+                      {values.category ? values.category.replace(/_/g, ' ') : '—'}
                     </p>
                   </div>
                 </div>
@@ -103,9 +92,7 @@ export function ReviewStep({ form, onBack, botUsername }: StepProps) {
                   <div className='flex size-8 items-center justify-center rounded-lg bg-sky-500/10'>
                     <Icons.bot className='size-4' />
                   </div>
-                  <CardTitle className='text-sm font-semibold'>
-                    Telegram Bot
-                  </CardTitle>
+                  <CardTitle className='text-sm font-semibold'>Bot Telegram</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className='flex flex-col gap-3'>
@@ -114,9 +101,7 @@ export function ReviewStep({ form, onBack, botUsername }: StepProps) {
                     <Icons.bot className='size-4 text-muted-foreground' />
                   </div>
                   <div className='min-w-0'>
-                    <p className='text-xs text-muted-foreground'>
-                      Bot Username
-                    </p>
+                    <p className='text-xs text-muted-foreground'>Username Bot</p>
                     <p className='truncate font-mono text-xs font-medium'>
                       {values.botToken ? (
                         botUsername || '—'
@@ -131,17 +116,18 @@ export function ReviewStep({ form, onBack, botUsername }: StepProps) {
                     <div className='flex size-8 shrink-0 items-center justify-center rounded bg-muted/50'>
                       <Icons.shieldLock className='size-4 text-muted-foreground' />
                     </div>
-                    <p className='text-xs text-muted-foreground'>
-                      Connection Status
-                    </p>
+                    <p className='text-xs text-muted-foreground'>Status Koneksi</p>
                   </div>
                   {values.botToken ? (
-                    <Badge variant='default' className='bg-primary/10 text-primary border-transparent'>
+                    <Badge
+                      variant='default'
+                      className='bg-primary/10 text-primary border-transparent'
+                    >
                       <span className='mr-1 inline-block size-1.5 rounded-full bg-primary' />
-                      Connected
+                      Terhubung
                     </Badge>
                   ) : (
-                    <Badge variant='secondary'>Not Connected</Badge>
+                    <Badge variant='secondary'>Belum Terhubung</Badge>
                   )}
                 </div>
               </CardContent>
@@ -153,9 +139,7 @@ export function ReviewStep({ form, onBack, botUsername }: StepProps) {
                   <div className='flex size-8 items-center justify-center rounded-lg bg-amber-500/10'>
                     <Icons.coin className='size-4' />
                   </div>
-                  <CardTitle className='text-sm font-semibold'>
-                    Payment Gateway
-                  </CardTitle>
+                  <CardTitle className='text-sm font-semibold'>Gateway Pembayaran</CardTitle>
                 </div>
               </CardHeader>
               <CardContent>
@@ -166,19 +150,20 @@ export function ReviewStep({ form, onBack, botUsername }: StepProps) {
                         <Icons.server className='size-4 text-muted-foreground' />
                       </div>
                       <div>
-                        <p className='text-sm font-medium'>Sandbox</p>
-                        <p className='text-xs text-muted-foreground'>
-                          Testing & development
-                        </p>
+                        <p className='text-sm font-medium'>Uji Coba</p>
+                        <p className='text-xs text-muted-foreground'>Pengujian & pengembangan</p>
                       </div>
                     </div>
                     {values.sandboxServerKey ? (
-                      <Badge variant='default' className='bg-primary/10 text-primary border-transparent'>
+                      <Badge
+                        variant='default'
+                        className='bg-primary/10 text-primary border-transparent'
+                      >
                         <span className='mr-1 inline-block size-1.5 rounded-full bg-primary' />
-                        Active
+                        Aktif
                       </Badge>
                     ) : (
-                      <Badge variant='secondary'>Not Configured</Badge>
+                      <Badge variant='secondary'>Belum Dikonfigurasi</Badge>
                     )}
                   </div>
                   <div className='flex items-center justify-between rounded-lg border border-border bg-card p-3'>
@@ -187,19 +172,20 @@ export function ReviewStep({ form, onBack, botUsername }: StepProps) {
                         <Icons.server className='size-4 text-muted-foreground' />
                       </div>
                       <div>
-                        <p className='text-sm font-medium'>Production</p>
-                        <p className='text-xs text-muted-foreground'>
-                          Live transactions
-                        </p>
+                        <p className='text-sm font-medium'>Produksi</p>
+                        <p className='text-xs text-muted-foreground'>Transaksi langsung</p>
                       </div>
                     </div>
                     {values.productionServerKey ? (
-                      <Badge variant='default' className='bg-primary/10 text-primary border-transparent'>
+                      <Badge
+                        variant='default'
+                        className='bg-primary/10 text-primary border-transparent'
+                      >
                         <span className='mr-1 inline-block size-1.5 rounded-full bg-primary' />
-                        Active
+                        Aktif
                       </Badge>
                     ) : (
-                      <Badge variant='secondary'>Not Configured</Badge>
+                      <Badge variant='secondary'>Belum Dikonfigurasi</Badge>
                     )}
                   </div>
                 </div>
@@ -210,14 +196,9 @@ export function ReviewStep({ form, onBack, botUsername }: StepProps) {
       </form.Subscribe>
 
       <div className='flex items-center justify-center gap-4 pt-2'>
-        <Button
-          type='button'
-          variant='outline'
-          className='min-w-[120px]'
-          onClick={onBack}
-        >
+        <Button type='button' variant='outline' className='min-w-[120px]' onClick={onBack}>
           <Icons.arrowLeft />
-          Back
+          Kembali
         </Button>
         <Button
           type='button'
@@ -229,7 +210,7 @@ export function ReviewStep({ form, onBack, botUsername }: StepProps) {
             scrollToFirstError();
           }}
         >
-          Go to Dashboard
+          Ke Dashboard
           <Icons.arrowRight />
         </Button>
       </div>

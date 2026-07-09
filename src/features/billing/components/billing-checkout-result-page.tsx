@@ -15,6 +15,7 @@ import {
   CardTitle
 } from '@/components/ui/card';
 import { Icons } from '@/components/icons';
+import { MidtransSnapCheckout } from '@/components/payments/midtrans-snap-checkout';
 import { formatDate, formatRupiah } from '@/lib/format';
 import { activeBillingQueryOptions } from '../api/queries';
 import type { ActiveBilling, BillingCycle } from '../api/types';
@@ -31,7 +32,7 @@ function formatStatus(status?: string) {
   if (!status) return '-';
   if (status === 'active') return 'Aktif';
   if (status === 'pending') return 'Menunggu Pembayaran';
-  if (status === 'expired') return 'Expired';
+  if (status === 'expired') return 'Kedaluwarsa';
   if (status === 'failed') return 'Gagal';
   return status;
 }
@@ -119,7 +120,7 @@ export function BillingCheckoutResultPage() {
               <p className='mt-1 text-lg font-semibold'>{billing.plan.display_name}</p>
             </div>
             <div className='rounded-lg border p-4'>
-              <p className='text-sm text-muted-foreground'>Billing Cycle</p>
+              <p className='text-sm text-muted-foreground'>Siklus Billing</p>
               <p className='mt-1 text-lg font-semibold'>
                 {formatBillingCycle(billing.billing_cycle)}
               </p>
@@ -155,7 +156,7 @@ export function BillingCheckoutResultPage() {
               <p className='mt-1 text-lg font-semibold'>{billing.plan.display_name}</p>
             </div>
             <div className='rounded-lg border p-4'>
-              <p className='text-sm text-muted-foreground'>Billing Cycle</p>
+              <p className='text-sm text-muted-foreground'>Siklus Billing</p>
               <p className='mt-1 text-lg font-semibold'>
                 {formatBillingCycle(billing.billing_cycle)}
               </p>
@@ -175,13 +176,18 @@ export function BillingCheckoutResultPage() {
             </AlertDescription>
           </Alert>
 
-          {billing?.payment_url && billing.status !== 'active' && (
-            <Button asChild variant='outline'>
-              <a href={billing.payment_url} target='_blank' rel='noreferrer'>
-                <Icons.externalLink className='h-4 w-4' />
-                Lanjutkan Pembayaran
-              </a>
-            </Button>
+          {(billing?.snap_token || billing?.payment_url) && billing.status !== 'active' && (
+            <MidtransSnapCheckout
+              snapToken={billing.snap_token}
+              paymentUrl={billing.payment_url}
+              clientKey={billing.client_key}
+              orderId={billing.order_id || billing.id}
+              successRedirectUrl='/dashboard/billing/checkout-result'
+              fallbackLabel='Lanjutkan Pembayaran'
+              variant='outline'
+            >
+              Lanjutkan Pembayaran
+            </MidtransSnapCheckout>
           )}
         </CardContent>
       )}

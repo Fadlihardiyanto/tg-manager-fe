@@ -2,14 +2,14 @@ import PageContainer from '@/components/layout/page-container';
 import BotListing from '@/features/bots/components/bot-listing';
 
 export const metadata = {
-  title: 'Dashboard: Bots'
+  title: 'Dashboard: Bot'
 };
 
 export default function BotsPage() {
   return (
     <PageContainer
-      pageTitle='Telegram Bots'
-      pageDescription='Manage your Telegram bots — register, configure roles, and control status.'
+      pageTitle='Bot Telegram'
+      pageDescription='Kelola bot Telegram Anda, mulai dari pendaftaran, pengaturan peran, hingga status aktif.'
     >
       <BotListing />
     </PageContainer>

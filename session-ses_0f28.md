@@ -3490,9 +3490,9 @@ Let me first check what video files exist in the project.
 
 **Output:**
 ```
-D:\Development\Application\Project-untuk-tambah-uang-nikah\tg-manager\next-shadcn-dashboard-starter\public\Uration.mp4
+D:\Development\Application\Project-untuk-tambah-uang-nikah\tg-manager\next-shadcn-dashboard-starter\public\Urator.mp4
 D:\Development\Application\Project-untuk-tambah-uang-nikah\tg-manager\next-shadcn-dashboard-starter\public\Two-factor-authentication.mp4
-D:\Development\Application\Project-untuk-tambah-uang-nikah\tg-manager\next-shadcn-dashboard-starter\public\assets\Uration.mp4
+D:\Development\Application\Project-untuk-tambah-uang-nikah\tg-manager\next-shadcn-dashboard-starter\public\assets\Urator.mp4
 ```
 
 **Tool: glob**

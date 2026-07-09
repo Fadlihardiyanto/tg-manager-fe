@@ -7,16 +7,10 @@ import { Icons } from '@/components/icons';
 import { useAppForm } from '@/components/ui/tanstack-form';
 import { TextField } from '@/components/forms/fields';
 import { IconMail, IconCheck } from '@tabler/icons-react';
-import {
-  forgotPasswordSchema,
-  type ForgotPasswordInput
-} from '../schemas/auth-schema';
+import { forgotPasswordSchema, type ForgotPasswordInput } from '../schemas/auth-schema';
 import { forgotPassword } from '../api/service';
 
-export function ForgotPasswordForm({
-  className,
-  ...props
-}: React.ComponentProps<'form'>) {
+export function ForgotPasswordForm({ className, ...props }: React.ComponentProps<'form'>) {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,9 +29,7 @@ export function ForgotPasswordForm({
         await forgotPassword(value);
         setIsSubmitted(true);
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : 'Something went wrong. Please try again.'
-        );
+        setError(err instanceof Error ? err.message : 'Terjadi kesalahan. Silakan coba lagi.');
       } finally {
         setIsSubmitting(false);
       }
@@ -55,15 +47,11 @@ export function ForgotPasswordForm({
         </div>
 
         {/* Success Message */}
-        <h1 className='text-2xl font-bold text-foreground mb-2'>
-          Check Your Email
-        </h1>
+        <h1 className='text-2xl font-bold text-foreground mb-2'>Periksa Email Anda</h1>
         <p className='text-sm text-muted-foreground mb-8'>
-          We&apos;ve sent a password reset link to{' '}
-          <span className='font-semibold text-foreground'>
-            {form.state.values.email}
-          </span>
-          . Please check your inbox and follow the instructions.
+          Kami telah mengirim tautan reset kata sandi ke{' '}
+          <span className='font-semibold text-foreground'>{form.state.values.email}</span>. Silakan
+          periksa kotak masuk Anda dan ikuti petunjuknya.
         </p>
 
         {/* Actions */}
@@ -72,16 +60,16 @@ export function ForgotPasswordForm({
             asChild
             className='w-full h-12 rounded-xl bg-primary text-base font-semibold text-primary-foreground transition-opacity hover:bg-primary/90'
           >
-            <Link href='/login'>Back to Sign In</Link>
+            <Link href='/login'>Kembali ke Masuk</Link>
           </Button>
           <p className='text-center text-sm text-muted-foreground'>
-            Didn&apos;t receive the email?{' '}
+            Belum menerima email?{' '}
             <button
               type='button'
               onClick={() => setIsSubmitted(false)}
               className='cursor-pointer font-bold text-foreground transition-colors hover:underline'
             >
-              Try again
+              Coba lagi
             </button>
           </p>
         </div>
@@ -92,13 +80,17 @@ export function ForgotPasswordForm({
   return (
     <div className='flex flex-col w-full'>
       {/* BEGIN: Header Section */}
-      <header className="flex flex-col items-center text-center mb-6">
-        <div className="relative flex items-center justify-center mb-4 h-16 w-full max-w-[250px]">
-          <img src="/uration-blue-version.png" alt="Uration Logo" className="relative h-full w-auto object-contain" />
+      <header className='flex flex-col items-center text-center mb-6'>
+        <div className='relative flex items-center justify-center mb-4 h-16 w-full max-w-[250px]'>
+          <img
+            src='/uration-blue-version.png'
+            alt='Urator Logo'
+            className='relative h-full w-auto object-contain'
+          />
         </div>
-        <h1 className="text-2xl font-bold text-foreground mb-2">Forgot Password?</h1>
-        <p className="text-muted-foreground text-sm">
-          No worries, we&apos;ll send you reset instructions.
+        <h1 className='text-2xl font-bold text-foreground mb-2'>Lupa kata sandi?</h1>
+        <p className='text-muted-foreground text-sm'>
+          Tidak masalah, kami akan mengirim petunjuk reset.
         </p>
       </header>
 
@@ -111,16 +103,14 @@ export function ForgotPasswordForm({
               <TextField
                 label=''
                 type='email'
-                placeholder='Email Address'
+                placeholder='Alamat email'
                 className='px-4 h-12 border border-border rounded-xl focus-visible:ring-ring text-base placeholder:text-muted-foreground bg-background'
               />
             )}
           />
 
           {/* Error Message */}
-          {error && (
-            <p className='text-sm text-destructive'>{error}</p>
-          )}
+          {error && <p className='text-sm text-destructive'>{error}</p>}
 
           {/* Submit Button */}
           <form.SubmitButton
@@ -130,23 +120,23 @@ export function ForgotPasswordForm({
             {isSubmitting ? (
               <span className='flex items-center gap-2'>
                 <Icons.spinner className='h-4 w-4 animate-spin' />
-                Sending...
+                Mengirim...
               </span>
             ) : (
-              'Send Reset Link'
+              'Kirim Tautan Reset'
             )}
           </form.SubmitButton>
         </form.Form>
       </form.AppForm>
 
       {/* BEGIN: Footer */}
-      <footer className="mt-6 text-center">
+      <footer className='mt-6 text-center'>
         <Link
-          href="/login"
-          className="inline-flex items-center gap-1.5 text-sm font-bold text-foreground transition-colors hover:underline"
+          href='/login'
+          className='inline-flex items-center gap-1.5 text-sm font-bold text-foreground transition-colors hover:underline'
         >
           <Icons.arrowLeft className='h-4 w-4' />
-          Back to Sign In
+          Kembali ke Masuk
         </Link>
       </footer>
     </div>

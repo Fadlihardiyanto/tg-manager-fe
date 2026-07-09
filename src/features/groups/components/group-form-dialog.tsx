@@ -25,8 +25,8 @@ type GroupFormValues = {
 };
 
 const groupFormSchema = z.object({
-  bot_id: z.string().min(1, 'Please select a bot'),
-  name: z.string().min(3, 'Group name must be at least 3 characters')
+  bot_id: z.string().min(1, 'Silakan pilih bot'),
+  name: z.string().min(3, 'Nama grup harus minimal 3 karakter')
 });
 
 interface GroupFormDialogProps {
@@ -50,15 +50,15 @@ export function GroupFormDialog({ group, open, onOpenChange }: GroupFormDialogPr
     ...updateGroupMutation,
     onSuccess: (res) => {
       if (res.success) {
-        toast.success('Group updated successfully');
+        toast.success('Grup berhasil diperbarui');
         onOpenChange(false);
         form.reset();
         void queryClient.invalidateQueries({ queryKey: groupKeys.all });
       } else {
-        toast.error(res.message || 'Failed to update group');
+        toast.error(res.message || 'Gagal memperbarui grup');
       }
     },
-    onError: () => toast.error('Failed to update group')
+    onError: () => toast.error('Gagal memperbarui grup')
   });
 
   const form = useAppForm({
@@ -93,21 +93,21 @@ export function GroupFormDialog({ group, open, onOpenChange }: GroupFormDialogPr
     >
       <DialogContent className='sm:max-w-[480px]'>
         <DialogHeader>
-          <DialogTitle>Edit Group</DialogTitle>
-          <DialogDescription>Update the group name or assigned bot.</DialogDescription>
+          <DialogTitle>Ubah Grup</DialogTitle>
+          <DialogDescription>Perbarui nama grup atau bot yang ditugaskan.</DialogDescription>
         </DialogHeader>
 
         <form.AppForm>
           <form.Form id='group-form-dialog' className='space-y-4'>
             <FormSelectField
               name='bot_id'
-              label='Assigned Bot'
+              label='Bot yang Ditugaskan'
               required
               options={botOptions}
-              placeholder='Select a bot'
-              description='The bot that will manage this group.'
+              placeholder='Pilih bot'
+              description='Bot yang akan mengelola grup ini.'
               validators={{
-                onBlur: z.string().min(1, 'Please select a bot')
+                onBlur: z.string().min(1, 'Silakan pilih bot')
               }}
             />
 
@@ -123,11 +123,11 @@ export function GroupFormDialog({ group, open, onOpenChange }: GroupFormDialogPr
 
             <FormTextField
               name='name'
-              label='Group Name'
+              label='Nama Grup'
               required
-              placeholder='VIP Trading Group'
+              placeholder='Grup Trading VIP'
               validators={{
-                onBlur: z.string().min(3, 'Group name must be at least 3 characters')
+                onBlur: z.string().min(3, 'Nama grup harus minimal 3 karakter')
               }}
             />
           </form.Form>
@@ -142,11 +142,11 @@ export function GroupFormDialog({ group, open, onOpenChange }: GroupFormDialogPr
               onOpenChange(false);
             }}
           >
-            Cancel
+            Batal
           </Button>
           <Button type='submit' form='group-form-dialog' isLoading={updateMutation.isPending}>
             <Icons.check className='mr-2 h-4 w-4' />
-            Update Group
+            Perbarui Grup
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -8,10 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import { useAppForm } from '@/components/ui/tanstack-form';
 import { TextField } from '@/components/forms/fields';
-import {
-  tenantRegisterSchema,
-  type TenantRegisterInput
-} from '../schemas/auth-schema';
+import { tenantRegisterSchema, type TenantRegisterInput } from '../schemas/auth-schema';
 import { useRegisterMutation } from '../api/queries';
 import { toast } from 'sonner';
 
@@ -19,8 +16,7 @@ import { toast } from 'sonner';
 function getPasswordChecks(password: string) {
   return {
     length: password.length >= 8,
-    numberOrSymbol:
-      /[0-9!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?`~]/.test(password),
+    numberOrSymbol: /[0-9!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?`~]/.test(password),
     mixedCase: /[a-z]/.test(password) && /[A-Z]/.test(password)
   };
 }
@@ -51,22 +47,19 @@ const RegisterForm = () => {
         });
 
         if (res.success) {
-          toast.success('Registration successful', {
-            description:
-              res.message ||
-              'Please check your email to verify your account.'
+          toast.success('Pendaftaran berhasil', {
+            description: res.message || 'Silakan periksa email Anda untuk memverifikasi akun.'
           });
           // BE guide: redirect to check-email page with email param
           router.push(`/check-email?email=${encodeURIComponent(value.email)}`);
         } else {
-          toast.error('Registration failed', {
-            description: res.message || 'An error occurred'
+          toast.error('Pendaftaran gagal', {
+            description: res.message || 'Terjadi kesalahan'
           });
         }
       } catch (error: unknown) {
-        const message =
-          error instanceof Error ? error.message : 'Please try again later';
-        toast.error('Registration failed', { description: message });
+        const message = error instanceof Error ? error.message : 'Please try again later';
+        toast.error('Pendaftaran gagal', { description: message });
       }
     }
   });
@@ -83,14 +76,16 @@ const RegisterForm = () => {
   return (
     <div className='flex flex-col w-full'>
       {/* BEGIN: Header Section */}
-      <header className="flex flex-col items-center text-center mb-6">
-        <div className="relative flex items-center justify-center mb-4 h-16 w-full max-w-[250px]">
-          <img src="/uration-blue-version.png" alt="Uration Logo" className="relative h-full w-auto object-contain" />
+      <header className='flex flex-col items-center text-center mb-6'>
+        <div className='relative flex items-center justify-center mb-4 h-16 w-full max-w-[250px]'>
+          <img
+            src='/uration-blue-version.png'
+            alt='Urator Logo'
+            className='relative h-full w-auto object-contain'
+          />
         </div>
-        <h1 className="text-2xl font-bold text-foreground mb-2">Create an account</h1>
-        <p className="text-muted-foreground text-sm">
-          Join the automation revolution for Telegram.
-        </p>
+        <h1 className='text-2xl font-bold text-foreground mb-2'>Buat akun</h1>
+        <p className='text-muted-foreground text-sm'>Bergabunglah dengan otomatisasi Telegram.</p>
       </header>
 
       <form.AppForm>
@@ -102,7 +97,7 @@ const RegisterForm = () => {
               <TextField
                 label=''
                 type='text'
-                placeholder='Full Name'
+                placeholder='Nama lengkap'
                 className='px-4 h-12 border border-border rounded-xl focus-visible:ring-ring text-base placeholder:text-muted-foreground bg-background'
               />
             )}
@@ -115,7 +110,7 @@ const RegisterForm = () => {
               <TextField
                 label=''
                 type='email'
-                placeholder='Email Address'
+                placeholder='Alamat email'
                 className='px-4 h-12 border border-border rounded-xl focus-visible:ring-ring text-base placeholder:text-muted-foreground bg-background'
               />
             )}
@@ -128,7 +123,7 @@ const RegisterForm = () => {
               <TextField
                 label=''
                 type={showPassword ? 'text' : 'password'}
-                placeholder='Password'
+                placeholder='Kata sandi'
                 hideError
                 rightElement={
                   <button
@@ -151,9 +146,15 @@ const RegisterForm = () => {
 
           {/* Password Validation Checklist */}
           <div className='-mt-2 mb-2 flex flex-col gap-2'>
-            <ValidationItem label='Least 8 characters' valid={passwordChecks.length} />
-            <ValidationItem label='Least one number (0-9) or a symbol' valid={passwordChecks.numberOrSymbol} />
-            <ValidationItem label='Lowercase (a-z) and uppercase (A-Z)' valid={passwordChecks.mixedCase} />
+            <ValidationItem label='Minimal 8 karakter' valid={passwordChecks.length} />
+            <ValidationItem
+              label='Minimal satu angka (0-9) atau simbol'
+              valid={passwordChecks.numberOrSymbol}
+            />
+            <ValidationItem
+              label='Huruf kecil (a-z) dan huruf besar (A-Z)'
+              valid={passwordChecks.mixedCase}
+            />
           </div>
 
           {/* Confirm Password */}
@@ -163,7 +164,7 @@ const RegisterForm = () => {
               <TextField
                 label=''
                 type={showConfirmPassword ? 'text' : 'password'}
-                placeholder='Re-Type Password'
+                placeholder='Ulangi kata sandi'
                 rightElement={
                   <button
                     type='button'
@@ -190,39 +191,30 @@ const RegisterForm = () => {
             {registerMutation.isPending ? (
               <>
                 <Icons.spinner className='mr-2 h-5 w-5 animate-spin' />
-                Signing up...
+                Sedang mendaftar...
               </>
             ) : (
-              'Sign Up'
+              'Daftar'
             )}
           </form.SubmitButton>
         </form.Form>
       </form.AppForm>
 
       {/* BEGIN: Footer */}
-      <footer className="mt-6 text-center">
-        <p className="text-sm text-muted-foreground">
-          Already a member?{' '}
-          <Link
-            href="/login"
-            className="text-foreground font-bold hover:underline transition-all"
-          >
-            Sign In
+      <footer className='mt-6 text-center'>
+        <p className='text-sm text-muted-foreground'>
+          Sudah punya akun?{' '}
+          <Link href='/login' className='text-foreground font-bold hover:underline transition-all'>
+            Masuk
           </Link>
         </p>
       </footer>
     </div>
   );
-}
+};
 
 /** Inline validation check item */
-function ValidationItem({
-  label,
-  valid
-}: {
-  label: string;
-  valid: boolean;
-}) {
+function ValidationItem({ label, valid }: { label: string; valid: boolean }) {
   return (
     <div
       className={`flex items-center gap-2 text-xs ${

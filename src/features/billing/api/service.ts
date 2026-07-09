@@ -50,7 +50,7 @@ export async function getActiveBilling(): Promise<ActiveBillingResponse> {
       headers: { ...authHeaders }
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to fetch active billing';
+    const message = err instanceof Error ? err.message : 'Gagal mengambil penagihan aktif';
     return { success: false, code: 400, message, data: undefined as never };
   }
 }
@@ -63,7 +63,7 @@ export async function getPublicPlans(): Promise<PublicPlansResponse> {
 
     return normalizePublicPlansResponse(response);
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to fetch public plans';
+    const message = err instanceof Error ? err.message : 'Gagal mengambil paket publik';
     return { success: false, code: 400, message, data: [] };
   }
 }
@@ -80,7 +80,7 @@ export async function checkoutBillingPlan(
       body: JSON.stringify(payload)
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to checkout billing plan';
+    const message = err instanceof Error ? err.message : 'Gagal memproses checkout paket';
     return {
       success: false,
       code: 400,
@@ -110,7 +110,7 @@ export async function getBillingHistory(
       }
     );
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to fetch billing history';
+    const message = err instanceof Error ? err.message : 'Gagal mengambil riwayat penagihan';
     return {
       success: false,
       code: 400,

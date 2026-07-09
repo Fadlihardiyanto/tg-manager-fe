@@ -16,8 +16,8 @@ export default function VerifyEmailClient() {
   // If token is missing, redirect to login
   useEffect(() => {
     if (!token) {
-      toast.error('Invalid verification link', {
-        description: 'Missing verification token.'
+      toast.error('Tautan verifikasi tidak valid', {
+        description: 'Token verifikasi tidak ditemukan.'
       });
       router.push('/login');
     }
@@ -39,8 +39,8 @@ export default function VerifyEmailClient() {
           needsOnboarding: res.data.needs_onboarding
         });
 
-        toast.success('Email Verified', {
-          description: res.message || 'You have been automatically logged in.'
+        toast.success('Email berhasil diverifikasi', {
+          description: res.message || 'Anda telah otomatis masuk.'
         });
 
         if (res.data?.needs_onboarding) {
@@ -49,15 +49,15 @@ export default function VerifyEmailClient() {
           router.push('/dashboard/overview');
         }
       } else {
-        toast.error('Verification failed', {
-          description: res?.message || 'Invalid or expired token.'
+        toast.error('Verifikasi gagal', {
+          description: res?.message || 'Token tidak valid atau sudah kedaluwarsa.'
         });
         setTimeout(() => router.push('/login'), 3000);
       }
     } else if (verifyQuery.isError) {
-      toast.error('Verification error', {
+      toast.error('Terjadi kesalahan verifikasi', {
         description:
-          verifyQuery.error?.message || 'An unexpected error occurred during verification.'
+          verifyQuery.error?.message || 'Terjadi kesalahan yang tidak terduga saat verifikasi.'
       });
       setTimeout(() => router.push('/login'), 3000);
     }
@@ -79,9 +79,10 @@ export default function VerifyEmailClient() {
         <>
           <Icons.spinner className='h-10 w-10 animate-spin text-primary' />
           <div className='space-y-2'>
-            <h1 className='text-xl font-semibold tracking-tight'>Verifying your email</h1>
+            <h1 className='text-xl font-semibold tracking-tight'>Memverifikasi email Anda</h1>
             <p className='text-sm text-muted-foreground'>
-              Please wait while we verify your email address. You will be redirected shortly.
+              Mohon tunggu sementara kami memverifikasi alamat email Anda. Anda akan segera
+              diarahkan.
             </p>
           </div>
         </>
@@ -91,11 +92,11 @@ export default function VerifyEmailClient() {
             <Icons.close className='h-6 w-6 text-destructive' />
           </div>
           <div className='space-y-2'>
-            <h1 className='text-xl font-semibold tracking-tight'>Verification Failed</h1>
+            <h1 className='text-xl font-semibold tracking-tight'>Verifikasi Gagal</h1>
             <p className='text-sm text-muted-foreground'>
               {verifyQuery.data?.message ||
                 verifyQuery.error?.message ||
-                'The link may be invalid or expired. Redirecting to login...'}
+                'Tautan mungkin tidak valid atau sudah kedaluwarsa. Mengarahkan ke halaman masuk...'}
             </p>
           </div>
         </>
@@ -105,8 +106,10 @@ export default function VerifyEmailClient() {
             <Icons.check className='h-6 w-6 text-primary' />
           </div>
           <div className='space-y-2'>
-            <h1 className='text-xl font-semibold tracking-tight'>Email Verified</h1>
-            <p className='text-sm text-muted-foreground'>Redirecting you to the next step...</p>
+            <h1 className='text-xl font-semibold tracking-tight'>Email Terverifikasi</h1>
+            <p className='text-sm text-muted-foreground'>
+              Anda akan segera diarahkan ke langkah berikutnya...
+            </p>
           </div>
         </>
       ) : null}

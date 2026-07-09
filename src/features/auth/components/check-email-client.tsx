@@ -38,15 +38,15 @@ export default function CheckEmailClient() {
 
     const res = await resendMutation.mutateAsync({ email });
     if (res.success) {
-      toast.success('Verification email resent', {
-        description: res.message || 'Please check your inbox again.'
+      toast.success('Email verifikasi terkirim ulang', {
+        description: res.message || 'Silakan periksa kotak masuk Anda lagi.'
       });
       // Restart cooldown
       setCooldown(COOLDOWN_SECONDS);
       setIsCooldownActive(true);
     } else {
-      toast.error('Failed to resend', {
-        description: res.message || 'Please try again later.'
+      toast.error('Gagal mengirim ulang', {
+        description: res.message || 'Silakan coba lagi nanti.'
       });
     }
   }, [email, isCooldownActive, resendMutation]);
@@ -80,15 +80,11 @@ export default function CheckEmailClient() {
 
           {/* Heading */}
           <div className='space-y-2'>
-            <h1 className='text-2xl font-bold tracking-tight'>
-              Check Your Email
-            </h1>
+            <h1 className='text-2xl font-bold tracking-tight'>Periksa Email Anda</h1>
             <p className='text-sm text-muted-foreground'>
-              We&apos;ve sent a verification link to
+              Kami telah mengirim tautan verifikasi ke
             </p>
-            <p className='text-sm font-semibold text-foreground break-all'>
-              {email}
-            </p>
+            <p className='text-sm font-semibold text-foreground break-all'>{email}</p>
           </div>
 
           {/* Instructions */}
@@ -97,16 +93,14 @@ export default function CheckEmailClient() {
               <div className='flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary'>
                 1
               </div>
-              <p className='text-sm text-muted-foreground'>
-                Open your email inbox
-              </p>
+              <p className='text-sm text-muted-foreground'>Buka kotak masuk email Anda</p>
             </div>
             <div className='flex items-start gap-3'>
               <div className='flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary'>
                 2
               </div>
               <p className='text-sm text-muted-foreground'>
-                Click the verification link in the email we sent you
+                Klik tautan verifikasi pada email yang kami kirim
               </p>
             </div>
             <div className='flex items-start gap-3'>
@@ -114,17 +108,14 @@ export default function CheckEmailClient() {
                 3
               </div>
               <p className='text-sm text-muted-foreground'>
-                You&apos;ll be automatically logged in and redirected to your
-                workspace setup
+                Anda akan otomatis masuk dan diarahkan ke pengaturan workspace
               </p>
             </div>
           </div>
 
           {/* Resend Button */}
           <div className='flex flex-col items-center gap-2'>
-            <p className='text-sm text-muted-foreground'>
-              Didn&apos;t receive the email?
-            </p>
+            <p className='text-sm text-muted-foreground'>Belum menerima email?</p>
             <Button
               variant='outline'
               size='lg'
@@ -135,17 +126,17 @@ export default function CheckEmailClient() {
               {resendMutation.isPending ? (
                 <>
                   <Icons.spinner className='mr-2 h-4 w-4 animate-spin' />
-                  Sending...
+                  Mengirim...
                 </>
               ) : isCooldownActive ? (
                 <>
                   <Icons.clock className='mr-2 h-4 w-4' />
-                  Resend in {cooldown}s
+                  Kirim ulang dalam {cooldown} detik
                 </>
               ) : (
                 <>
                   <Icons.refresh className='mr-2 h-4 w-4' />
-                  Resend Verification Email
+                  Kirim Ulang Email Verifikasi
                 </>
               )}
             </Button>
@@ -153,12 +144,12 @@ export default function CheckEmailClient() {
 
           {/* Sign in link */}
           <p className='text-sm text-muted-foreground'>
-            Already verified?{' '}
+            Sudah verifikasi?{' '}
             <Link
               href='/login'
               className='font-bold text-primary transition-colors hover:text-primary/80'
             >
-              Sign in
+              Masuk
             </Link>
           </p>
         </CardContent>

@@ -30,12 +30,12 @@ export function CellAction({ data, onEdit }: CellActionProps) {
   const deleteMutation = useMutation({
     ...deletePackageMutation,
     onSuccess: () => {
-      toast.success('Package deleted successfully');
+      toast.success('Paket berhasil dihapus');
       setDeleteOpen(false);
       void queryClient.invalidateQueries({ queryKey: packageKeys.all });
     },
     onError: () => {
-      toast.error('Failed to delete package');
+      toast.error('Gagal menghapus paket');
     }
   });
 
@@ -50,16 +50,16 @@ export function CellAction({ data, onEdit }: CellActionProps) {
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <Button variant='ghost' className='h-8 w-8 p-0'>
-            <span className='sr-only'>Open menu</span>
+            <span className='sr-only'>Buka menu</span>
             <Icons.ellipsis className='h-4 w-4' />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end'>
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuLabel>Aksi</DropdownMenuLabel>
           <DropdownMenuSeparator />
           {onEdit && (
             <DropdownMenuItem onClick={() => onEdit(data)}>
-              <Icons.edit className='mr-2 h-4 w-4' /> Edit Package
+              <Icons.edit className='mr-2 h-4 w-4' /> Ubah Paket
             </DropdownMenuItem>
           )}
           <DropdownMenuSeparator />
@@ -67,7 +67,7 @@ export function CellAction({ data, onEdit }: CellActionProps) {
             className='text-destructive focus:text-destructive'
             onClick={() => setDeleteOpen(true)}
           >
-            <Icons.trash className='mr-2 h-4 w-4' /> Delete
+            <Icons.trash className='mr-2 h-4 w-4' /> Hapus
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

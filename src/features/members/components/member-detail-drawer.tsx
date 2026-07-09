@@ -1,13 +1,19 @@
-"use client";
+'use client';
 
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
-import { useQueryState } from "nuqs";
-import { MemberDetail } from "./member-detail";
-import { Suspense } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription
+} from '@/components/ui/sheet';
+import { useQueryState } from 'nuqs';
+import { MemberDetail } from './member-detail';
+import { Suspense } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export function MemberDetailDrawer() {
-  const [memberId, setMemberId] = useQueryState("memberId");
+  const [memberId, setMemberId] = useQueryState('memberId');
 
   const isOpen = !!memberId;
 
@@ -17,8 +23,8 @@ export function MemberDetailDrawer() {
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <SheetContent className="w-full sm:max-w-[450px] p-0 flex flex-col gap-0 border-l shadow-2xl overflow-hidden bg-background [&>button]:hidden">
-        <SheetTitle className="sr-only">Member Details</SheetTitle>
+      <SheetContent className='w-full sm:max-w-[450px] p-0 flex flex-col gap-0 border-l shadow-2xl overflow-hidden bg-background [&>button]:hidden'>
+        <SheetTitle className='sr-only'>Detail Member</SheetTitle>
         {memberId && (
           <Suspense fallback={<MemberDetailSkeleton />}>
             <MemberDetail memberId={memberId} />

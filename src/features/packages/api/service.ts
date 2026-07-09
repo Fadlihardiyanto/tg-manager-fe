@@ -38,7 +38,7 @@ export async function getPackages(): Promise<PackagesListResponse> {
       headers: { ...authHeaders }
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to fetch packages';
+    const message = err instanceof Error ? err.message : 'Gagal mengambil paket';
     return { success: false, code: 400, message, data: [] };
   }
 }
@@ -53,7 +53,7 @@ export async function getPackageById(id: string): Promise<PackageResponse> {
       headers: { ...authHeaders }
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to fetch package';
+    const message = err instanceof Error ? err.message : 'Gagal mengambil paket';
     return { success: false, code: 400, message, data: undefined as any };
   }
 }
@@ -69,7 +69,7 @@ export async function createPackage(data: CreatePackageRequest): Promise<Package
       body: JSON.stringify(data)
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to create package';
+    const message = err instanceof Error ? err.message : 'Gagal membuat paket';
     return { success: false, code: 400, message, data: undefined as any };
   }
 }
@@ -88,7 +88,7 @@ export async function updatePackage(
       body: JSON.stringify(data)
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to update package';
+    const message = err instanceof Error ? err.message : 'Gagal memperbarui paket';
     return { success: false, code: 400, message, data: undefined as any };
   }
 }
@@ -103,7 +103,7 @@ export async function deletePackage(id: string): Promise<ApiResponse<null>> {
       headers: { ...authHeaders }
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to delete package';
+    const message = err instanceof Error ? err.message : 'Gagal menghapus paket';
     return { success: false, code: 400, message, data: null };
   }
 }
@@ -119,7 +119,7 @@ export async function togglePackageStatus(id: string, isActive: boolean): Promis
       headers: { ...authHeaders }
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : `Failed to ${action} package`;
+    const message = err instanceof Error ? err.message : `Gagal ${action} paket`;
     return { success: false, code: 400, message, data: undefined as any };
   }
 }
@@ -138,7 +138,7 @@ export async function associateGroupsToPackage(
       body: JSON.stringify(data)
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to associate groups';
+    const message = err instanceof Error ? err.message : 'Gagal menghubungkan grup';
     return { success: false, code: 400, message, data: null };
   }
 }

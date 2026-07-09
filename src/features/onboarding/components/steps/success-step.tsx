@@ -19,23 +19,17 @@ export function SuccessStep() {
       </div>
 
       <div className='flex flex-col gap-2 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 delay-300'>
-        <h3 className='text-2xl font-bold tracking-tight'>
-          You&apos;re All Set!
-        </h3>
+        <h3 className='text-2xl font-bold tracking-tight'>Semua Sudah Siap!</h3>
         <p className='mx-auto max-w-sm text-muted-foreground'>
-          Your workspace has been configured successfully. Start managing your
-          Telegram community with TG-Manager now.
+          Workspace Anda telah berhasil dikonfigurasi. Mulai kelola komunitas Telegram Anda dengan
+          TG-Manager sekarang.
         </p>
       </div>
 
       <div className='flex w-full max-w-xs flex-col gap-3 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 delay-500'>
-        <Button
-          size='lg'
-          className='w-full'
-          onClick={() => router.push('/dashboard/overview')}
-        >
+        <Button size='lg' className='w-full' onClick={() => router.push('/dashboard/overview')}>
           <Icons.dashboard />
-          Go to Dashboard
+          Ke Dashboard
         </Button>
       </div>
     </div>

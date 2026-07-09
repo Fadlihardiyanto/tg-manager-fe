@@ -79,7 +79,7 @@ function StatusCell({ cmd }: { cmd: Command }) {
         checked={cmd.is_active}
         onCheckedChange={handleToggle}
         disabled={updateMutation.isPending}
-        aria-label={cmd.is_active ? 'Deactivate command' : 'Activate command'}
+        aria-label={cmd.is_active ? 'Nonaktifkan perintah' : 'Aktifkan perintah'}
       />
     </>
   );
@@ -98,7 +98,7 @@ export function getColumns(
     {
       id: 'command_trigger',
       accessorKey: 'command_trigger',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Command' />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Perintah' />,
       cell: ({ row }) => (
         <div className={cn('flex items-center gap-2', !row.original.is_active && 'opacity-60')}>
           <code className='rounded bg-muted px-1.5 py-0.5 text-sm font-semibold'>
@@ -107,8 +107,8 @@ export function getColumns(
         </div>
       ),
       meta: {
-        label: 'Command',
-        placeholder: 'Search commands...',
+        label: 'Perintah',
+        placeholder: 'Cari perintah...',
         variant: 'text',
         icon: Icons.slash
       },
@@ -118,7 +118,7 @@ export function getColumns(
     {
       id: 'bot_username',
       accessorKey: 'bot_username',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Bot Username' />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Username Bot' />,
       filterFn: (row, columnId, filterValue) => {
         if (!Array.isArray(filterValue)) return true;
         const value = row.getValue<string>(columnId);
@@ -130,7 +130,7 @@ export function getColumns(
         </span>
       ),
       meta: {
-        label: 'Bot Username',
+        label: 'Username Bot',
         variant: 'multiSelect',
         options: botUsernameOptions
       },
@@ -226,15 +226,15 @@ export function getColumns(
         label: 'status',
         variant: 'multiSelect' as const,
         options: [
-          { label: 'Active', value: 'true' },
-          { label: 'Inactive', value: 'false' }
+          { label: 'Aktif', value: 'true' },
+          { label: 'Nonaktif', value: 'false' }
         ]
       }
     },
     {
       id: 'created_at',
       accessorKey: 'created_at',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Created' />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Dibuat' />,
       cell: ({ cell }) => {
         const date = cell.getValue<string>();
         return (

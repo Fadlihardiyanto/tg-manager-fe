@@ -50,13 +50,13 @@ export function TenantLoginForm({ className, ...props }: React.ComponentProps<'f
     if (!unverifiedEmail || cooldown > 0 || resendMutation.isPending) return;
     const res = await resendMutation.mutateAsync({ email: unverifiedEmail });
     if (res.success) {
-      toast.success('Verification email resent', {
-        description: res.message || 'Please check your inbox.'
+      toast.success('Email verifikasi terkirim ulang', {
+        description: res.message || 'Silakan periksa kotak masuk Anda.'
       });
       setCooldown(RESEND_COOLDOWN);
     } else {
-      toast.error('Resend failed', {
-        description: res.message || 'Please try again later.'
+      toast.error('Gagal mengirim ulang', {
+        description: res.message || 'Silakan coba lagi nanti.'
       });
     }
   }, [unverifiedEmail, cooldown, resendMutation]);
@@ -93,18 +93,18 @@ export function TenantLoginForm({ className, ...props }: React.ComponentProps<'f
             router.push('/dashboard/overview');
           }
         } else {
-          const msg = res.message || 'Invalid credentials';
+          const msg = res.message || 'Kredensial tidak valid';
           // BE guide: Detect 403 unverified email and show resend option
           if (isUnverifiedEmailError(msg)) {
             setUnverifiedEmail(value.email);
             setCooldown(RESEND_COOLDOWN);
           } else {
-            toast.error('Login failed', { description: msg });
+            toast.error('Gagal masuk', { description: msg });
           }
         }
       } catch (error: unknown) {
-        const message = error instanceof Error ? error.message : 'Please try again later';
-        toast.error('Login failed', { description: message });
+        const message = error instanceof Error ? error.message : 'Silakan coba lagi nanti';
+        toast.error('Gagal masuk', { description: message });
       }
     }
   });
@@ -116,12 +116,12 @@ export function TenantLoginForm({ className, ...props }: React.ComponentProps<'f
         <div className='relative flex items-center justify-center mb-4 h-16 w-full max-w-[250px]'>
           <img
             src='/uration-blue-version.png'
-            alt='Uration Logo'
+            alt='Urator Logo'
             className='relative h-full w-auto object-contain'
           />
         </div>
-        <h1 className='text-2xl font-bold text-foreground mb-2'>Welcome back</h1>
-        <p className='text-muted-foreground text-sm'>Please enter your details to sign in.</p>
+        <h1 className='text-2xl font-bold text-foreground mb-2'>Selamat datang kembali</h1>
+        <p className='text-muted-foreground text-sm'>Silakan masukkan detail Anda untuk masuk.</p>
       </header>
 
       <form.AppForm>
@@ -131,7 +131,7 @@ export function TenantLoginForm({ className, ...props }: React.ComponentProps<'f
             <Alert className='mb-4 border-amber-500/30 bg-amber-500/5 [&>svg]:mt-0.5'>
               <Icons.warning className='text-amber-500' />
               <AlertTitle className='text-sm font-semibold text-foreground'>
-                Email Not Verified
+                Email belum diverifikasi
               </AlertTitle>
               <AlertDescription className='space-y-3 text-muted-foreground'>
                 <p className='text-sm'>
@@ -149,17 +149,17 @@ export function TenantLoginForm({ className, ...props }: React.ComponentProps<'f
                     {resendMutation.isPending ? (
                       <>
                         <Icons.spinner className='mr-1.5 h-3.5 w-3.5 animate-spin' />
-                        Sending...
+                        Mengirim...
                       </>
                     ) : cooldown > 0 ? (
                       <>
                         <Icons.clock className='mr-1.5 h-3.5 w-3.5' />
-                        Resend in {cooldown}s
+                        Kirim ulang dalam {cooldown} detik
                       </>
                     ) : (
                       <>
                         <Icons.refresh className='mr-1.5 h-3.5 w-3.5' />
-                        Resend Verification Email
+                        Kirim Ulang Email Verifikasi
                       </>
                     )}
                   </Button>
@@ -169,7 +169,7 @@ export function TenantLoginForm({ className, ...props }: React.ComponentProps<'f
                     size='sm'
                     onClick={() => setUnverifiedEmail(null)}
                   >
-                    Dismiss
+                    Tutup
                   </Button>
                 </div>
               </AlertDescription>
@@ -183,7 +183,7 @@ export function TenantLoginForm({ className, ...props }: React.ComponentProps<'f
               <TextField
                 label=''
                 type='email'
-                placeholder='Enter your email...'
+                placeholder='Masukkan email Anda...'
                 className='px-4 h-12 border border-border rounded-xl focus-visible:ring-ring text-base placeholder:text-muted-foreground bg-background'
               />
             )}
@@ -227,14 +227,14 @@ export function TenantLoginForm({ className, ...props }: React.ComponentProps<'f
                 htmlFor='remember-me'
                 className='cursor-pointer text-sm font-medium text-foreground'
               >
-                Remember me
+                Ingat saya
               </Label>
             </div>
             <Link
               href='/forgot-password'
               className='text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4 decoration-border'
             >
-              Forgot password?
+              Lupa kata sandi?
             </Link>
           </div>
 
@@ -245,10 +245,10 @@ export function TenantLoginForm({ className, ...props }: React.ComponentProps<'f
             {loginMutation.isPending ? (
               <>
                 <Icons.spinner className='mr-2 h-5 w-5 animate-spin' />
-                Signing in...
+                Sedang masuk...
               </>
             ) : (
-              'Sign in'
+              'Masuk'
             )}
           </form.SubmitButton>
         </form.Form>
@@ -257,12 +257,12 @@ export function TenantLoginForm({ className, ...props }: React.ComponentProps<'f
       {/* BEGIN: Footer */}
       <footer className='mt-6 text-center'>
         <p className='text-sm text-muted-foreground'>
-          Don&apos;t have an account yet?{' '}
+          Belum punya akun?{' '}
           <Link
             href='/register-tenant'
             className='text-foreground font-bold hover:underline transition-all'
           >
-            Sign Up
+            Daftar
           </Link>
         </p>
       </footer>

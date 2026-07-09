@@ -13,6 +13,7 @@ import {
   TableRow
 } from '@/components/ui/table';
 import { Icons } from '@/components/icons';
+import { MidtransSnapCheckout } from '@/components/payments/midtrans-snap-checkout';
 import { formatDate, formatRupiah } from '@/lib/format';
 import { billingHistoryQueryOptions } from '../api/queries';
 import type { BillingCycle, BillingHistoryItem, BillingStatus } from '../api/types';
@@ -28,7 +29,7 @@ function formatBillingStatus(status?: BillingStatus) {
   if (status === 'pending') return 'Menunggu Pembayaran';
   if (status === 'upgraded') return 'Telah Di-upgrade';
   if (status === 'cancelled') return 'Dibatalkan';
-  if (status === 'expired') return 'Expired';
+  if (status === 'expired') return 'Kedaluwarsa';
   if (status === 'past_due') return 'Lewat Jatuh Tempo';
   if (status === 'failed') return 'Gagal';
   return status || '-';
@@ -52,14 +53,19 @@ function getHistoryAction(item: BillingHistoryItem) {
     );
   }
 
-  if (item.status === 'pending' && item.payment_url) {
+  if (item.status === 'pending' && (item.snap_token || item.payment_url)) {
     return (
-      <Button asChild size='sm'>
-        <a href={item.payment_url} target='_blank' rel='noreferrer'>
-          <Icons.externalLink className='h-4 w-4' />
-          Selesaikan Pembayaran
-        </a>
-      </Button>
+      <MidtransSnapCheckout
+        snapToken={item.snap_token}
+        paymentUrl={item.payment_url}
+        clientKey={item.client_key}
+        orderId={item.order_id || item.id}
+        successRedirectUrl='/dashboard/billing/checkout-result'
+        fallbackLabel='Selesaikan Pembayaran'
+        size='sm'
+      >
+        Selesaikan Pembayaran
+      </MidtransSnapCheckout>
     );
   }
 

@@ -209,7 +209,7 @@ export async function getMe() {
     });
     return res;
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to fetch profile';
+    const message = err instanceof Error ? err.message : 'Gagal mengambil profil';
     return { success: false, code: 400, message, data: null };
   }
 }

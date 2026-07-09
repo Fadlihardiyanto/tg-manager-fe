@@ -58,10 +58,10 @@ export function MembersTable({ filters }: { filters: MemberFilters }) {
             onValueChange={(v) => setPackageId(v === 'all' ? null : v)}
           >
             <SelectTrigger className='h-8 w-40'>
-              <SelectValue placeholder='All packages' />
+              <SelectValue placeholder='Semua paket' />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value='all'>All packages</SelectItem>
+              <SelectItem value='all'>Semua paket</SelectItem>
               {packages.map((pkg) => (
                 <SelectItem key={pkg.id} value={pkg.id}>
                   {pkg.name}

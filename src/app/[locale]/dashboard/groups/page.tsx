@@ -2,14 +2,14 @@ import PageContainer from '@/components/layout/page-container';
 import GroupListing from '@/features/groups/components/group-listing';
 
 export const metadata = {
-  title: 'Dashboard: Groups'
+  title: 'Dashboard: Grup'
 };
 
 export default function GroupsPage() {
   return (
     <PageContainer
-      pageTitle='Telegram Groups'
-      pageDescription='Manage your Telegram groups — register, assign bots, and monitor member counts.'
+      pageTitle='Grup Telegram'
+      pageDescription='Kelola grup Telegram Anda, mulai dari pendaftaran, penugasan bot, hingga pantauan jumlah member.'
     >
       <GroupListing />
     </PageContainer>

@@ -4,8 +4,8 @@ import CheckEmailClient from '@/features/auth/components/check-email-client';
 import { Icons } from '@/components/icons';
 
 export const metadata: Metadata = {
-  title: 'Check Your Email - TeleCommand',
-  description: 'Verify your email address to complete registration.'
+  title: 'Periksa Email Anda - TG-Manager',
+  description: 'Verifikasi alamat email Anda untuk menyelesaikan pendaftaran.'
 };
 
 export default function CheckEmailPage() {
@@ -15,7 +15,7 @@ export default function CheckEmailPage() {
         <div className='flex h-svh items-center justify-center bg-background'>
           <div className='flex flex-col items-center gap-4'>
             <Icons.spinner className='h-8 w-8 animate-spin text-primary' />
-            <p className='text-sm text-muted-foreground'>Loading...</p>
+            <p className='text-sm text-muted-foreground'>Memuat...</p>
           </div>
         </div>
       }

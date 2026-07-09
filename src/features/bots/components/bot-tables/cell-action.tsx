@@ -24,25 +24,23 @@ export function CellAction({ data, onEdit }: CellActionProps) {
   const deleteMutation = useMutation({
     ...deleteBotMutation,
     onSuccess: () => {
-      toast.success('Bot deleted successfully');
+      toast.success('Bot berhasil dihapus');
       setDeleteOpen(false);
       void queryClient.invalidateQueries({ queryKey: botKeys.all });
     },
     onError: () => {
-      toast.error('Failed to delete bot');
+      toast.error('Gagal menghapus bot');
     }
   });
 
   const toggleActiveMutation = useMutation({
     ...updateBotMutation,
     onSuccess: () => {
-      toast.success(
-        data.is_active ? 'Bot deactivated successfully' : 'Bot activated successfully'
-      );
+      toast.success(data.is_active ? 'Bot berhasil dinonaktifkan' : 'Bot berhasil diaktifkan');
       void queryClient.invalidateQueries({ queryKey: botKeys.all });
     },
     onError: () => {
-      toast.error('Failed to update bot status');
+      toast.error('Gagal memperbarui status bot');
     }
   });
 
@@ -58,16 +56,11 @@ export function CellAction({ data, onEdit }: CellActionProps) {
         {onEdit && (
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button
-                variant='ghost'
-                size='icon'
-                className='h-8 w-8'
-                onClick={() => onEdit(data)}
-              >
+              <Button variant='ghost' size='icon' className='h-8 w-8' onClick={() => onEdit(data)}>
                 <Icons.edit className='h-4 w-4' />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>Edit Bot</TooltipContent>
+            <TooltipContent>Ubah Bot</TooltipContent>
           </Tooltip>
         )}
         <Tooltip>
@@ -90,7 +83,7 @@ export function CellAction({ data, onEdit }: CellActionProps) {
               )}
             </Button>
           </TooltipTrigger>
-          <TooltipContent>{data.is_active ? 'Deactivate' : 'Activate'}</TooltipContent>
+          <TooltipContent>{data.is_active ? 'Nonaktifkan' : 'Aktifkan'}</TooltipContent>
         </Tooltip>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -103,7 +96,7 @@ export function CellAction({ data, onEdit }: CellActionProps) {
               <Icons.trash className='h-4 w-4' />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Delete</TooltipContent>
+          <TooltipContent>Hapus</TooltipContent>
         </Tooltip>
       </div>
     </>

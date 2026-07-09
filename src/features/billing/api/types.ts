@@ -66,6 +66,9 @@ export interface ActiveBilling {
   expired_at: string;
   paid_at?: string;
   payment_url?: string;
+  snap_token?: string;
+  order_id?: string;
+  client_key?: string;
   receipt_url?: string;
   note?: string;
   is_manual?: boolean;
@@ -84,7 +87,10 @@ export interface CheckoutBillingRequest {
 }
 
 export interface CheckoutBillingData {
-  payment_url: string;
+  payment_url?: string;
+  snap_token?: string;
+  order_id?: string;
+  client_key?: string;
 }
 
 export type CheckoutBillingResponse = ApiResponse<CheckoutBillingData>;

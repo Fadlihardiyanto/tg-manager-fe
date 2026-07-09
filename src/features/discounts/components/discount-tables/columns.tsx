@@ -23,22 +23,18 @@ export function getColumns(
     {
       id: 'name',
       accessorKey: 'name',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Name' />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Nama' />,
       cell: ({ row }) => (
         <div className='flex flex-col'>
           <span className='font-medium'>{row.original.name}</span>
           {row.original.code && (
-            <span className='text-xs text-muted-foreground font-mono'>
-              {row.original.code}
-            </span>
+            <span className='text-xs text-muted-foreground font-mono'>{row.original.code}</span>
           )}
         </div>
       ),
       meta: {
-        label: 'Name',
-        placeholder: 'Search discounts...',
+        label: 'Nama',
+        placeholder: 'Cari diskon...',
         variant: 'text',
         icon: Icons.text
       },
@@ -48,22 +44,19 @@ export function getColumns(
     {
       id: 'type_value',
       accessorKey: 'type',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Type & Value' />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Tipe & Nilai' />,
       cell: ({ row }) => {
         const discount = row.original;
-        const typeBadge = discount.type === 'percentage'
-          ? 'bg-primary/10 text-primary hover:bg-primary/20 border-transparent'
-          : 'bg-secondary/50 text-secondary-foreground hover:bg-secondary/80 border-transparent';
+        const typeBadge =
+          discount.type === 'percentage'
+            ? 'bg-primary/10 text-primary hover:bg-primary/20 border-transparent'
+            : 'bg-secondary/50 text-secondary-foreground hover:bg-secondary/80 border-transparent';
         return (
           <div className='flex items-center gap-2'>
             <Badge variant='outline' className={cn(typeBadge)}>
-              {discount.type === 'percentage' ? '%' : 'Fixed'}
+              {discount.type === 'percentage' ? '%' : 'Tetap'}
             </Badge>
-            <span className='font-semibold tabular-nums'>
-              {formatDiscountValue(discount)}
-            </span>
+            <span className='font-semibold tabular-nums'>{formatDiscountValue(discount)}</span>
           </div>
         );
       },
@@ -73,9 +66,7 @@ export function getColumns(
     {
       id: 'usage',
       accessorKey: 'used_count',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Usage' />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Pemakaian' />,
       cell: ({ row }) => {
         const { used_count, max_usage } = row.original;
         const maxLabel = max_usage === -1 ? '∞' : max_usage.toString();
@@ -91,16 +82,16 @@ export function getColumns(
     {
       id: 'valid_until',
       accessorKey: 'valid_until',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Valid Until' />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Berlaku Sampai' />,
       cell: ({ cell }) => {
         const date = cell.getValue<string>();
         if (!date) return <span className='text-muted-foreground text-sm'>—</span>;
         const isExpired = new Date(date) < new Date();
         return (
           <div className='flex items-center gap-2'>
-            <span className={cn('text-sm', isExpired ? 'text-destructive' : 'text-muted-foreground')}>
+            <span
+              className={cn('text-sm', isExpired ? 'text-destructive' : 'text-muted-foreground')}
+            >
               {formatDate(date, {
                 month: 'short',
                 day: 'numeric',
@@ -109,7 +100,7 @@ export function getColumns(
             </span>
             {isExpired && (
               <Badge variant='outline' className='text-destructive border-destructive/30 text-xs'>
-                Expired
+                Kedaluwarsa
               </Badge>
             )}
           </div>
@@ -121,9 +112,7 @@ export function getColumns(
     {
       id: 'is_active',
       accessorKey: 'is_active',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Status' />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Status' />,
       cell: ({ cell }) => {
         const isActive = cell.getValue<boolean>();
         const Icon = isActive ? Icons.circleCheck : Icons.xCircle;
@@ -131,13 +120,11 @@ export function getColumns(
           <Badge
             variant={isActive ? 'default' : 'outline'}
             className={cn(
-              isActive
-                ? 'bg-primary/10 text-primary border-transparent'
-                : 'text-muted-foreground'
+              isActive ? 'bg-primary/10 text-primary border-transparent' : 'text-muted-foreground'
             )}
           >
             <Icon className='size-3' />
-            {isActive ? 'Active' : 'Inactive'}
+            {isActive ? 'Aktif' : 'Nonaktif'}
           </Badge>
         );
       },
@@ -147,9 +134,7 @@ export function getColumns(
     {
       id: 'created_at',
       accessorKey: 'created_at',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Created' />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Dibuat' />,
       cell: ({ cell }) => {
         const date = cell.getValue<string>();
         return (

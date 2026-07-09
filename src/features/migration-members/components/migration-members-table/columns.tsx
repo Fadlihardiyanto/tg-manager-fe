@@ -25,7 +25,7 @@ export function getColumns({
       enableSorting: false,
       meta: {
         label: 'Username',
-        placeholder: 'Search username...',
+        placeholder: 'Cari username...',
         variant: 'text',
         icon: Icons.text
       }
@@ -33,19 +33,19 @@ export function getColumns({
     {
       id: 'migration_package_id',
       accessorKey: 'package_id',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Package' />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Paket' />,
       cell: ({ row }) => packageNames.get(row.original.package_id) ?? '-',
       enableColumnFilter: true,
       enableSorting: false,
       meta: {
-        label: 'Package',
+        label: 'Paket',
         variant: 'select',
         options: packageOptions
       }
     },
     {
       accessorKey: 'expired_at',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Expired At' />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Kedaluwarsa Pada' />,
       cell: ({ row }) =>
         row.original.expired_at
           ? formatDate(row.original.expired_at, {
@@ -73,14 +73,14 @@ export function getColumns({
         label: 'Status',
         variant: 'select',
         options: [
-          { label: 'Pending', value: 'pending' },
-          { label: 'Claimed', value: 'claimed' }
+          { label: 'Menunggu', value: 'pending' },
+          { label: 'Diambil', value: 'claimed' }
         ]
       }
     },
     {
       accessorKey: 'created_at',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Created At' />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Dibuat Pada' />,
       cell: ({ row }) =>
         row.original.created_at
           ? formatDate(row.original.created_at, {

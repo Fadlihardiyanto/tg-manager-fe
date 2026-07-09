@@ -19,8 +19,13 @@ const META_THEME_COLORS = {
 };
 
 export const metadata: Metadata = {
-  title: 'Next Shadcn',
-  description: 'Basic dashboard with Next.js and Shadcn'
+  title: 'Urator',
+  description: 'Urator - Platform untuk mengordinasi komunitas dan monetisasi telegram.',
+  icons: {
+    icon: '/uration-blue-version.png',
+    shortcut: '/uration-blue-version.png',
+    apple: '/uration-blue-version.png'
+  }
 };
 
 export const viewport: Viewport = {

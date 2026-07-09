@@ -12,18 +12,15 @@ import {
 } from '@/components/ui/dialog';
 import { Icons } from '@/components/icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import {
-  createDiscountMutation,
-  updateDiscountMutation
-} from '../api/mutations';
+import { createDiscountMutation, updateDiscountMutation } from '../api/mutations';
 import { discountKeys } from '../api/queries';
 import type { MemberDiscount, DiscountType } from '../api/types';
 import { toast } from 'sonner';
 import * as z from 'zod';
 
 const DISCOUNT_TYPE_OPTIONS = [
-  { value: 'percentage', label: 'Percentage (%)' },
-  { value: 'fixed', label: 'Fixed Amount (IDR)' }
+  { value: 'percentage', label: 'Persentase (%)' },
+  { value: 'fixed', label: 'Nominal Tetap (IDR)' }
 ];
 
 type DiscountFormValues = {
@@ -40,16 +37,13 @@ type DiscountFormValues = {
 };
 
 const discountFormSchema = z.object({
-  name: z.string().min(1, 'Discount name is required'),
+  name: z.string().min(1, 'Nama diskon wajib diisi'),
   code: z.string(),
-  type: z.string().min(1, 'Please select a discount type'),
+  type: z.string().min(1, 'Silakan pilih tipe diskon'),
   value: z
     .string()
-    .min(1, 'Value is required')
-    .refine(
-      (val) => !isNaN(Number(val)) && Number(val) > 0,
-      'Value must be a positive number'
-    ),
+    .min(1, 'Nilai wajib diisi')
+    .refine((val) => !isNaN(Number(val)) && Number(val) > 0, 'Harus berupa angka positif'),
   max_discount: z.string(),
   min_purchase: z.string(),
   max_usage: z.string(),
@@ -64,11 +58,7 @@ interface DiscountFormDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export function DiscountFormDialog({
-  discount,
-  open,
-  onOpenChange
-}: DiscountFormDialogProps) {
+export function DiscountFormDialog({ discount, open, onOpenChange }: DiscountFormDialogProps) {
   const isEdit = !!discount;
   const queryClient = useQueryClient();
 
@@ -76,29 +66,29 @@ export function DiscountFormDialog({
     ...createDiscountMutation,
     onSuccess: (res) => {
       if (res.success) {
-        toast.success('Discount created successfully');
+        toast.success('Diskon berhasil dibuat');
         onOpenChange(false);
         form.reset();
         void queryClient.invalidateQueries({ queryKey: discountKeys.all });
       } else {
-        toast.error(res.message || 'Failed to create discount');
+        toast.error(res.message || 'Gagal membuat diskon');
       }
     },
-    onError: () => toast.error('Failed to create discount')
+    onError: () => toast.error('Gagal membuat diskon')
   });
 
   const updateMutation = useMutation({
     ...updateDiscountMutation,
     onSuccess: (res) => {
       if (res.success) {
-        toast.success('Discount updated successfully');
+        toast.success('Diskon berhasil diperbarui');
         onOpenChange(false);
         void queryClient.invalidateQueries({ queryKey: discountKeys.all });
       } else {
-        toast.error(res.message || 'Failed to update discount');
+        toast.error(res.message || 'Gagal memperbarui diskon');
       }
     },
-    onError: () => toast.error('Failed to update discount')
+    onError: () => toast.error('Gagal memperbarui diskon')
   });
 
   const form = useAppForm({
@@ -118,8 +108,7 @@ export function DiscountFormDialog({
       onSubmit: discountFormSchema
     },
     onSubmit: async ({ value }) => {
-      const toOptionalNumber = (v: string) =>
-        v.trim() === '' ? undefined : Number(v);
+      const toOptionalNumber = (v: string) => (v.trim() === '' ? undefined : Number(v));
 
       const toOptionalISO = (v: string) =>
         v.trim() === '' ? undefined : new Date(v).toISOString();
@@ -154,8 +143,7 @@ export function DiscountFormDialog({
     }
   });
 
-  const { FormTextField, FormSelectField } =
-    useFormFields<DiscountFormValues>();
+  const { FormTextField, FormSelectField } = useFormFields<DiscountFormValues>();
 
   const isPending = createMutation.isPending || updateMutation.isPending;
 
@@ -169,13 +157,11 @@ export function DiscountFormDialog({
     >
       <DialogContent className='sm:max-w-[560px] max-h-[85vh] overflow-y-auto'>
         <DialogHeader>
-          <DialogTitle>
-            {isEdit ? 'Edit Discount' : 'Add New Discount'}
-          </DialogTitle>
+          <DialogTitle>{isEdit ? 'Ubah Diskon' : 'Tambah Diskon Baru'}</DialogTitle>
           <DialogDescription>
             {isEdit
-              ? 'Update discount details. Type and code cannot be changed.'
-              : 'Create a promo code for your subscription packages.'}
+              ? 'Perbarui detail diskon. Tipe dan kode tidak bisa diubah.'
+              : 'Buat kode promo untuk paket langganan Anda.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -184,45 +170,45 @@ export function DiscountFormDialog({
             <div className='grid grid-cols-2 gap-4'>
               <FormTextField
                 name='name'
-                label='Discount Name'
+                label='Nama Diskon'
                 required
-                placeholder='End of Year Sale'
+                placeholder='Diskon Akhir Tahun'
                 validators={{
-                  onBlur: z.string().min(1, 'Name is required')
+                  onBlur: z.string().min(1, 'Nama wajib diisi')
                 }}
               />
               <FormTextField
                 name='code'
-                label='Promo Code'
+                label='Kode Promo'
                 placeholder='PROMO2026'
-                description='Leave blank to auto-generate.'
+                description='Kosongkan untuk dibuat otomatis.'
               />
             </div>
 
             <div className='grid grid-cols-2 gap-4'>
               <FormSelectField
                 name='type'
-                label='Discount Type'
+                label='Tipe Diskon'
                 required
                 options={DISCOUNT_TYPE_OPTIONS}
-                placeholder='Select type'
+                placeholder='Pilih tipe'
                 validators={{
-                  onBlur: z.string().min(1, 'Please select a type')
+                  onBlur: z.string().min(1, 'Silakan pilih tipe')
                 }}
               />
               <FormTextField
                 name='value'
-                label='Value'
+                label='Nilai'
                 required
                 placeholder='20'
-                description='Percentage (0–100) or fixed IDR amount.'
+                description='Persentase (0-100) atau nominal tetap dalam IDR.'
                 validators={{
                   onBlur: z
                     .string()
-                    .min(1, 'Value is required')
+                    .min(1, 'Nilai wajib diisi')
                     .refine(
                       (val) => !isNaN(Number(val)) && Number(val) > 0,
-                      'Must be a positive number'
+                      'Harus berupa angka positif'
                     )
                 }}
               />
@@ -231,44 +217,40 @@ export function DiscountFormDialog({
             <div className='grid grid-cols-2 gap-4'>
               <FormTextField
                 name='max_discount'
-                label='Max Discount (IDR)'
+                label='Maks Diskon (IDR)'
                 placeholder='50000'
-                description='Cap for percentage type. Leave blank for no cap.'
+                description='Batas maksimum untuk tipe persentase. Kosongkan jika tanpa batas.'
               />
               <FormTextField
                 name='min_purchase'
-                label='Min Purchase (IDR)'
+                label='Minimum Pembelian (IDR)'
                 placeholder='100000'
-                description='Minimum order amount required.'
+                description='Nominal minimum pesanan yang dibutuhkan.'
               />
             </div>
 
             <div className='grid grid-cols-2 gap-4'>
               <FormTextField
                 name='max_usage'
-                label='Max Usage'
+                label='Maks Pemakaian'
                 placeholder='-1'
-                description='-1 for unlimited.'
+                description='-1 untuk tidak terbatas.'
               />
-              <FormTextField
-                name='max_usage_per_user'
-                label='Max Per User'
-                placeholder='1'
-              />
+              <FormTextField name='max_usage_per_user' label='Maks per Pengguna' placeholder='1' />
             </div>
 
             <div className='grid grid-cols-2 gap-4'>
               <FormTextField
                 name='valid_from'
-                label='Valid From'
+                label='Berlaku Dari'
                 placeholder='2026-01-01T00:00'
-                description='ISO format: YYYY-MM-DDThh:mm (leave blank for immediate).'
+                description='Format ISO: YYYY-MM-DDThh:mm (kosongkan untuk langsung berlaku).'
               />
               <FormTextField
                 name='valid_until'
-                label='Valid Until'
+                label='Berlaku Sampai'
                 placeholder='2026-12-31T23:59'
-                description='ISO format: YYYY-MM-DDThh:mm (leave blank for no expiry).'
+                description='Format ISO: YYYY-MM-DDThh:mm (kosongkan jika tidak ada kedaluwarsa).'
               />
             </div>
           </form.Form>
@@ -283,15 +265,11 @@ export function DiscountFormDialog({
               onOpenChange(false);
             }}
           >
-            Cancel
+            Batal
           </Button>
-          <Button
-            type='submit'
-            form='discount-form-dialog'
-            isLoading={isPending}
-          >
+          <Button type='submit' form='discount-form-dialog' isLoading={isPending}>
             <Icons.check className='mr-2 h-4 w-4' />
-            {isEdit ? 'Update Discount' : 'Add Discount'}
+            {isEdit ? 'Perbarui Diskon' : 'Tambah Diskon'}
           </Button>
         </DialogFooter>
       </DialogContent>

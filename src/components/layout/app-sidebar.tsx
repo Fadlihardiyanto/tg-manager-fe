@@ -131,7 +131,7 @@ export default function AppSidebar({ navGroups }: { navGroups: NavGroup[] }) {
                   className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
                 >
                   <Icons.user className='size-4' />
-                  <span className='truncate group-data-[collapsible=icon]:hidden'>Account</span>
+                  <span className='truncate group-data-[collapsible=icon]:hidden'>Akun</span>
                   <Icons.chevronsDown className='ml-auto size-4 group-data-[collapsible=icon]:hidden' />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
@@ -143,13 +143,13 @@ export default function AppSidebar({ navGroups }: { navGroups: NavGroup[] }) {
               >
                 <DropdownMenuLabel className='p-0 font-normal'>
                   <div className='text-muted-foreground px-1 py-1.5 text-sm'>
-                    Sign in to manage your account
+                    Masuk untuk mengelola akun Anda
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                   <Icons.notification className='mr-2 h-4 w-4' />
-                  Notifications
+                  Notifikasi
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
@@ -160,7 +160,7 @@ export default function AppSidebar({ navGroups }: { navGroups: NavGroup[] }) {
                   }}
                 >
                   <Icons.logout className='mr-2 h-4 w-4' />
-                  Log out
+                  Keluar
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

@@ -35,7 +35,7 @@ export async function getGroups(): Promise<GroupsListResponse> {
       headers: { ...authHeaders }
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to fetch groups';
+    const message = err instanceof Error ? err.message : 'Gagal mengambil grup';
     return { success: false, code: 400, message, data: [] };
   }
 }
@@ -50,7 +50,7 @@ export async function getGroupById(id: string): Promise<GroupResponse> {
       headers: { ...authHeaders }
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to fetch group';
+    const message = err instanceof Error ? err.message : 'Gagal mengambil grup';
     return { success: false, code: 400, message, data: undefined as any };
   }
 }
@@ -66,7 +66,7 @@ export async function updateGroup(id: string, data: UpdateGroupRequest): Promise
       body: JSON.stringify(data)
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to update group';
+    const message = err instanceof Error ? err.message : 'Gagal memperbarui grup';
     return { success: false, code: 400, message, data: undefined as any };
   }
 }
@@ -81,7 +81,7 @@ export async function deleteGroup(id: string): Promise<ApiResponse<null>> {
       headers: { ...authHeaders }
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to delete group';
+    const message = err instanceof Error ? err.message : 'Gagal menghapus grup';
     return { success: false, code: 400, message, data: null };
   }
 }
@@ -113,7 +113,7 @@ export async function generateConnectToken(botId: string): Promise<ConnectTokenR
       }
     );
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to generate token';
+    const message = err instanceof Error ? err.message : 'Gagal membuat token';
     return { success: false, code: 400, message, data: undefined as any };
   }
 }

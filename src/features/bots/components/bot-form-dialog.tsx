@@ -21,9 +21,9 @@ import { toast } from 'sonner';
 import * as z from 'zod';
 
 const BOT_ROLE_OPTIONS = [
-  { value: 'all_in_one', label: 'All-in-One' },
-  { value: 'sales_only', label: 'Sales Only' },
-  { value: 'gatekeeper_only', label: 'Gatekeeper Only' }
+  { value: 'all_in_one', label: 'Semua Fungsi' },
+  { value: 'sales_only', label: 'Hanya Penjualan' },
+  { value: 'gatekeeper_only', label: 'Hanya Gatekeeper' }
 ];
 
 type BotFormValues = {
@@ -34,7 +34,7 @@ type BotFormValues = {
 
 const botFormSchema = z.object({
   token: z.string(),
-  bot_role: z.string().min(1, 'Please select a bot role'),
+  bot_role: z.string().min(1, 'Silakan pilih peran bot'),
   is_active: z.string()
 });
 
@@ -54,29 +54,29 @@ export function BotFormDialog({ bot, open, onOpenChange }: BotFormDialogProps) {
     ...createBotMutation,
     onSuccess: (res) => {
       if (res.success) {
-        toast.success('Bot created successfully');
+        toast.success('Bot berhasil dibuat');
         onOpenChange(false);
         form.reset();
         void queryClient.invalidateQueries({ queryKey: botKeys.all });
       } else {
-        toast.error(res.message || 'Failed to create bot');
+        toast.error(res.message || 'Gagal membuat bot');
       }
     },
-    onError: () => toast.error('Failed to create bot')
+    onError: () => toast.error('Gagal membuat bot')
   });
 
   const updateMutation = useMutation({
     ...updateBotMutation,
     onSuccess: (res) => {
       if (res.success) {
-        toast.success('Bot updated successfully');
+        toast.success('Bot berhasil diperbarui');
         onOpenChange(false);
         void queryClient.invalidateQueries({ queryKey: botKeys.all });
       } else {
-        toast.error(res.message || 'Failed to update bot');
+        toast.error(res.message || 'Gagal memperbarui bot');
       }
     },
-    onError: () => toast.error('Failed to update bot')
+    onError: () => toast.error('Gagal memperbarui bot')
   });
 
   const form = useAppForm({
@@ -125,11 +125,11 @@ export function BotFormDialog({ bot, open, onOpenChange }: BotFormDialogProps) {
     >
       <DialogContent className='sm:max-w-[480px]'>
         <DialogHeader>
-          <DialogTitle>{isEdit ? 'Edit Bot' : 'Add New Bot'}</DialogTitle>
+          <DialogTitle>{isEdit ? 'Ubah Bot' : 'Tambah Bot Baru'}</DialogTitle>
           <DialogDescription>
             {isEdit
-              ? 'Update the bot role and status.'
-              : 'Register a new Telegram bot using its token from BotFather.'}
+              ? 'Perbarui peran dan status bot.'
+              : 'Daftarkan bot Telegram baru menggunakan token dari BotFather.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -138,11 +138,11 @@ export function BotFormDialog({ bot, open, onOpenChange }: BotFormDialogProps) {
             {!isEdit && (
               <FormTextField
                 name='token'
-                label='Bot Token'
+                label='Token Bot'
                 required
                 placeholder='123456789:ABCdefGHIjklMNOpqrSTUvwxYZ'
                 validators={{
-                  onBlur: z.string().min(10, 'Bot token must be at least 10 characters')
+                  onBlur: z.string().min(10, 'Token bot minimal 10 karakter')
                 }}
               />
             )}
@@ -159,12 +159,12 @@ export function BotFormDialog({ bot, open, onOpenChange }: BotFormDialogProps) {
 
             <FormSelectField
               name='bot_role'
-              label='Bot Role'
+              label='Peran Bot'
               required
               options={BOT_ROLE_OPTIONS}
-              placeholder='Select bot role'
+              placeholder='Pilih peran bot'
               validators={{
-                onBlur: z.string().min(1, 'Please select a bot role')
+                onBlur: z.string().min(1, 'Silakan pilih peran bot')
               }}
             />
 
@@ -174,10 +174,10 @@ export function BotFormDialog({ bot, open, onOpenChange }: BotFormDialogProps) {
                 label='Status'
                 required
                 options={[
-                  { value: 'true', label: 'Active' },
-                  { value: 'false', label: 'Inactive' }
+                  { value: 'true', label: 'Aktif' },
+                  { value: 'false', label: 'Nonaktif' }
                 ]}
-                placeholder='Select status'
+                placeholder='Pilih status'
               />
             )}
 
@@ -200,7 +200,7 @@ export function BotFormDialog({ bot, open, onOpenChange }: BotFormDialogProps) {
               onOpenChange(false);
             }}
           >
-            Cancel
+            Batal
           </Button>
           <Button
             type='submit'
@@ -209,7 +209,7 @@ export function BotFormDialog({ bot, open, onOpenChange }: BotFormDialogProps) {
             disabled={!canCreateBot}
           >
             <Icons.check className='mr-2 h-4 w-4' />
-            {isEdit ? 'Update Bot' : 'Add Bot'}
+            {isEdit ? 'Perbarui Bot' : 'Tambah Bot'}
           </Button>
         </DialogFooter>
       </DialogContent>

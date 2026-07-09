@@ -10,14 +10,12 @@ import { formatDate } from '@/lib/format';
 import { CellAction } from './cell-action';
 
 const BOT_ROLE_LABELS: Record<string, string> = {
-  sales_only: 'Sales Only',
-  gatekeeper_only: 'Gatekeeper',
-  all_in_one: 'All-in-One'
+  sales_only: 'Penjualan Saja',
+  gatekeeper_only: 'Penjaga',
+  all_in_one: 'Semua dalam Satu'
 };
 
-export function getColumns(
-  onEdit: (bot: TelegramBot) => void
-): ColumnDef<TelegramBot>[] {
+export function getColumns(onEdit: (bot: TelegramBot) => void): ColumnDef<TelegramBot>[] {
   return [
     {
       id: 'username',
@@ -38,9 +36,7 @@ export function getColumns(
             </div>
             <div>
               <h6 className='text-sm font-semibold'>@{bot.username}</h6>
-              <p className='text-xs text-muted-foreground'>
-                ID: {bot.telegram_bot_id}
-              </p>
+              <p className='text-xs text-muted-foreground'>ID: {bot.telegram_bot_id}</p>
             </div>
           </div>
         );
@@ -48,7 +44,7 @@ export function getColumns(
       enableColumnFilter: true,
       meta: {
         label: 'Bot',
-        placeholder: 'Search bots...',
+        placeholder: 'Cari bot...',
         variant: 'text',
         icon: Icons.search
       }
@@ -58,15 +54,12 @@ export function getColumns(
       accessorKey: 'bot_role',
       enableSorting: false,
       header: ({ column }: { column: Column<TelegramBot, unknown> }) => (
-        <DataTableColumnHeader column={column} title='Role' />
+        <DataTableColumnHeader column={column} title='Peran' />
       ),
       cell: ({ cell }) => {
         const role = cell.getValue<TelegramBot['bot_role']>();
         return (
-          <Badge 
-            variant='outline' 
-            className='capitalize'
-          >
+          <Badge variant='outline' className='capitalize'>
             {BOT_ROLE_LABELS[role] ?? role}
           </Badge>
         );
@@ -76,9 +69,9 @@ export function getColumns(
         label: 'Role',
         variant: 'multiSelect',
         options: [
-          { label: 'Sales Only', value: 'sales_only' },
+          { label: 'Sales Saja', value: 'sales_only' },
           { label: 'Gatekeeper', value: 'gatekeeper_only' },
-          { label: 'All-in-One', value: 'all_in_one' }
+          { label: 'Semua dalam Satu', value: 'all_in_one' }
         ]
       }
     },
@@ -97,13 +90,11 @@ export function getColumns(
           <Badge
             variant={isActive ? 'default' : 'outline'}
             className={cn(
-              isActive
-                ? 'bg-primary/10 text-primary border-transparent'
-                : 'text-muted-foreground'
+              isActive ? 'bg-primary/10 text-primary border-transparent' : 'text-muted-foreground'
             )}
           >
             <StatusIcon className='size-3' />
-            {isActive ? 'Active' : 'Inactive'}
+            {isActive ? 'Aktif' : 'Nonaktif'}
           </Badge>
         );
       }
@@ -112,7 +103,7 @@ export function getColumns(
       id: 'created_at',
       accessorKey: 'created_at',
       header: ({ column }: { column: Column<TelegramBot, unknown> }) => (
-        <DataTableColumnHeader column={column} title='Created' />
+        <DataTableColumnHeader column={column} title='Dibuat' />
       ),
       cell: ({ row }) => (
         <span className='text-sm text-muted-foreground'>

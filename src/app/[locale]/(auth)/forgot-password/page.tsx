@@ -2,8 +2,8 @@ import { Metadata } from 'next';
 import ForgotPasswordPageLayout from '@/features/auth/components/forgot-password-page-layout';
 
 export const metadata: Metadata = {
-  title: 'Forgot Password - TeleCommand',
-  description: 'Reset your password'
+  title: 'Lupa Kata Sandi - TG-Manager',
+  description: 'Atur ulang kata sandi Anda'
 };
 
 export default function ForgotPasswordPage() {
