@@ -3,6 +3,8 @@
 import { useAppForm, useFormFields } from '@/components/ui/tanstack-form';
 import { useStore } from '@tanstack/react-form';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
@@ -15,16 +17,24 @@ import {
 } from '@/components/ui/dialog';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Icons } from '@/components/icons';
-import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { createCommandMutation, updateCommandMutation } from '../api/mutations';
 import { getPresignedUrl } from '../api/service';
 import { commandKeys } from '../api/queries';
 import { botsQueryOptions } from '@/features/bots/api/queries';
+import { groupsQueryOptions } from '@/features/groups/api/queries';
+import { packagesQueryOptions } from '@/features/packages/api/queries';
 import { useActivePlan } from '@/features/billing/components/active-plan-provider';
-import type { Command, CreateCommandRequest } from '../api/types';
+import type {
+  Command,
+  CommandAccessScope,
+  CommandChatTypeScope,
+  CreateCommandRequest,
+  UpdateCommandRequest
+} from '../api/types';
 import { toast } from 'sonner';
 import * as z from 'zod';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const BLACKLIST = ['/start', '/packages', '/mysub', '/status', '/myorders', '/connect'];
 
@@ -33,16 +43,29 @@ type CommandFormValues = {
   command_trigger: string;
   response_type: string;
   response_text: string;
+  access_scope: CommandAccessScope;
+  chat_type_scope: CommandChatTypeScope;
+  package_ids: string[];
+  group_ids: string[];
   file: File[];
 };
 
 const commandFormSchema = z.object({
   bot_id: z.string().min(1, 'Pilih bot'),
-  command_trigger: z.string().min(1, 'Nama perintah wajib diisi').max(31, 'Maksimal 31 karakter'),
+  command_trigger: z.string().min(1, 'Nama perintah wajib diisi').max(49, 'Maksimal 49 karakter'),
   response_type: z.string().min(1, 'Pilih tipe respon'),
   response_text: z.string().min(1, 'Isi pesan wajib diisi'),
+  access_scope: z.enum(['public', 'admin', 'member']),
+  chat_type_scope: z.enum(['all', 'dm_only', 'group_only']),
+  package_ids: z.array(z.string()),
+  group_ids: z.array(z.string()),
   file: z.array(z.any())
 });
+
+function formatBotUsername(username?: string) {
+  if (!username) return '-';
+  return username.startsWith('@') ? username : `@${username}`;
+}
 
 interface CommandFormDialogProps {
   command?: Command | null;
@@ -59,7 +82,11 @@ export function CommandFormDialog({ command, open, onOpenChange }: CommandFormDi
   const [linkSelection, setLinkSelection] = useState<{ start: number; end: number } | null>(null);
 
   const { data: botsData } = useSuspenseQuery(botsQueryOptions());
+  const { data: packagesData, isLoading: isPackagesLoading } = useQuery(packagesQueryOptions());
+  const { data: groupsData, isLoading: isGroupsLoading } = useQuery(groupsQueryOptions());
   const bots = (botsData?.data ?? []).filter((b) => b.is_active);
+  const packages = packagesData?.data ?? [];
+  const groups = groupsData?.data ?? [];
 
   const createMutation = useMutation({
     ...createCommandMutation,
@@ -96,6 +123,10 @@ export function CommandFormDialog({ command, open, onOpenChange }: CommandFormDi
       command_trigger: command?.command_trigger?.replace(/^\//, '') ?? '',
       response_type: command?.response_type ?? 'text',
       response_text: command?.response_text ?? '',
+      access_scope: command?.access_scope ?? 'public',
+      chat_type_scope: command?.chat_type_scope ?? 'all',
+      package_ids: command?.package_ids ?? [],
+      group_ids: command?.group_ids ?? [],
       file: []
     } as CommandFormValues,
     validators: {
@@ -110,10 +141,10 @@ export function CommandFormDialog({ command, open, onOpenChange }: CommandFormDi
       let trigger = value.command_trigger.trim().toLowerCase();
       if (!trigger.startsWith('/')) trigger = '/' + trigger;
 
-      const triggerRegex = /^\/[a-z0-9_]{1,31}$/;
+      const triggerRegex = /^\/[a-z0-9_]{1,49}$/;
       if (!triggerRegex.test(trigger)) {
         toast.error(
-          'Format perintah salah! Hanya gunakan huruf kecil, angka, dan underscore (maks 32 karakter).'
+          'Format perintah salah! Hanya gunakan huruf kecil, angka, dan underscore (maks 50 karakter termasuk /).'
         );
         return;
       }
@@ -180,17 +211,25 @@ export function CommandFormDialog({ command, open, onOpenChange }: CommandFormDi
         }
       }
 
-      const payload: CreateCommandRequest = {
-        bot_id: value.bot_id,
+      const scopePayload = {
         command_trigger: trigger,
         response_type: value.response_type as 'text' | 'photo' | 'document',
         response_text: value.response_text,
+        access_scope: value.access_scope,
+        chat_type_scope: value.chat_type_scope,
+        package_ids: value.access_scope === 'member' ? value.package_ids : [],
+        group_ids: value.chat_type_scope === 'dm_only' ? [] : value.group_ids,
         ...(needsUpload && file_url ? { file_url } : {})
       };
 
       if (isEdit && command) {
+        const payload: UpdateCommandRequest = scopePayload;
         await updateMutation.mutateAsync({ id: command.id, values: payload });
       } else {
+        const payload: CreateCommandRequest = {
+          bot_id: value.bot_id,
+          ...scopePayload
+        };
         await createMutation.mutateAsync(payload);
       }
     }
@@ -200,11 +239,27 @@ export function CommandFormDialog({ command, open, onOpenChange }: CommandFormDi
     useFormFields<CommandFormValues>();
 
   const responseType = useStore(form.store, (state) => state.values.response_type);
+  const accessScope = useStore(form.store, (state) => state.values.access_scope);
+  const chatTypeScope = useStore(form.store, (state) => state.values.chat_type_scope);
+  const selectedPackageIds = useStore(form.store, (state) => state.values.package_ids);
+  const selectedGroupIds = useStore(form.store, (state) => state.values.group_ids);
   const isPending = createMutation.isPending || updateMutation.isPending;
   const canCreateCommand = isEdit || hasQuota('custom_commands');
   const maxChars = responseType === 'text' ? 4096 : 1024;
   const responseText = useStore(form.store, (state) => state.values.response_text);
   const remaining = maxChars - Array.from(responseText).length;
+
+  useEffect(() => {
+    if (accessScope !== 'member' && selectedPackageIds.length > 0) {
+      form.setFieldValue('package_ids', []);
+    }
+  }, [accessScope, form, selectedPackageIds]);
+
+  useEffect(() => {
+    if (chatTypeScope === 'dm_only' && selectedGroupIds.length > 0) {
+      form.setFieldValue('group_ids', []);
+    }
+  }, [chatTypeScope, form, selectedGroupIds]);
 
   const handleFormat = (tag: string, href?: string, selection = linkSelection) => {
     const el = document.getElementById('response_text') as HTMLTextAreaElement;
@@ -261,16 +316,26 @@ export function CommandFormDialog({ command, open, onOpenChange }: CommandFormDi
 
         <form.AppForm>
           <form.Form id='command-form-dialog' className='space-y-4'>
-            <FormSelectField
-              name='bot_id'
-              label='Bot'
-              required
-              options={bots.map((b) => ({ value: b.id, label: `@${b.username}` }))}
-              placeholder='Pilih bot'
-              validators={{
-                onBlur: z.string().min(1, 'Pilih bot')
-              }}
-            />
+            {isEdit ? (
+              <FieldGroup>
+                <FieldLabel>Bot</FieldLabel>
+                <div className='rounded-md border bg-muted/30 px-3 py-2 text-sm font-medium'>
+                  {formatBotUsername(command?.bot_username)}
+                </div>
+                <FieldDescription>Bot tidak bisa diubah saat edit perintah.</FieldDescription>
+              </FieldGroup>
+            ) : (
+              <FormSelectField
+                name='bot_id'
+                label='Bot'
+                required
+                options={bots.map((b) => ({ value: b.id, label: `@${b.username}` }))}
+                placeholder='Pilih bot'
+                validators={{
+                  onBlur: z.string().min(1, 'Pilih bot')
+                }}
+              />
+            )}
 
             <FormTextField
               name='command_trigger'
@@ -283,7 +348,7 @@ export function CommandFormDialog({ command, open, onOpenChange }: CommandFormDi
                 onBlur: z
                   .string()
                   .min(1, 'Nama perintah wajib diisi')
-                  .max(31, 'Maksimal 31 karakter')
+                  .max(49, 'Maksimal 49 karakter')
               }}
             />
 
@@ -298,6 +363,135 @@ export function CommandFormDialog({ command, open, onOpenChange }: CommandFormDi
               ]}
               placeholder='Pilih tipe respon'
             />
+
+            <FormSelectField
+              name='access_scope'
+              label='Siapa yang Bisa Akses'
+              required
+              options={[
+                { value: 'public', label: 'Public / Umum' },
+                { value: 'admin', label: 'Admin / Owner' },
+                { value: 'member', label: 'Member' }
+              ]}
+              placeholder='Pilih akses'
+              description='Atur command ini bisa dipakai oleh siapa.'
+            />
+
+            <FormSelectField
+              name='chat_type_scope'
+              label='Tipe Chat'
+              required
+              options={[
+                { value: 'all', label: 'Semua Chat' },
+                { value: 'dm_only', label: 'DM Saja' },
+                { value: 'group_only', label: 'Group Saja' }
+              ]}
+              placeholder='Pilih tipe chat'
+              description='Batasi command hanya di DM, hanya di group, atau keduanya.'
+            />
+
+            {accessScope === 'member' && (
+              <form.AppField name='package_ids'>
+                {(field) => {
+                  const value = (field.state.value as string[]) ?? [];
+
+                  return (
+                    <FieldGroup>
+                      <FieldLabel>Paket yang Diizinkan</FieldLabel>
+                      <FieldDescription>
+                        Opsional. Kosongkan jika semua paket member boleh memakai command ini.
+                      </FieldDescription>
+                      <div className='flex max-h-[160px] flex-col gap-2 overflow-y-auto rounded-md border p-3'>
+                        {isPackagesLoading ? (
+                          <p className='text-muted-foreground text-sm'>Memuat paket...</p>
+                        ) : packages.length === 0 ? (
+                          <p className='text-muted-foreground text-sm'>Belum ada paket tersedia.</p>
+                        ) : (
+                          packages.map((pkg) => {
+                            const checked = value.includes(pkg.id);
+
+                            return (
+                              <label
+                                key={pkg.id}
+                                className='flex cursor-pointer items-center gap-2'
+                              >
+                                <Checkbox
+                                  checked={checked}
+                                  onCheckedChange={() => {
+                                    field.handleChange(
+                                      checked
+                                        ? value.filter((id) => id !== pkg.id)
+                                        : [...value, pkg.id]
+                                    );
+                                  }}
+                                />
+                                <span className='text-sm font-medium'>{pkg.name}</span>
+                                {!pkg.is_active && (
+                                  <span className='text-muted-foreground text-xs'>(nonaktif)</span>
+                                )}
+                              </label>
+                            );
+                          })
+                        )}
+                      </div>
+                    </FieldGroup>
+                  );
+                }}
+              </form.AppField>
+            )}
+
+            {chatTypeScope !== 'dm_only' && (
+              <form.AppField name='group_ids'>
+                {(field) => {
+                  const value = (field.state.value as string[]) ?? [];
+
+                  return (
+                    <FieldGroup>
+                      <FieldLabel>Grup yang Diizinkan</FieldLabel>
+                      <FieldDescription>
+                        Opsional. Kosongkan jika semua grup boleh memakai command ini.
+                      </FieldDescription>
+                      <div className='flex max-h-[180px] flex-col gap-2 overflow-y-auto rounded-md border p-3'>
+                        {isGroupsLoading ? (
+                          <p className='text-muted-foreground text-sm'>Memuat grup...</p>
+                        ) : groups.length === 0 ? (
+                          <p className='text-muted-foreground text-sm'>Belum ada grup tersedia.</p>
+                        ) : (
+                          groups.map((group) => {
+                            const checked = value.includes(group.id);
+
+                            return (
+                              <label
+                                key={group.id}
+                                className='flex cursor-pointer items-center gap-2'
+                              >
+                                <Checkbox
+                                  checked={checked}
+                                  onCheckedChange={() => {
+                                    field.handleChange(
+                                      checked
+                                        ? value.filter((id) => id !== group.id)
+                                        : [...value, group.id]
+                                    );
+                                  }}
+                                />
+                                <span className='text-sm font-medium'>{group.name}</span>
+                                <span className='text-muted-foreground text-xs'>
+                                  ({group.member_count} member)
+                                </span>
+                                {!group.is_active && (
+                                  <span className='text-muted-foreground text-xs'>(nonaktif)</span>
+                                )}
+                              </label>
+                            );
+                          })
+                        )}
+                      </div>
+                    </FieldGroup>
+                  );
+                }}
+              </form.AppField>
+            )}
 
             <div className='space-y-1'>
               <div className='flex items-center gap-1'>

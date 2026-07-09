@@ -85,6 +85,11 @@ function StatusCell({ cmd }: { cmd: Command }) {
   );
 }
 
+function formatBotUsername(username?: string) {
+  if (!username) return '-';
+  return username.startsWith('@') ? username : `@${username}`;
+}
+
 interface BotUsernameOption {
   label: string;
   value: string;
@@ -126,7 +131,7 @@ export function getColumns(
       },
       cell: ({ row }) => (
         <span className='text-sm text-muted-foreground'>
-          {row.original.bot_username ? `@${row.original.bot_username}` : '-'}
+          {formatBotUsername(row.original.bot_username)}
         </span>
       ),
       meta: {
@@ -136,6 +141,49 @@ export function getColumns(
       },
       enableSorting: true,
       enableColumnFilter: true
+    },
+    {
+      id: 'access_scope',
+      accessorKey: 'access_scope',
+      header: ({ column }) => <DataTableColumnHeader column={column} title='Akses' />,
+      cell: ({ row }) => {
+        const cmd = row.original;
+        const accessLabel =
+          cmd.access_scope === 'admin'
+            ? 'Admin/Owner'
+            : cmd.access_scope === 'member'
+              ? 'Member'
+              : 'Public';
+        const chatLabel =
+          cmd.chat_type_scope === 'dm_only'
+            ? 'DM'
+            : cmd.chat_type_scope === 'group_only'
+              ? 'Group'
+              : 'Semua chat';
+
+        return (
+          <div className='space-y-1'>
+            <div className='flex flex-wrap gap-1'>
+              <Badge variant='secondary'>{accessLabel}</Badge>
+              <Badge variant='outline'>{chatLabel}</Badge>
+            </div>
+            <p className='text-muted-foreground text-xs'>
+              Paket: {cmd.package_ids?.length || 'semua'} • Grup: {cmd.group_ids?.length || 'semua'}
+            </p>
+          </div>
+        );
+      },
+      enableSorting: false,
+      enableColumnFilter: true,
+      meta: {
+        label: 'Akses',
+        variant: 'multiSelect',
+        options: [
+          { label: 'Public', value: 'public' },
+          { label: 'Admin/Owner', value: 'admin' },
+          { label: 'Member', value: 'member' }
+        ]
+      }
     },
     {
       id: 'response_type',

@@ -24,7 +24,7 @@ export function CommandTable({ onEdit }: CommandTableProps) {
         .filter((username): username is string => Boolean(username))
     )
   ).map((username) => ({
-    label: `@${username}`,
+    label: username.startsWith('@') ? username : `@${username}`,
     value: username
   }));
   const columns = useMemo(
