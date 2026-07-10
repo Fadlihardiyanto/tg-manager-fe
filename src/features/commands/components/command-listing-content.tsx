@@ -5,7 +5,6 @@ import { CommandTable } from './command-tables';
 import { CommandFormDialog } from './command-form-dialog';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { QuotaCard } from '@/features/billing/components/quota-card';
 import { useActivePlan } from '@/features/billing/components/active-plan-provider';
 import type { Command } from '../api/types';
@@ -42,16 +41,6 @@ export function CommandListingContent() {
       </div>
 
       <QuotaCard resource='custom_commands' title='Kuota perintah kustom' className='mt-4' />
-
-      {!canCreateCommand && (
-        <Alert variant='warning' className='mt-4'>
-          <Icons.warning />
-          <AlertTitle>Kuota perintah kustom penuh</AlertTitle>
-          <AlertDescription>
-            Anda tidak bisa membuat perintah baru sampai batas plan ditingkatkan.
-          </AlertDescription>
-        </Alert>
-      )}
 
       <CommandTable onEdit={handleEdit} />
 
