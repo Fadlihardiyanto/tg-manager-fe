@@ -14,7 +14,7 @@ pnpm-lock.yaml
 # next.js
 /.next/
 /out/
-.next-build-verify/
+.next-build-verify*/
 
 # production
 /build
