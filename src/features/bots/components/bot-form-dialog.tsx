@@ -89,11 +89,6 @@ export function BotFormDialog({ bot, open, onOpenChange }: BotFormDialogProps) {
       onSubmit: botFormSchema
     },
     onSubmit: async ({ value }) => {
-      if (!isEdit && !canCreateBot) {
-        toast.error('Quota bot penuh. Upgrade plan untuk menambahkan bot baru.');
-        return;
-      }
-
       if (isEdit && bot) {
         await updateMutation.mutateAsync({
           id: bot.id,
@@ -179,14 +174,6 @@ export function BotFormDialog({ bot, open, onOpenChange }: BotFormDialogProps) {
                 ]}
                 placeholder='Pilih status'
               />
-            )}
-
-            {!canCreateBot && (
-              <Alert variant='warning'>
-                <Icons.warning />
-                <AlertTitle>Quota bot penuh</AlertTitle>
-                <AlertDescription>Upgrade plan Anda untuk menambahkan bot baru.</AlertDescription>
-              </Alert>
             )}
           </form.Form>
         </form.AppForm>

@@ -70,7 +70,10 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
   const [showQuotaAlert, setShowQuotaAlert] = useState(false);
   const [isLinkPopoverOpen, setIsLinkPopoverOpen] = useState(false);
   const [linkUrl, setLinkUrl] = useState('');
-  const [linkSelection, setLinkSelection] = useState<{ start: number; end: number } | null>(null);
+  const [linkSelection, setLinkSelection] = useState<{
+    start: number;
+    end: number;
+  } | null>(null);
 
   const mutation = useMutation({
     mutationFn: (params: { botId: string; data: CreateBroadcastRequest }) =>
@@ -104,11 +107,6 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
       onSubmit: broadcastFormSchema
     },
     onSubmit: async ({ value }) => {
-      if (!hasQuota('broadcasts')) {
-        toast.error('Kuota siaran penuh. Tingkatkan paket untuk membuat siaran baru.');
-        return;
-      }
-
       if (!canUseFeature('allow_media_broadcast') && value.message_type !== 'text') {
         toast.error('Paket aktif Anda hanya mengizinkan siaran teks.');
         return;
@@ -438,16 +436,6 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
                 description='Format: YYYY-MM-DD HH:MM (waktu lokal). Minimal 1 menit dari sekarang.'
                 type='text'
               />
-
-              {!canCreateBroadcast && (
-                <Alert variant='warning'>
-                  <Icons.warning />
-                  <AlertTitle>Kuota siaran penuh</AlertTitle>
-                  <AlertDescription>
-                    Tingkatkan paket Anda untuk membuat siaran baru.
-                  </AlertDescription>
-                </Alert>
-              )}
             </form.Form>
           </form.AppForm>
 

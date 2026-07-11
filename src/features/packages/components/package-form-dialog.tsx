@@ -83,11 +83,6 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
       onSubmit: packageFormSchema
     },
     onSubmit: async ({ value }) => {
-      if (!isEdit && !hasQuota('packages')) {
-        toast.error('Kuota paket penuh. Upgrade paket untuk menambahkan paket baru.');
-        return;
-      }
-
       const payload = {
         name: value.name,
         price: Number(value.price.replace(/\./g, '')),
@@ -308,16 +303,6 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
                   ))}
                 </div>
               </FieldGroup>
-            )}
-
-            {!canCreatePackage && (
-              <Alert variant='warning'>
-                <Icons.warning />
-                <AlertTitle>Kuota paket penuh</AlertTitle>
-                <AlertDescription>
-                  Upgrade paket Anda untuk menambahkan paket baru.
-                </AlertDescription>
-              </Alert>
             )}
           </form.Form>
         </form.AppForm>

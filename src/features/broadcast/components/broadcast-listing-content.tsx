@@ -63,16 +63,6 @@ export function BroadcastListingContent() {
 
       <QuotaCard resource='broadcasts' title='Kuota siaran' className='mt-4' />
 
-      {!canCreateBroadcast && (
-        <Alert variant='warning' className='mt-4'>
-          <Icons.warning />
-          <AlertTitle>Kuota siaran penuh</AlertTitle>
-          <AlertDescription>
-            Anda tidak bisa membuat siaran baru sampai batas paket ditingkatkan.
-          </AlertDescription>
-        </Alert>
-      )}
-
       {botId && (
         <Suspense fallback={<Skeleton className='h-64 w-full' />}>
           <BroadcastTable botId={botId} />

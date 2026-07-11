@@ -20,10 +20,10 @@ interface DataTableProps<TData> extends React.ComponentProps<'div'> {
 
 export function DataTable<TData>({ table, actionBar, children }: DataTableProps<TData>) {
   return (
-    <div className='flex flex-1 flex-col space-y-4'>
+    <div className='flex flex-1 flex-col space-y-3'>
       {children}
       <div className='relative flex flex-1'>
-        <div className='absolute inset-0 flex overflow-hidden rounded-lg border border-border bg-background'>
+        <div className='absolute inset-0 flex overflow-hidden rounded-md border border-border bg-background'>
           <ScrollArea className='h-full w-full'>
             <Table>
               <TableHeader className='bg-muted/40 sticky top-0 z-10'>
@@ -35,7 +35,8 @@ export function DataTable<TData>({ table, actionBar, children }: DataTableProps<
                         colSpan={header.colSpan}
                         style={{
                           ...getCommonPinningStyles({ column: header.column }),
-                          width: header.column.getSize() !== 150 ? header.column.getSize() : undefined
+                          width:
+                            header.column.getSize() !== 150 ? header.column.getSize() : undefined
                         }}
                       >
                         {header.isPlaceholder
@@ -76,7 +77,7 @@ export function DataTable<TData>({ table, actionBar, children }: DataTableProps<
           </ScrollArea>
         </div>
       </div>
-      <div className='flex flex-col gap-2.5'>
+      <div className='flex flex-col gap-2'>
         <DataTablePagination table={table} />
         {actionBar && table.getFilteredSelectedRowModel().rows.length > 0 && actionBar}
       </div>

@@ -26,12 +26,12 @@ export function DataTablePagination<TData>({
   return (
     <div
       className={cn(
-        'flex w-full flex-wrap items-center justify-between gap-2 overflow-auto p-1 sm:gap-8',
+        'flex w-full flex-wrap items-center justify-between gap-2 overflow-auto px-1 py-0.5 sm:gap-6',
         className
       )}
       {...props}
     >
-      <div className='text-muted-foreground text-sm whitespace-nowrap'>
+      <div className='text-muted-foreground text-xs whitespace-nowrap'>
         {table.getFilteredSelectedRowModel().rows.length > 0 ? (
           <>
             {table.getFilteredSelectedRowModel().rows.length} of{' '}
@@ -43,7 +43,7 @@ export function DataTablePagination<TData>({
       </div>
       <div className='flex items-center gap-2 sm:gap-6 lg:gap-8'>
         <div className='hidden items-center space-x-2 sm:flex'>
-          <p className='text-sm font-medium whitespace-nowrap'>Rows per page</p>
+          <p className='text-xs font-medium whitespace-nowrap'>Rows per page</p>
           <Select
             value={`${table.getState().pagination.pageSize}`}
             onValueChange={(value) => {
@@ -62,7 +62,7 @@ export function DataTablePagination<TData>({
             </SelectContent>
           </Select>
         </div>
-        <div className='flex items-center justify-center text-sm font-medium whitespace-nowrap'>
+        <div className='flex items-center justify-center text-xs font-medium whitespace-nowrap'>
           Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
         </div>
         <div className='flex items-center space-x-1'>

@@ -47,16 +47,6 @@ export function BotListingContent() {
 
       <QuotaCard resource='bots' title='Kuota bot' className='mt-4' />
 
-      {!canCreateBot && (
-        <Alert variant='warning' className='mt-4'>
-          <Icons.warning />
-          <AlertTitle>Quota bot penuh</AlertTitle>
-          <AlertDescription>
-            Anda tidak bisa menambah bot baru sampai limit plan ditingkatkan.
-          </AlertDescription>
-        </Alert>
-      )}
-
       <BotTable onEdit={handleEdit} />
 
       <BotFormDialog bot={editingBot} open={dialogOpen} onOpenChange={handleDialogChange} />

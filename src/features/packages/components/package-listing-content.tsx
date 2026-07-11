@@ -64,16 +64,6 @@ export function PackageListingContent() {
 
       <QuotaCard resource='packages' title='Kuota paket' className='mt-4' />
 
-      {!canCreatePackage && (
-        <Alert variant='warning' className='mt-4'>
-          <Icons.warning />
-          <AlertTitle>Kuota paket penuh</AlertTitle>
-          <AlertDescription>
-            Anda tidak bisa membuat paket baru sampai batas plan ditingkatkan.
-          </AlertDescription>
-        </Alert>
-      )}
-
       <PackageTable onEdit={handleEdit} />
 
       <PackageFormDialog
