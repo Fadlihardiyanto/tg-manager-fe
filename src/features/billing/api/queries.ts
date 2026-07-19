@@ -1,6 +1,10 @@
 import { queryOptions } from '@tanstack/react-query';
-import { getActiveBilling, getBillingHistory, getPublicPlans } from './service';
-import type { BillingHistoryFilters } from './types';
+import type {
+  ActiveBillingResponse,
+  BillingHistoryFilters,
+  BillingHistoryResponse,
+  PublicPlansResponse
+} from './types';
 
 export const activeBillingKeys = {
   all: ['active-billing'] as const,
@@ -17,23 +21,40 @@ export const billingHistoryKeys = {
   list: (filters: BillingHistoryFilters) => [...billingHistoryKeys.all, 'list', filters] as const
 };
 
+async function fetchJson<T>(url: string): Promise<T> {
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`Request failed: ${response.status}`);
+  }
+
+  return response.json() as Promise<T>;
+}
+
 export const activeBillingQueryOptions = () =>
   queryOptions({
     queryKey: activeBillingKeys.detail(),
-    queryFn: () => getActiveBilling(),
+    queryFn: () => fetchJson<ActiveBillingResponse>('/api/tenant/billing/active'),
     staleTime: 60_000
   });
 
 export const publicPlansQueryOptions = () =>
   queryOptions({
     queryKey: publicPlansKeys.list(),
-    queryFn: () => getPublicPlans(),
+    queryFn: () => fetchJson<PublicPlansResponse>('/api/public/plans'),
     staleTime: 5 * 60_000
   });
 
 export const billingHistoryQueryOptions = (filters: BillingHistoryFilters) =>
   queryOptions({
     queryKey: billingHistoryKeys.list(filters),
-    queryFn: () => getBillingHistory(filters),
+    queryFn: () => {
+      const params = new URLSearchParams();
+
+      if (filters.page) params.set('page', String(filters.page));
+      if (filters.limit) params.set('limit', String(filters.limit));
+
+      return fetchJson<BillingHistoryResponse>(`/api/tenant/billing/history?${params}`);
+    },
     staleTime: 60_000
   });

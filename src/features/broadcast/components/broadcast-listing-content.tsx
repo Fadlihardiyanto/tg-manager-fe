@@ -8,7 +8,6 @@ import { BroadcastTable } from './broadcast-tables';
 import { BroadcastFormDialog } from './broadcast-form-dialog';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { QuotaCard } from '@/features/billing/components/quota-card';
 import { useActivePlan } from '@/features/billing/components/active-plan-provider';
 import { botsQueryOptions } from '@/features/bots/api/queries';
@@ -33,8 +32,8 @@ export function BroadcastListingContent() {
   const handleAdd = () => setDialogOpen(true);
 
   return (
-    <div className='flex flex-1 flex-col space-y-4'>
-      <div className='flex items-end justify-between gap-4'>
+    <div className='flex min-h-0 flex-1 flex-col gap-4'>
+      <div className='flex flex-col gap-4 rounded-xl border border-border/70 bg-background/80 p-4 shadow-sm sm:flex-row sm:items-end sm:justify-between'>
         <div className='flex items-end gap-4'>
           <div className='space-y-1'>
             <Label>Pilih Bot</Label>
@@ -43,7 +42,7 @@ export function BroadcastListingContent() {
               onValueChange={(v) => setBotId(v || null)}
               disabled={botsLoading}
             >
-              <SelectTrigger className='w-[250px]'>
+              <SelectTrigger className='w-full rounded-full sm:w-[250px]'>
                 <SelectValue placeholder={botsLoading ? 'Memuat...' : 'Pilih bot Telegram...'} />
               </SelectTrigger>
               <SelectContent>
@@ -56,22 +55,37 @@ export function BroadcastListingContent() {
             </Select>
           </div>
         </div>
-        <Button onClick={handleAdd} size='sm' disabled={!botId || !canCreateBroadcast}>
-          <Icons.send className='mr-2 h-4 w-4' /> Buat Broadcast
-        </Button>
       </div>
-
-      <QuotaCard resource='broadcasts' title='Kuota siaran' className='mt-4' />
 
       {botId && (
         <Suspense fallback={<Skeleton className='h-64 w-full' />}>
-          <BroadcastTable botId={botId} />
+          <BroadcastTable
+            botId={botId}
+            notice={<QuotaCard resource='broadcasts' title='Kuota siaran' />}
+            toolbarActions={
+              <Button
+                onClick={handleAdd}
+                size='sm'
+                disabled={!canCreateBroadcast}
+                className='rounded-full'
+              >
+                {canCreateBroadcast ? (
+                  <Icons.send className='mr-2 h-4 w-4' />
+                ) : (
+                  <Icons.lock className='mr-2 h-4 w-4' />
+                )}
+                {canCreateBroadcast ? 'Buat Broadcast' : 'Limit Tercapai'}
+              </Button>
+            }
+          />
         </Suspense>
       )}
 
       {!botId && (
-        <div className='flex flex-1 flex-col items-center justify-center text-muted-foreground'>
-          <Icons.telegram className='mb-4 h-12 w-12 opacity-30' />
+        <div className='text-muted-foreground flex min-h-64 flex-1 flex-col items-center justify-center rounded-xl border border-dashed border-border/70 bg-muted/20 p-8 text-center'>
+          <div className='mb-4 flex size-14 items-center justify-center rounded-full bg-background shadow-sm'>
+            <Icons.telegram className='h-7 w-7 opacity-50' />
+          </div>
           <p>Pilih bot untuk melihat riwayat broadcast</p>
         </div>
       )}

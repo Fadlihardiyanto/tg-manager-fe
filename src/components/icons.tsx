@@ -3,6 +3,7 @@ import {
   IconAlertCircle,
   IconAlertTriangle,
   IconArrowRight,
+  IconArrowUpRight,
   IconBell,
   IconBold,
   IconBox,
@@ -10,6 +11,7 @@ import {
   IconBrandTelegram,
   IconBrandTwitter,
   IconBrightness,
+  IconChartBar,
   IconBuilding,
   IconCalendar,
   IconCheck,
@@ -31,6 +33,7 @@ import {
   IconCommand,
   IconConfetti,
   IconCreditCard,
+  IconCircleArrowUpRight,
   IconDeviceLaptop,
   IconDots,
   IconDotsVertical,
@@ -56,6 +59,8 @@ import {
   IconLock,
   IconLogin,
   IconLogout,
+  IconMail,
+  IconMenu2,
   IconMessage,
   IconMinus,
   IconMoon,
@@ -75,6 +80,7 @@ import {
   IconSend,
   IconSettings,
   IconShare,
+  IconShieldCheck,
   IconSlash,
   IconSparkles,
   IconStack2,
@@ -119,6 +125,7 @@ export const Icons = {
   alertCircle: IconAlertCircle,
   warning: IconAlertTriangle,
   arrowRight: IconArrowRight,
+  arrowUpRight: IconArrowUpRight,
   arrowLeft: IconArrowLeft,
   check: IconCheck,
   checks: IconChecks,
@@ -184,6 +191,14 @@ export const Icons = {
   media: IconPhoto,
   music: IconMusic,
 
+  // Data / Charts
+  trendingDown: IconTrendingDown,
+  trendingUp: IconTrendingUp,
+  eye: IconEye,
+  eyeOff: IconEyeOff,
+  adjustments: IconAdjustmentsHorizontal,
+  chartBar: IconChartBar,
+
   // Actions
   add: IconPlus,
   edit: IconEdit,
@@ -191,6 +206,7 @@ export const Icons = {
   share: IconShare,
   login: IconLogin,
   logout: IconLogout,
+  mail: IconMail,
   gripVertical: IconGripVertical,
 
   // Shapes / Indicators
@@ -199,6 +215,7 @@ export const Icons = {
   plusCircle: IconCirclePlus,
   xCircle: IconCircleX,
   minus: IconMinus,
+  menu: IconMenu2,
 
   // Theme
   sun: IconSun,
@@ -216,15 +233,9 @@ export const Icons = {
   sparkles: IconSparkles,
   badgeCheck: IconRosetteDiscountCheck,
   shield: IconShield,
+  shieldCheck: IconShieldCheck,
   lock: IconLock,
   network: IconNetwork,
-
-  // Data / Charts
-  trendingDown: IconTrendingDown,
-  trendingUp: IconTrendingUp,
-  eye: IconEye,
-  eyeOff: IconEyeOff,
-  adjustments: IconAdjustmentsHorizontal,
 
   // Text formatting
   bold: IconBold,

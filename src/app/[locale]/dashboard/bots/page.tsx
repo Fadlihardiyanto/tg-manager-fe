@@ -7,10 +7,7 @@ export const metadata = {
 
 export default function BotsPage() {
   return (
-    <PageContainer
-      pageTitle='Bot Telegram'
-      pageDescription='Kelola bot Telegram Anda, mulai dari pendaftaran, pengaturan peran, hingga status aktif.'
-    >
+    <PageContainer pageTitle='Bots'>
       <BotListing />
     </PageContainer>
   );

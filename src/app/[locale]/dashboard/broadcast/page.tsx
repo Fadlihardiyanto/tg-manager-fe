@@ -7,10 +7,7 @@ export const metadata = {
 
 export default function BroadcastPage() {
   return (
-    <PageContainer
-      pageTitle='Broadcast'
-      pageDescription='Kirim pesan massal ke grup atau member Telegram.'
-    >
+    <PageContainer pageTitle='Broadcast'>
       <BroadcastListingContent />
     </PageContainer>
   );

@@ -1,7 +1,7 @@
 import { Separator } from '@/components/ui/separator';
-import { IconBrandTelegram as Telegram, IconBrandTwitter as Twitter } from '@tabler/icons-react';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
+import { Icons } from '@/components/icons';
 
 const Footer = () => {
   const t = useTranslations('Footer');
@@ -34,7 +34,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className='mt-12 xs:mt-20 dark bg-background border-t'>
+    <footer className='mt-20 dark bg-background border-t'>
       <div className='max-w-(--breakpoint-xl) mx-auto py-12 flex flex-col md:flex-row justify-between gap-10 px-6'>
         {/* Brand Section */}
         <div className='flex flex-col max-w-sm'>
@@ -88,10 +88,10 @@ const Footer = () => {
         {/* Social Icons */}
         <div className='flex items-center gap-5 text-muted-foreground'>
           <Link href='#' target='_blank' className='hover:text-sky-500 transition-colors'>
-            <Telegram className='h-5 w-5' />
+            <Icons.telegram className='h-5 w-5' />
           </Link>
           <Link href='#' target='_blank' className='hover:text-foreground transition-colors'>
-            <Twitter className='h-5 w-5' />
+            <Icons.twitter className='h-5 w-5' />
           </Link>
         </div>
       </div>

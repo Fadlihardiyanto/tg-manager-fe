@@ -8,12 +8,15 @@ import { packagesQueryOptions } from '../../api/queries';
 import { getColumns } from './columns';
 import type { Package } from '../../api/types';
 import { useMemo } from 'react';
+import type { ReactNode } from 'react';
 
 interface PackageTableProps {
   onEdit: (pkg: Package) => void;
+  toolbarActions?: ReactNode;
+  notice?: ReactNode;
 }
 
-export function PackageTable({ onEdit }: PackageTableProps) {
+export function PackageTable({ onEdit, toolbarActions, notice }: PackageTableProps) {
   const columns = useMemo(() => getColumns(onEdit), [onEdit]);
 
   const { data } = useSuspenseQuery(packagesQueryOptions());
@@ -34,8 +37,13 @@ export function PackageTable({ onEdit }: PackageTableProps) {
   });
 
   return (
-    <DataTable table={table}>
-      <DataTableToolbar table={table} />
+    <DataTable
+      table={table}
+      notice={notice}
+      title='Daftar Paket'
+      description='Kelola paket langganan, harga, durasi, dan akses grup.'
+    >
+      <DataTableToolbar table={table}>{toolbarActions}</DataTableToolbar>
     </DataTable>
   );
 }

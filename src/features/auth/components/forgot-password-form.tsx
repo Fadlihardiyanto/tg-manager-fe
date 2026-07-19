@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import { useAppForm } from '@/components/ui/tanstack-form';
 import { TextField } from '@/components/forms/fields';
-import { IconMail, IconCheck } from '@tabler/icons-react';
 import { forgotPasswordSchema, type ForgotPasswordInput } from '../schemas/auth-schema';
 import { forgotPassword } from '../api/service';
 
@@ -42,7 +41,7 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
         {/* Success Icon */}
         <div className='flex justify-center mb-6'>
           <div className='flex h-16 w-16 items-center justify-center rounded-full bg-primary/10'>
-            <IconCheck className='h-8 w-8 text-primary' />
+            <Icons.check className='h-8 w-8 text-primary' />
           </div>
         </div>
 
@@ -58,7 +57,7 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
         <div className='flex flex-col gap-4'>
           <Button
             asChild
-            className='w-full h-12 rounded-xl bg-primary text-base font-semibold text-primary-foreground transition-opacity hover:bg-primary/90'
+            className='w-full h-12 rounded-xl bg-gradient-to-r from-primary to-primary/80 text-base font-semibold text-primary-foreground transition-opacity hover:from-primary/90 hover:to-primary/70'
           >
             <Link href='/login'>Kembali ke Masuk</Link>
           </Button>
@@ -104,7 +103,8 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
                 label=''
                 type='email'
                 placeholder='Alamat email'
-                className='px-4 h-12 border border-border rounded-xl focus-visible:ring-ring text-base placeholder:text-muted-foreground bg-background'
+                leftIcon={<Icons.mail className='h-5 w-5' />}
+                className='pl-10 h-12 border border-border rounded-xl focus-visible:ring-2 focus-visible:ring-ring/40 text-base placeholder:text-muted-foreground bg-background'
               />
             )}
           />
@@ -115,7 +115,7 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
           {/* Submit Button */}
           <form.SubmitButton
             disabled={isSubmitting}
-            className='w-full bg-primary text-primary-foreground font-semibold h-12 rounded-xl hover:bg-primary/90 active:scale-[0.98] transition-all mt-4 text-base'
+            className='w-full bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-semibold h-12 rounded-xl hover:from-primary/90 hover:to-primary/70 active:scale-[0.98] transition-all mt-4 text-base'
           >
             {isSubmitting ? (
               <span className='flex items-center gap-2'>

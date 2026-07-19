@@ -45,10 +45,17 @@ export const navGroups: NavGroup[] = [
         shortcut: ['d', 'd'],
         items: []
       },
+      // {
+      //   title: "Billing Plan",
+      //   url: "/dashboard/billing",
+      //   icon: "billing",
+      //   isActive: false,
+      //   items: [],
+      // },
       {
-        title: 'Billing Plan',
-        url: '/dashboard/billing',
-        icon: 'billing',
+        title: 'Midtrans',
+        url: '/dashboard/midtrans',
+        icon: 'wallet',
         isActive: false,
         items: []
       },
@@ -97,40 +104,14 @@ export const navGroups: NavGroup[] = [
         shortcut: ['b', 'r'],
         isActive: false,
         items: []
-      },
-      {
-        title: 'Discounts',
-        url: '/dashboard/discounts',
-        icon: 'tag',
-        isActive: false,
-        items: []
-      },
-      {
-        title: 'React Query',
-        url: '/dashboard/react-query',
-        icon: 'code',
-        isActive: false,
-        items: []
       }
-    ]
-  },
-  {
-    label: '',
-    items: [
-      {
-        title: 'Account',
-        url: '#',
-        icon: 'account',
-        isActive: true,
-        items: [
-          {
-            title: 'Login',
-            shortcut: ['l', 'l'],
-            url: '/',
-            icon: 'login'
-          }
-        ]
-      }
+      // {
+      //   title: "Discounts",
+      //   url: "/dashboard/discounts",
+      //   icon: "tag",
+      //   isActive: false,
+      //   items: [],
+      // },
     ]
   }
 ];

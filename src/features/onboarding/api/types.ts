@@ -84,16 +84,66 @@ export interface UpdateBotResponse {
 
 export interface UpdatePaymentRequest {
   is_sandbox: boolean;
-  sandbox_server_key: string;
-  sandbox_client_key: string;
-  production_server_key: string;
-  production_client_key: string;
+  sandbox_merchant_id?: string;
+  sandbox_server_key?: string;
+  sandbox_client_key?: string;
+  production_merchant_id?: string;
+  production_server_key?: string;
+  production_client_key?: string;
 }
 
 export interface UpdatePaymentResponse {
   success: boolean;
   code: number;
   message: string;
+}
+
+export interface PaymentSettings {
+  has_sandbox_server_key: boolean;
+  has_sandbox_client_key: boolean;
+  has_sandbox_merchant_id: boolean;
+  sandbox_merchant_id: string;
+  sandbox_client_key: string;
+  sandbox_server_key: string;
+  has_production_server_key: boolean;
+  has_production_client_key: boolean;
+  has_production_merchant_id: boolean;
+  production_merchant_id: string;
+  production_client_key: string;
+  production_server_key: string;
+  is_sandbox: boolean;
+}
+
+export interface PaymentSettingsResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  data: PaymentSettings;
+}
+
+export interface PaymentKeyExchangeRequest {
+  client_public_key: string;
+}
+
+export interface PaymentKeyExchangeResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  data: {
+    session_id: string;
+    server_public_key: string;
+  };
+}
+
+export interface EncryptedPaymentSettingsRequest {
+  session_id: string;
+  is_sandbox: boolean;
+  sandbox_merchant_id?: string;
+  sandbox_server_key?: string;
+  sandbox_client_key?: string;
+  production_merchant_id?: string;
+  production_server_key?: string;
+  production_client_key?: string;
 }
 
 // ─── Generic API Error ────────────────────────────────────────────────

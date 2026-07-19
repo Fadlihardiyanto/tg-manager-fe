@@ -3,12 +3,12 @@
 // ============================================================
 'use client';
 
+import Link from 'next/link';
 import { useCallback, useState } from 'react';
 import { DiscountTable } from './discount-tables';
 import { DiscountFormDialog } from './discount-form-dialog';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useActivePlan } from '@/features/billing/components/active-plan-provider';
 import type { MemberDiscount } from '../api/types';
 
@@ -36,30 +36,58 @@ export function DiscountListingContent() {
   }, []);
 
   return (
-    <>
-      <div className='flex justify-end'>
-        <Button onClick={handleAdd} size='sm' disabled={!allowDiscountSystem}>
-          <Icons.add className='mr-2 h-4 w-4' /> Tambah Diskon
-        </Button>
+    <div className='flex min-h-0 flex-1 flex-col gap-4'>
+      <div className='relative flex min-h-0 flex-1'>
+        <div
+          className={
+            allowDiscountSystem
+              ? 'flex min-h-0 flex-1'
+              : 'pointer-events-none flex min-h-0 flex-1 select-none blur-[2px]'
+          }
+        >
+          <DiscountTable
+            onEdit={handleEdit}
+            toolbarActions={
+              <Button
+                onClick={handleAdd}
+                size='sm'
+                disabled={!allowDiscountSystem}
+                className='rounded-full'
+              >
+                {allowDiscountSystem ? (
+                  <Icons.add className='mr-2 h-4 w-4' />
+                ) : (
+                  <Icons.lock className='mr-2 h-4 w-4' />
+                )}
+                {allowDiscountSystem ? 'Tambah Diskon' : 'Fitur Terkunci'}
+              </Button>
+            }
+          />
+        </div>
+
+        {!allowDiscountSystem && (
+          <div className='absolute inset-0 z-50 flex items-center justify-center bg-background/45 p-4'>
+            <div className='w-full max-w-sm rounded-3xl border border-border/70 bg-background p-6 text-center shadow-[0_18px_50px_rgba(15,23,42,0.14)]'>
+              <div className='mx-auto mb-4 flex size-14 items-center justify-center rounded-full bg-primary/15 text-primary'>
+                <Icons.lock className='size-7' />
+              </div>
+              <h3 className='text-base font-bold text-foreground'>Buka Sistem Diskon</h3>
+              <p className='text-muted-foreground mt-2 text-sm'>
+                Upgrade plan Anda untuk membuat, mengelola, dan melacak performa diskon.
+              </p>
+              <Button asChild className='mt-5 rounded-full'>
+                <Link href='/dashboard/billing?tab=upgrade'>Upgrade Plan</Link>
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
-
-      {!allowDiscountSystem && (
-        <Alert variant='warning' className='mt-4'>
-          <Icons.lock />
-          <AlertTitle>Sistem diskon terkunci</AlertTitle>
-          <AlertDescription>
-            Tingkatkan plan Anda untuk membuat dan mengelola diskon.
-          </AlertDescription>
-        </Alert>
-      )}
-
-      <DiscountTable onEdit={handleEdit} />
 
       <DiscountFormDialog
         discount={editingDiscount}
         open={dialogOpen}
         onOpenChange={handleDialogChange}
       />
-    </>
+    </div>
   );
 }

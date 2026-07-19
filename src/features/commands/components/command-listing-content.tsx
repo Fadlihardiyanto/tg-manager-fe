@@ -33,22 +33,32 @@ export function CommandListingContent() {
   }, []);
 
   return (
-    <>
-      <div className='flex justify-end'>
-        <Button onClick={handleAdd} size='sm' disabled={!canCreateCommand}>
-          <Icons.add className='mr-2 h-4 w-4' /> Tambah Perintah
-        </Button>
-      </div>
-
-      <QuotaCard resource='custom_commands' title='Kuota perintah kustom' className='mt-4' />
-
-      <CommandTable onEdit={handleEdit} />
+    <div className='flex min-h-0 flex-1 flex-col gap-4'>
+      <CommandTable
+        onEdit={handleEdit}
+        notice={<QuotaCard resource='custom_commands' title='Kuota perintah kustom' />}
+        toolbarActions={
+          <Button
+            onClick={handleAdd}
+            size='sm'
+            disabled={!canCreateCommand}
+            className='rounded-full'
+          >
+            {canCreateCommand ? (
+              <Icons.add className='mr-2 h-4 w-4' />
+            ) : (
+              <Icons.lock className='mr-2 h-4 w-4' />
+            )}
+            {canCreateCommand ? 'Tambah Perintah' : 'Limit Tercapai'}
+          </Button>
+        }
+      />
 
       <CommandFormDialog
         command={editingCommand}
         open={dialogOpen}
         onOpenChange={handleDialogChange}
       />
-    </>
+    </div>
   );
 }

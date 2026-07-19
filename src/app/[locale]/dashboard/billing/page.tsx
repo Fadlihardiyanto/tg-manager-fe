@@ -7,10 +7,7 @@ export const metadata = {
 
 export default function BillingPage() {
   return (
-    <PageContainer
-      pageTitle='Penagihan & Plan'
-      pageDescription='Lihat plan tenant aktif, kuota yang masih tersedia, dan jalur upgrade plan.'
-    >
+    <PageContainer pageTitle='Billing Plan'>
       <ActivePlanPage />
     </PageContainer>
   );

@@ -46,13 +46,6 @@ export function MigrationMembersTab() {
   return (
     <>
       <div className='flex flex-1 min-h-0 flex-col gap-4'>
-        <div>
-          <h2 className='text-lg font-semibold'>Migration & Import</h2>
-          <p className='text-muted-foreground text-sm'>
-            Review imported members, track claim status, and manage CSV migration flow.
-          </p>
-        </div>
-
         <div className='flex flex-1 min-h-0'>
           <MigrationMembersTable
             onExport={handleExport}

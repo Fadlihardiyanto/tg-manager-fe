@@ -8,7 +8,6 @@ import { BotTable } from './bot-tables';
 import { BotFormDialog } from './bot-form-dialog';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { QuotaCard } from '@/features/billing/components/quota-card';
 import { useActivePlan } from '@/features/billing/components/active-plan-provider';
 import type { TelegramBot } from '../api/types';
@@ -38,18 +37,23 @@ export function BotListingContent() {
   }, []);
 
   return (
-    <>
-      <div className='flex justify-end'>
-        <Button onClick={handleAdd} size='sm' disabled={!canCreateBot}>
-          <Icons.add className='mr-2 h-4 w-4' /> Tambah Bot
-        </Button>
-      </div>
-
-      <QuotaCard resource='bots' title='Kuota bot' className='mt-4' />
-
-      <BotTable onEdit={handleEdit} />
+    <div className='flex min-h-0 flex-1 flex-col gap-4'>
+      <BotTable
+        onEdit={handleEdit}
+        notice={<QuotaCard resource='bots' title='Kuota bot' />}
+        toolbarActions={
+          <Button onClick={handleAdd} size='sm' disabled={!canCreateBot} className='rounded-full'>
+            {canCreateBot ? (
+              <Icons.add className='mr-2 h-4 w-4' />
+            ) : (
+              <Icons.lock className='mr-2 h-4 w-4' />
+            )}
+            {canCreateBot ? 'Tambah Bot' : 'Limit Tercapai'}
+          </Button>
+        }
+      />
 
       <BotFormDialog bot={editingBot} open={dialogOpen} onOpenChange={handleDialogChange} />
-    </>
+    </div>
   );
 }

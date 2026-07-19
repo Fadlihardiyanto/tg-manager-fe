@@ -286,8 +286,10 @@ export default function OnboardingFlow() {
 
           const res = await updatePayment.mutateAsync({
             is_sandbox: isSandbox,
+            sandbox_merchant_id: isSandbox ? (value.sandboxMerchantId ?? '') : '',
             sandbox_server_key: isSandbox ? (value.sandboxServerKey ?? '') : '',
             sandbox_client_key: isSandbox ? (value.sandboxClientKey ?? '') : '',
+            production_merchant_id: !isSandbox ? (value.productionMerchantId ?? '') : '',
             production_server_key: !isSandbox ? (value.productionServerKey ?? '') : '',
             production_client_key: !isSandbox ? (value.productionClientKey ?? '') : ''
           });

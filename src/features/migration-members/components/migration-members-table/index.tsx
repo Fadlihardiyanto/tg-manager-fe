@@ -99,10 +99,20 @@ export function MigrationMembersTable({
         </Alert>
       ) : null}
 
-      <DataTable table={table}>
+      <DataTable
+        table={table}
+        title='Migration & Import'
+        description='Kelola migrasi member dari sistem lama ke sistem baru. Anda dapat menambahkan member secara manual atau mengimpor dari file CSV.'
+      >
         <DataTableToolbar table={table}>
           <ImportMigrationMembersDialog onImported={onImported} />
-          <Button variant='outline' onClick={onExport} isLoading={isExporting}>
+          <Button
+            variant='outline'
+            size='sm'
+            className='rounded-full'
+            onClick={onExport}
+            isLoading={isExporting}
+          >
             Export CSV
           </Button>
         </DataTableToolbar>

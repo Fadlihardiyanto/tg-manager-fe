@@ -1,7 +1,12 @@
 'use client';
 
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { PageTabs } from '@/components/ui/page-tabs';
 import { parseAsString, useQueryState } from 'nuqs';
+
+const tabs = [
+  { value: 'active', label: 'Member Aktif' },
+  { value: 'migration', label: 'Migration & Import' }
+];
 
 export function MembersPageTabs() {
   const [tab, setTab] = useQueryState(
@@ -9,12 +14,5 @@ export function MembersPageTabs() {
     parseAsString.withDefault('active').withOptions({ shallow: false, history: 'replace' })
   );
 
-  return (
-    <Tabs value={tab} onValueChange={setTab} className='space-y-4'>
-      <TabsList>
-        <TabsTrigger value='active'>Member Aktif</TabsTrigger>
-        <TabsTrigger value='migration'>Migration & Import</TabsTrigger>
-      </TabsList>
-    </Tabs>
-  );
+  return <PageTabs value={tab} onValueChange={setTab} items={tabs} />;
 }

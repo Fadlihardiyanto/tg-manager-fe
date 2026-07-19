@@ -7,10 +7,7 @@ export const metadata = {
 
 export default function PackagesPage() {
   return (
-    <PageContainer
-      pageTitle='Paket Langganan'
-      pageDescription='Buat dan kelola paket langganan untuk grup Telegram Anda, termasuk harga, durasi, dan level akses.'
-    >
+    <PageContainer pageTitle='Packages'>
       <PackageListing />
     </PageContainer>
   );

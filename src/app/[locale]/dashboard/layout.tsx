@@ -1,10 +1,4 @@
-import KBar from '@/components/kbar';
-import AppSidebar from '@/components/layout/app-sidebar';
-import Header from '@/components/layout/header';
-import { InfoSidebar } from '@/components/layout/info-sidebar';
-import { InfobarProvider } from '@/components/ui/infobar';
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
-import { ActivePlanProvider } from '@/features/billing/components/active-plan-provider';
+import { DashboardShell } from '@/components/layout/dashboard-shell';
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import { getMe } from '@/features/auth/api/service';
@@ -31,19 +25,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const defaultOpen = cookieStore.get('sidebar_state')?.value === 'true';
 
   return (
-    <KBar navGroups={filteredGroups}>
-      <SidebarProvider defaultOpen={defaultOpen}>
-        <AppSidebar navGroups={filteredGroups} />
-        <SidebarInset>
-          <Header />
-          <InfobarProvider defaultOpen={false}>
-            <ActivePlanProvider>
-              {children}
-              <InfoSidebar side='right' />
-            </ActivePlanProvider>
-          </InfobarProvider>
-        </SidebarInset>
-      </SidebarProvider>
-    </KBar>
+    <DashboardShell navGroups={filteredGroups} defaultOpen={defaultOpen}>
+      {children}
+    </DashboardShell>
   );
 }

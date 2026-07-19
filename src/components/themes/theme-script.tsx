@@ -1,5 +1,3 @@
-'use client';
-
 import Script from 'next/script';
 
 // ponytail: inline script matches next-themes FOUC prevention.

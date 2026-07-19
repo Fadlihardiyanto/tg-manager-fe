@@ -9,7 +9,6 @@ import { PackageTable } from './package-tables';
 import { PackageFormDialog } from './package-form-dialog';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { QuotaCard } from '@/features/billing/components/quota-card';
 import { useActivePlan } from '@/features/billing/components/active-plan-provider';
 import { groupsQueryOptions } from '@/features/groups/api/queries';
@@ -43,34 +42,44 @@ export function PackageListingContent() {
   }, []);
 
   return (
-    <>
+    <div className='flex min-h-0 flex-1 flex-col gap-4'>
       {!hasActiveGroups && (
-        <div className='rounded-lg border border-amber-200 bg-amber-50 p-4 mb-4 text-sm'>
+        <div className='rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm shadow-sm dark:border-amber-500/30 dark:bg-amber-500/10'>
           <p className='font-medium text-amber-800'>Anda belum memiliki grup terdaftar.</p>
           <p className='mt-1 text-amber-700'>
             Silakan hubungkan grup Telegram Anda terlebih dahulu sebelum membuat paket jualan.
           </p>
-          <Button asChild size='sm' className='mt-3'>
+          <Button asChild size='sm' className='mt-3 rounded-full'>
             <Link href='/dashboard/groups'>Hubungkan Grup</Link>
           </Button>
         </div>
       )}
 
-      <div className='flex justify-end'>
-        <Button onClick={handleAdd} size='sm' disabled={!hasActiveGroups || !canCreatePackage}>
-          <Icons.add className='mr-2 h-4 w-4' /> Tambah Paket
-        </Button>
-      </div>
-
-      <QuotaCard resource='packages' title='Kuota paket' className='mt-4' />
-
-      <PackageTable onEdit={handleEdit} />
+      <PackageTable
+        onEdit={handleEdit}
+        notice={<QuotaCard resource='packages' title='Kuota paket' />}
+        toolbarActions={
+          <Button
+            onClick={handleAdd}
+            size='sm'
+            disabled={!hasActiveGroups || !canCreatePackage}
+            className='rounded-full'
+          >
+            {canCreatePackage ? (
+              <Icons.add className='mr-2 h-4 w-4' />
+            ) : (
+              <Icons.lock className='mr-2 h-4 w-4' />
+            )}
+            {canCreatePackage ? 'Tambah Paket' : 'Limit Tercapai'}
+          </Button>
+        }
+      />
 
       <PackageFormDialog
         package_={editingPackage}
         open={dialogOpen}
         onOpenChange={handleDialogChange}
       />
-    </>
+    </div>
   );
 }

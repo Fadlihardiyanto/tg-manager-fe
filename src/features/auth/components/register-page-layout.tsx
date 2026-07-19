@@ -6,8 +6,8 @@ import RegisterForm from './register-form';
 
 export default function RegisterPageLayout() {
   return (
-    <div className='flex min-h-svh w-full items-center justify-center p-4 md:p-6 bg-background'>
-      <div className='w-full max-w-md flex flex-col gap-4'>
+    <div className='w-full min-h-svh flex items-center justify-center p-4 md:p-6'>
+      <div className='w-full max-w-md flex flex-col gap-4 animate-fade-up'>
         <div className='flex'>
           <Button
             asChild
@@ -20,9 +20,11 @@ export default function RegisterPageLayout() {
             </Link>
           </Button>
         </div>
-        <Card className='w-full p-6 md:p-8 border-border shadow-[0_4px_12px_rgb(0,0,0,0.08)] dark:shadow-[0_4px_12px_rgb(0,0,0,0.3)]'>
-          <RegisterForm />
-        </Card>
+        <div className='rounded-2xl bg-gradient-to-br from-border/80 via-border/40 to-transparent p-[1px] shadow-xl shadow-black/5'>
+          <Card className='rounded-[15px] w-full p-6 md:p-8 bg-background/80 backdrop-blur-sm'>
+            <RegisterForm />
+          </Card>
+        </div>
       </div>
     </div>
   );

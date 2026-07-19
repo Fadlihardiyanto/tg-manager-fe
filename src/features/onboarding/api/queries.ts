@@ -11,6 +11,7 @@ import {
   updateProfile,
   createBot,
   updateBot,
+  getPaymentSettings,
   updatePaymentSettings
 } from './service';
 import type {
@@ -23,6 +24,11 @@ import type {
 
 export const onboardingKeys = {
   all: ['onboarding'] as const
+};
+
+export const paymentSettingsKeys = {
+  all: ['payment-settings'] as const,
+  detail: () => [...paymentSettingsKeys.all, 'detail'] as const
 };
 
 // ─── Step 1: Create Onboarding (first time) ─────────────────────────
@@ -60,3 +66,9 @@ export const useUpdatePaymentMutation = () => {
     mutationFn: (data: UpdatePaymentRequest) => updatePaymentSettings(data)
   });
 };
+
+export const paymentSettingsQueryOptions = () => ({
+  queryKey: paymentSettingsKeys.detail(),
+  queryFn: getPaymentSettings,
+  staleTime: 60_000
+});

@@ -7,10 +7,7 @@ export const metadata = {
 
 export default function DiscountsPage() {
   return (
-    <PageContainer
-      pageTitle='Diskon Member'
-      pageDescription='Buat dan kelola kode promo untuk paket langganan Anda, termasuk jenis, nilai, batas penggunaan, dan masa berlaku.'
-    >
+    <PageContainer pageTitle='Discounts'>
       <DiscountListing />
     </PageContainer>
   );

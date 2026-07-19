@@ -26,6 +26,10 @@ import type {
   CreateBotResponse,
   UpdateBotRequest,
   UpdateBotResponse,
+  EncryptedPaymentSettingsRequest,
+  PaymentKeyExchangeRequest,
+  PaymentKeyExchangeResponse,
+  PaymentSettingsResponse,
   UpdatePaymentRequest,
   UpdatePaymentResponse
 } from './types';
@@ -143,6 +147,58 @@ export async function updateBot(botId: string, data: UpdateBotRequest): Promise<
 
 // ─── Step 3: Update Payment Settings ────────────────────────────────
 // Called when user submits Step 3 (Finish).
+export async function getPaymentSettings(): Promise<PaymentSettingsResponse> {
+  const authHeaders = await getAuthHeaders();
+
+  try {
+    return await apiClient<PaymentSettingsResponse>('/api/v1/tenant/settings/payment', {
+      method: 'GET',
+      headers: { ...authHeaders }
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Gagal mengambil pengaturan pembayaran';
+    return { success: false, code: 400, message, data: undefined as never };
+  }
+}
+
+export async function initiatePaymentKeyExchange(
+  data: PaymentKeyExchangeRequest
+): Promise<PaymentKeyExchangeResponse> {
+  const authHeaders = await getAuthHeaders();
+
+  try {
+    return await apiClient<PaymentKeyExchangeResponse>(
+      '/api/v1/tenant/settings/payment/key-exchange/initiate',
+      {
+        method: 'POST',
+        headers: { ...authHeaders },
+        body: JSON.stringify(data)
+      }
+    );
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Gagal memulai enkripsi pembayaran';
+    return { success: false, code: 400, message, data: undefined as never };
+  }
+}
+
+export async function updateEncryptedPaymentSettings(
+  data: EncryptedPaymentSettingsRequest
+): Promise<UpdatePaymentResponse> {
+  const authHeaders = await getAuthHeaders();
+
+  try {
+    return await apiClient<UpdatePaymentResponse>('/api/v1/tenant/settings/payment/encrypted', {
+      method: 'PUT',
+      headers: { ...authHeaders },
+      body: JSON.stringify(data)
+    });
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : 'Gagal memperbarui pengaturan pembayaran terenkripsi';
+    return { success: false, code: 400, message };
+  }
+}
+
 export async function updatePaymentSettings(
   data: UpdatePaymentRequest
 ): Promise<UpdatePaymentResponse> {

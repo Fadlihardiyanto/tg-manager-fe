@@ -50,6 +50,7 @@ interface MidtransSnapCheckoutProps {
 }
 
 const SNAP_SCRIPT_ID = 'midtrans-snap-script';
+export const MIDTRANS_PENDING_PAYMENT_STORAGE_KEY = 'midtrans-pending-payment';
 
 function getSnapScriptUrl(environment: MidtransEnvironment) {
   return environment === 'production'
@@ -97,6 +98,20 @@ export function MidtransSnapCheckout({
   const [didAutoOpen, setDidAutoOpen] = useState(false);
   const resolvedClientKey = useMemo(() => getClientKey(clientKey), [clientKey]);
   const scriptUrl = useMemo(() => getSnapScriptUrl(environment), [environment]);
+
+  useEffect(() => {
+    if (!snapToken && !paymentUrl) return;
+
+    sessionStorage.setItem(
+      MIDTRANS_PENDING_PAYMENT_STORAGE_KEY,
+      JSON.stringify({
+        snapToken,
+        paymentUrl,
+        clientKey,
+        orderId
+      })
+    );
+  }, [clientKey, orderId, paymentUrl, snapToken]);
 
   useEffect(() => {
     if (!snapToken || !resolvedClientKey) return;
@@ -159,6 +174,7 @@ export function MidtransSnapCheckout({
     }
 
     setIsOpening(true);
+    document.body.style.pointerEvents = 'auto';
     window.snap.pay(snapToken, {
       onSuccess: (result) => {
         setIsOpening(false);
@@ -175,7 +191,8 @@ export function MidtransSnapCheckout({
       },
       onClose: () => {
         setIsOpening(false);
-        toast.info('Checkout ditutup. Anda bisa melanjutkan pembayaran kapan saja.');
+        toast.info('Checkout ditutup. Anda bisa melanjutkan pembayaran dari halaman billing.');
+        if (pendingRedirectUrl) redirectToResult(pendingRedirectUrl);
       }
     });
   }, [

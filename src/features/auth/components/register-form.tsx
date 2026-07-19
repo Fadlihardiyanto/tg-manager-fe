@@ -98,7 +98,8 @@ const RegisterForm = () => {
                 label=''
                 type='text'
                 placeholder='Nama lengkap'
-                className='px-4 h-12 border border-border rounded-xl focus-visible:ring-ring text-base placeholder:text-muted-foreground bg-background'
+                leftIcon={<Icons.user className='h-5 w-5' />}
+                className='pl-10 h-12 border border-border rounded-xl focus-visible:ring-2 focus-visible:ring-ring/40 text-base placeholder:text-muted-foreground bg-background'
               />
             )}
           />
@@ -111,7 +112,8 @@ const RegisterForm = () => {
                 label=''
                 type='email'
                 placeholder='Alamat email'
-                className='px-4 h-12 border border-border rounded-xl focus-visible:ring-ring text-base placeholder:text-muted-foreground bg-background'
+                leftIcon={<Icons.mail className='h-5 w-5' />}
+                className='pl-10 h-12 border border-border rounded-xl focus-visible:ring-2 focus-visible:ring-ring/40 text-base placeholder:text-muted-foreground bg-background'
               />
             )}
           />
@@ -125,6 +127,7 @@ const RegisterForm = () => {
                 type={showPassword ? 'text' : 'password'}
                 placeholder='Kata sandi'
                 hideError
+                leftIcon={<Icons.lock className='h-5 w-5' />}
                 rightElement={
                   <button
                     type='button'
@@ -139,13 +142,13 @@ const RegisterForm = () => {
                     )}
                   </button>
                 }
-                className='px-4 h-12 border border-border rounded-xl focus-visible:ring-ring font-mono tracking-widest text-base placeholder:text-muted-foreground bg-background'
+                className='pl-10 h-12 border border-border rounded-xl focus-visible:ring-2 focus-visible:ring-ring/40 font-mono tracking-widest text-base placeholder:text-muted-foreground bg-background'
               />
             )}
           />
 
           {/* Password Validation Checklist */}
-          <div className='-mt-2 mb-2 flex flex-col gap-2'>
+          <div className='-mt-1 mb-1 flex flex-col gap-1.5'>
             <ValidationItem label='Minimal 8 karakter' valid={passwordChecks.length} />
             <ValidationItem
               label='Minimal satu angka (0-9) atau simbol'
@@ -165,6 +168,7 @@ const RegisterForm = () => {
                 label=''
                 type={showConfirmPassword ? 'text' : 'password'}
                 placeholder='Ulangi kata sandi'
+                leftIcon={<Icons.lock className='h-5 w-5' />}
                 rightElement={
                   <button
                     type='button'
@@ -179,13 +183,13 @@ const RegisterForm = () => {
                     )}
                   </button>
                 }
-                className='px-4 h-12 border border-border rounded-xl focus-visible:ring-ring font-mono tracking-widest text-base placeholder:text-muted-foreground bg-background'
+                className='pl-10 h-12 border border-border rounded-xl focus-visible:ring-2 focus-visible:ring-ring/40 font-mono tracking-widest text-base placeholder:text-muted-foreground bg-background'
               />
             )}
           />
 
           <form.SubmitButton
-            className='w-full bg-primary text-primary-foreground font-semibold h-12 rounded-xl hover:bg-primary/90 active:scale-[0.98] transition-all mt-4 text-base'
+            className='w-full bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-semibold h-12 rounded-xl hover:from-primary/90 hover:to-primary/70 active:scale-[0.98] transition-all mt-4 text-base'
             disabled={registerMutation.isPending}
           >
             {registerMutation.isPending ? (

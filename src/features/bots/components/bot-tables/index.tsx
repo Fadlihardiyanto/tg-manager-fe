@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import type { ReactNode } from 'react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { DataTable } from '@/components/ui/table/data-table';
 import { DataTableToolbar } from '@/components/ui/table/data-table-toolbar';
@@ -11,9 +12,11 @@ import type { TelegramBot } from '../../api/types';
 
 interface BotTableProps {
   onEdit: (bot: TelegramBot) => void;
+  toolbarActions?: ReactNode;
+  notice?: ReactNode;
 }
 
-export function BotTable({ onEdit }: BotTableProps) {
+export function BotTable({ onEdit, toolbarActions, notice }: BotTableProps) {
   const { data } = useSuspenseQuery(botsQueryOptions());
   const bots = data.data ?? [];
 
@@ -31,8 +34,13 @@ export function BotTable({ onEdit }: BotTableProps) {
   });
 
   return (
-    <DataTable table={table}>
-      <DataTableToolbar table={table} />
+    <DataTable
+      table={table}
+      notice={notice}
+      title='Daftar Bot'
+      description='Kelola bot Telegram, peran, dan status koneksinya.'
+    >
+      <DataTableToolbar table={table}>{toolbarActions}</DataTableToolbar>
     </DataTable>
   );
 }

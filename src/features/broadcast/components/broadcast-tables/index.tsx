@@ -2,6 +2,7 @@
 
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { parseAsInteger, useQueryState } from 'nuqs';
+import type { ReactNode } from 'react';
 import { DataTable } from '@/components/ui/table/data-table';
 import { DataTableToolbar } from '@/components/ui/table/data-table-toolbar';
 import { useDataTable } from '@/hooks/use-data-table';
@@ -10,9 +11,11 @@ import { columns } from './columns';
 
 interface BroadcastTableProps {
   botId: string;
+  toolbarActions?: ReactNode;
+  notice?: ReactNode;
 }
 
-export function BroadcastTable({ botId }: BroadcastTableProps) {
+export function BroadcastTable({ botId, toolbarActions, notice }: BroadcastTableProps) {
   const [page] = useQueryState('page', parseAsInteger.withDefault(1));
   const [perPage] = useQueryState('perPage', parseAsInteger.withDefault(10));
 
@@ -34,8 +37,13 @@ export function BroadcastTable({ botId }: BroadcastTableProps) {
   });
 
   return (
-    <DataTable table={table}>
-      <DataTableToolbar table={table} />
+    <DataTable
+      table={table}
+      notice={notice}
+      title='Riwayat Broadcast'
+      description='Pantau broadcast terkirim, jadwal eksekusi, dan progres pengiriman.'
+    >
+      <DataTableToolbar table={table}>{toolbarActions}</DataTableToolbar>
     </DataTable>
   );
 }

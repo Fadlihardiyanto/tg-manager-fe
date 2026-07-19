@@ -34,32 +34,36 @@ export function GroupListingContent() {
   }, []);
 
   return (
-    <>
-      <div className='flex justify-end gap-2'>
-        <Button
-          variant='outline'
-          size='sm'
-          isLoading={syncMutation.isPending}
-          onClick={() => {
-            toast.promise(syncMutation.mutateAsync(), {
-              loading: 'Memulai sync groups...',
-              success: (res) => res.message || 'Sync groups dimulai',
-              error: 'Gagal menjalankan sync groups'
-            });
-          }}
-        >
-          <Icons.refresh className='mr-2 h-4 w-4' /> Sync Groups
-        </Button>
-        <Button onClick={handleAdd} size='sm'>
-          <Icons.add className='mr-2 h-4 w-4' /> Tambah Grup Baru
-        </Button>
-      </div>
-
-      <GroupTable onEdit={handleEdit} />
+    <div className='flex min-h-0 flex-1 flex-col gap-4'>
+      <GroupTable
+        onEdit={handleEdit}
+        toolbarActions={
+          <>
+            <Button
+              variant='outline'
+              size='sm'
+              className='rounded-full'
+              isLoading={syncMutation.isPending}
+              onClick={() => {
+                toast.promise(syncMutation.mutateAsync(), {
+                  loading: 'Memulai sync groups...',
+                  success: (res) => res.message || 'Sync groups dimulai',
+                  error: 'Gagal menjalankan sync groups'
+                });
+              }}
+            >
+              <Icons.refresh className='mr-2 h-4 w-4' /> Sync Groups
+            </Button>
+            <Button onClick={handleAdd} size='sm' className='rounded-full'>
+              <Icons.add className='mr-2 h-4 w-4' /> Tambah Grup Baru
+            </Button>
+          </>
+        }
+      />
 
       <GroupFormDialog group={editingGroup} open={dialogOpen} onOpenChange={handleDialogChange} />
 
       <ConnectGroupModal open={connectOpen} onOpenChange={setConnectOpen} />
-    </>
+    </div>
   );
 }

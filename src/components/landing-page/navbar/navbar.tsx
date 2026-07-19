@@ -9,7 +9,7 @@ const Navbar = () => {
   const t = useTranslations('Navbar');
 
   return (
-    <nav className='h-16 bg-background border-b border-accent'>
+    <nav className='sticky top-0 z-50 h-16 bg-background/80 backdrop-blur-lg border-b border-accent'>
       <div className='h-full flex items-center justify-between max-w-(--breakpoint-xl) mx-auto px-4 sm:px-6'>
         <Logo />
 

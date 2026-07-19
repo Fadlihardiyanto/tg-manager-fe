@@ -36,21 +36,29 @@ export function DataTableSkeleton({
   );
 
   return (
-    <div className={cn('flex flex-1 flex-col space-y-4', className)} {...props}>
-      <div className='flex w-full items-center justify-between gap-2 overflow-auto p-1'>
+    <div
+      className={cn(
+        'flex min-h-0 flex-1 flex-col rounded-lg border border-border/70 bg-background shadow-sm',
+        className
+      )}
+      {...props}
+    >
+      <div className='sticky top-16 z-40 flex w-full shrink-0 items-center justify-between gap-2 overflow-auto border-b border-border/70 bg-background/95 p-2 backdrop-blur md:top-14'>
         <div className='flex flex-1 items-center gap-2'>
           {filterCount > 0
             ? Array.from({ length: filterCount }).map((_, i) => (
-                <Skeleton key={i} className='h-7 w-[4.5rem] border-dashed' />
+                <Skeleton key={i} className='h-7 w-[4.5rem] rounded-full border-dashed' />
               ))
             : null}
         </div>
-        {withViewOptions ? <Skeleton className='ml-auto hidden h-7 w-[4.5rem] lg:flex' /> : null}
+        {withViewOptions ? (
+          <Skeleton className='ml-auto hidden h-7 w-[4.5rem] rounded-full lg:flex' />
+        ) : null}
       </div>
 
-      <div className='flex-1 rounded-md border'>
+      <div className='min-h-0 flex-1 overflow-hidden'>
         <Table>
-          <TableHeader>
+          <TableHeader className='bg-muted/50'>
             {Array.from({ length: 1 }).map((_, i) => (
               <TableRow key={i} className='hover:bg-transparent'>
                 {Array.from({ length: columnCount }).map((_, j) => (
@@ -87,7 +95,7 @@ export function DataTableSkeleton({
         </Table>
       </div>
       {withPagination ? (
-        <div className='flex w-full items-center justify-between gap-4 overflow-auto p-1 sm:gap-8'>
+        <div className='sticky bottom-0 z-30 flex w-full shrink-0 items-center justify-between gap-4 overflow-auto border-t border-border/70 bg-background/95 px-2 py-1.5 backdrop-blur sm:gap-8'>
           <Skeleton className='h-7 w-40 shrink-0' />
           <div className='flex items-center gap-4 sm:gap-6 lg:gap-8'>
             <div className='flex items-center gap-2'>

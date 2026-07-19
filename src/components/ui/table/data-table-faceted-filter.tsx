@@ -81,12 +81,23 @@ export function DataTableFacetedFilter<TData, TValue>({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant='outline' size='sm' className='border-dashed'>
+        <Button
+          variant='outline'
+          size='sm'
+          className='h-10 rounded-full border-border px-4 text-sm font-bold'
+        >
           {selectedValues?.size > 0 ? (
             <span
               role='button'
+              tabIndex={0}
               aria-label={`Clear ${title} filter`}
               onClick={onReset}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  column?.setFilterValue(undefined);
+                }
+              }}
               className='focus-visible:ring-ring rounded-sm opacity-70 transition-opacity hover:opacity-100 focus-visible:ring-1 focus-visible:outline-none'
             >
               <Icons.xCircle />
@@ -101,12 +112,12 @@ export function DataTableFacetedFilter<TData, TValue>({
                 orientation='vertical'
                 className='mx-0.5 data-[orientation=vertical]:h-4'
               />
-              <Badge variant='secondary' className='rounded-sm px-1 font-normal lg:hidden'>
+              <Badge variant='secondary' className='rounded-full px-1.5 py-0 font-normal lg:hidden'>
                 {selectedValues.size}
               </Badge>
               <div className='hidden items-center gap-1 lg:flex'>
                 {selectedValues.size > 2 ? (
-                  <Badge variant='secondary' className='rounded-sm px-1 font-normal'>
+                  <Badge variant='secondary' className='rounded-full px-1.5 py-0 font-normal'>
                     {selectedValues.size} selected
                   </Badge>
                 ) : (
@@ -116,7 +127,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                       <Badge
                         variant='secondary'
                         key={option.value}
-                        className='rounded-sm px-1 font-normal'
+                        className='rounded-full px-1.5 py-0 font-normal'
                       >
                         {option.label}
                       </Badge>

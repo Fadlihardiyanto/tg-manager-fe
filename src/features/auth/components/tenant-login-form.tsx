@@ -112,31 +112,24 @@ export function TenantLoginForm({ className, ...props }: React.ComponentProps<'f
   return (
     <div className='flex flex-col w-full'>
       {/* BEGIN: Header Section */}
-      <header className='flex flex-col items-center text-center mb-6'>
-        <div className='relative flex items-center justify-center mb-4 h-16 w-full max-w-[250px]'>
-          <img
-            src='/uration-blue-version.png'
-            alt='Urator Logo'
-            className='relative h-full w-auto object-contain'
-          />
-        </div>
-        <h1 className='text-2xl font-bold text-foreground mb-2'>Selamat datang kembali</h1>
-        <p className='text-muted-foreground text-sm'>Silakan masukkan detail Anda untuk masuk.</p>
+      <header className='flex flex-col items-center text-center mb-8'>
+        <h1 className='text-2xl font-bold text-foreground'>Selamat datang kembali</h1>
+        <p className='text-muted-foreground text-sm mt-1.5'>Silakan masuk ke akun Anda.</p>
       </header>
 
       <form.AppForm>
-        <form.Form className='space-y-5 w-full' {...props}>
+        <form.Form className='space-y-4.5 w-full' {...props}>
           {/* Unverified Email Alert */}
           {unverifiedEmail && (
-            <Alert className='mb-4 border-amber-500/30 bg-amber-500/5 [&>svg]:mt-0.5'>
+            <Alert className='mb-3 border-amber-500/30 bg-amber-500/5 [&>svg]:mt-0.5'>
               <Icons.warning className='text-amber-500' />
               <AlertTitle className='text-sm font-semibold text-foreground'>
                 Email belum diverifikasi
               </AlertTitle>
               <AlertDescription className='space-y-3 text-muted-foreground'>
                 <p className='text-sm'>
-                  Please verify your email address before signing in. Check your inbox for the
-                  verification link.
+                  Verifikasi alamat email Anda sebelum masuk. Periksa kotak masuk Anda untuk tautan
+                  verifikasi.
                 </p>
                 <div className='flex items-center gap-2'>
                   <Button
@@ -181,10 +174,11 @@ export function TenantLoginForm({ className, ...props }: React.ComponentProps<'f
             name='email'
             children={(field) => (
               <TextField
-                label=''
+                label='Email'
                 type='email'
-                placeholder='Masukkan email Anda...'
-                className='px-4 h-12 border border-border rounded-xl focus-visible:ring-ring text-base placeholder:text-muted-foreground bg-background'
+                placeholder='Masukkan email Anda'
+                leftIcon={<Icons.mail className='h-5 w-5' />}
+                className='pl-10 h-11 border border-border rounded-xl focus-visible:ring-2 focus-visible:ring-ring/40 text-sm placeholder:text-muted-foreground bg-background'
               />
             )}
           />
@@ -194,9 +188,10 @@ export function TenantLoginForm({ className, ...props }: React.ComponentProps<'f
             name='password'
             children={(field) => (
               <TextField
-                label=''
+                label='Kata Sandi'
                 type={showPassword ? 'text' : 'password'}
-                placeholder='••••••••••'
+                placeholder='Masukkan kata sandi'
+                leftIcon={<Icons.lock className='h-5 w-5' />}
                 rightElement={
                   <button
                     type='button'
@@ -211,13 +206,13 @@ export function TenantLoginForm({ className, ...props }: React.ComponentProps<'f
                     )}
                   </button>
                 }
-                className='px-4 h-12 border border-border rounded-xl focus-visible:ring-ring font-mono tracking-widest text-base placeholder:text-muted-foreground bg-background'
+                className='pl-10 h-11 border border-border rounded-xl focus-visible:ring-2 focus-visible:ring-ring/40 text-sm placeholder:text-muted-foreground bg-background'
               />
             )}
           />
 
           {/* Remember Me & Forgot Password */}
-          <div className='flex items-center justify-between text-sm py-2'>
+          <div className='flex items-center justify-between text-sm pt-1'>
             <div className='flex items-center gap-2'>
               <Checkbox
                 id='remember-me'
@@ -225,21 +220,21 @@ export function TenantLoginForm({ className, ...props }: React.ComponentProps<'f
               />
               <Label
                 htmlFor='remember-me'
-                className='cursor-pointer text-sm font-medium text-foreground'
+                className='cursor-pointer text-sm font-medium text-foreground select-none'
               >
                 Ingat saya
               </Label>
             </div>
             <Link
               href='/forgot-password'
-              className='text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4 decoration-border'
+              className='text-sm text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4 decoration-border'
             >
               Lupa kata sandi?
             </Link>
           </div>
 
           <form.SubmitButton
-            className='w-full bg-primary text-primary-foreground font-semibold h-12 rounded-xl hover:bg-primary/90 active:scale-[0.98] transition-all mt-4 text-base'
+            className='w-full bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-semibold h-11 rounded-xl hover:from-primary/90 hover:to-primary/70 active:scale-[0.98] transition-all mt-2 text-sm'
             disabled={loginMutation.isPending}
           >
             {loginMutation.isPending ? (
@@ -253,19 +248,6 @@ export function TenantLoginForm({ className, ...props }: React.ComponentProps<'f
           </form.SubmitButton>
         </form.Form>
       </form.AppForm>
-
-      {/* BEGIN: Footer */}
-      <footer className='mt-6 text-center'>
-        <p className='text-sm text-muted-foreground'>
-          Belum punya akun?{' '}
-          <Link
-            href='/register-tenant'
-            className='text-foreground font-bold hover:underline transition-all'
-          >
-            Daftar
-          </Link>
-        </p>
-      </footer>
     </div>
   );
 }

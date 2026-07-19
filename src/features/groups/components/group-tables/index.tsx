@@ -8,12 +8,14 @@ import { groupsQueryOptions } from '../../api/queries';
 import { getColumns } from './columns';
 import type { TelegramGroup } from '../../api/types';
 import { useMemo } from 'react';
+import type { ReactNode } from 'react';
 
 interface GroupTableProps {
   onEdit: (group: TelegramGroup) => void;
+  toolbarActions?: ReactNode;
 }
 
-export function GroupTable({ onEdit }: GroupTableProps) {
+export function GroupTable({ onEdit, toolbarActions }: GroupTableProps) {
   const columns = useMemo(() => getColumns(onEdit), [onEdit]);
 
   const { data } = useSuspenseQuery(groupsQueryOptions());
@@ -32,8 +34,12 @@ export function GroupTable({ onEdit }: GroupTableProps) {
   });
 
   return (
-    <DataTable table={table}>
-      <DataTableToolbar table={table} />
+    <DataTable
+      table={table}
+      title='Daftar Grup'
+      description='Kelola grup Telegram, penugasan bot, dan status akses member.'
+    >
+      <DataTableToolbar table={table}>{toolbarActions}</DataTableToolbar>
     </DataTable>
   );
 }

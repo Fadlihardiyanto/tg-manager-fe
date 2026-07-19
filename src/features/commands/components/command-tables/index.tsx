@@ -8,12 +8,15 @@ import { commandsQueryOptions } from '../../api/queries';
 import { getColumns } from './columns';
 import type { Command } from '../../api/types';
 import { useMemo } from 'react';
+import type { ReactNode } from 'react';
 
 interface CommandTableProps {
   onEdit: (cmd: Command) => void;
+  toolbarActions?: ReactNode;
+  notice?: ReactNode;
 }
 
-export function CommandTable({ onEdit }: CommandTableProps) {
+export function CommandTable({ onEdit, toolbarActions, notice }: CommandTableProps) {
   const { data } = useSuspenseQuery(commandsQueryOptions());
 
   const commands = data.data ?? [];
@@ -46,8 +49,15 @@ export function CommandTable({ onEdit }: CommandTableProps) {
   });
 
   return (
-    <DataTable table={table}>
-      <DataTableToolbar table={table} />
-    </DataTable>
+    <div className='flex min-h-0 flex-1'>
+      <DataTable
+        table={table}
+        notice={notice}
+        title='Daftar Perintah'
+        description='Kelola perintah kustom, akses, tipe balasan, dan status aktifnya.'
+      >
+        <DataTableToolbar table={table}>{toolbarActions}</DataTableToolbar>
+      </DataTable>
+    </div>
   );
 }

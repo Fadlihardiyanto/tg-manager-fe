@@ -262,7 +262,7 @@ export function ImportMigrationMembersDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
+        <Button size='sm' className='rounded-full'>
           <Icons.upload className='size-4' />
           Import CSV
         </Button>

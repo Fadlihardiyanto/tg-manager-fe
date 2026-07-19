@@ -31,17 +31,22 @@ function initials(name: string) {
 
 export function RecentSales({ data }: { data: RecentOrder[] }) {
   return (
-    <Card className='h-full'>
-      <CardHeader>
-        <CardTitle>Pesanan Terbaru</CardTitle>
+    <Card className='h-full overflow-hidden border-border/70 shadow-sm'>
+      <CardHeader className='border-b bg-muted/20'>
+        <CardTitle className='text-base'>Pesanan Terbaru</CardTitle>
         <CardDescription>{data.length} transaksi terakhir</CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className='space-y-6'>
+      <CardContent className='pt-5'>
+        <div className='space-y-3'>
           {data.map((order) => (
-            <div key={order.id} className='flex items-center'>
-              <Avatar className='h-9 w-9'>
-                <AvatarFallback>{initials(order.member_name)}</AvatarFallback>
+            <div
+              key={order.id}
+              className='group flex items-center rounded-lg border border-transparent p-2 transition-colors hover:border-border hover:bg-muted/35'
+            >
+              <Avatar className='h-10 w-10 border shadow-xs'>
+                <AvatarFallback className='bg-primary/10 text-primary text-xs font-semibold'>
+                  {initials(order.member_name)}
+                </AvatarFallback>
               </Avatar>
               <div className='ml-4 flex-1 space-y-1'>
                 <p className='text-sm leading-none font-medium'>{order.member_name}</p>
@@ -56,7 +61,7 @@ export function RecentSales({ data }: { data: RecentOrder[] }) {
                 <p className='text-sm font-medium'>{formatRp(order.amount)}</p>
                 <Badge
                   variant='outline'
-                  className='bg-green-50 text-green-700 border-green-200 text-xs'
+                  className='border-emerald-200 bg-emerald-50 text-xs text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-300'
                 >
                   {order.status}
                 </Badge>

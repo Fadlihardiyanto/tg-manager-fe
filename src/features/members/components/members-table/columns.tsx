@@ -108,7 +108,7 @@ export const columns: ColumnDef<Member>[] = [
   },
   {
     accessorKey: 'phone',
-    header: 'TELEPON',
+    header: 'Telepon',
     cell: ({ row }) => row.original.phone || '-'
   },
   {
@@ -117,7 +117,7 @@ export const columns: ColumnDef<Member>[] = [
       row.subscriptions?.map((subscription) => subscription.package_name).join(', ') ??
       row.active_packages.join(', '),
     enableSorting: false,
-    header: 'LANGGANAN',
+    header: 'Langganan',
     cell: ({ row }) => {
       const subscriptions = row.original.subscriptions;
 
@@ -181,7 +181,7 @@ export const columns: ColumnDef<Member>[] = [
   {
     id: 'joined',
     accessorKey: 'created_at',
-    header: 'BERGABUNG',
+    header: 'Bergabung',
     cell: ({ cell }) => {
       const date = cell.getValue<string | undefined>();
       return date ? format(new Date(date), 'dd MMMM yyyy', { locale: idLocale }) : '-';
@@ -203,7 +203,7 @@ export const columns: ColumnDef<Member>[] = [
     id: 'status',
     accessorFn: (row) => (row.global_status ? 'active' : 'expired'),
     enableSorting: false,
-    header: 'STATUS',
+    header: 'Status',
     cell: () => null,
     enableColumnFilter: true,
     meta: {

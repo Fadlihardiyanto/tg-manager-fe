@@ -7,10 +7,7 @@ export const metadata = {
 
 export default function CommandsPage() {
   return (
-    <PageContainer
-      pageTitle='Perintah Kustom'
-      pageDescription='Buat dan kelola perintah kustom untuk respon otomatis bot Telegram.'
-    >
+    <PageContainer pageTitle='Custom Commands'>
       <CommandListing />
     </PageContainer>
   );

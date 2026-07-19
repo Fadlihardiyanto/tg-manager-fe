@@ -163,12 +163,23 @@ export function DataTableDateFilter<TData>({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant='outline' size='sm' className='border-dashed'>
+        <Button
+          variant='outline'
+          size='sm'
+          className='h-10 rounded-full border-border px-4 text-sm font-bold'
+        >
           {hasValue ? (
             <span
               role='button'
+              tabIndex={0}
               aria-label={`Clear ${title} filter`}
               onClick={onReset}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  column.setFilterValue(undefined);
+                }
+              }}
               className='focus-visible:ring-ring rounded-sm opacity-70 transition-opacity hover:opacity-100 focus-visible:ring-1 focus-visible:outline-none'
             >
               <Icons.xCircle />

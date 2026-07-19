@@ -51,13 +51,17 @@ export function MembersTable({ filters }: { filters: MemberFilters }) {
 
   return (
     <>
-      <DataTable table={table}>
+      <DataTable
+        table={table}
+        title='Member Aktif'
+        description='Kelola member aktif, pantau paket langganan, dan lihat status keanggotaan.'
+      >
         <DataTableToolbar table={table}>
           <Select
             value={packageId ?? 'all'}
             onValueChange={(v) => setPackageId(v === 'all' ? null : v)}
           >
-            <SelectTrigger className='h-8 w-40'>
+            <SelectTrigger className='h-10 w-44 rounded-full border-border font-semibold'>
               <SelectValue placeholder='Semua paket' />
             </SelectTrigger>
             <SelectContent>

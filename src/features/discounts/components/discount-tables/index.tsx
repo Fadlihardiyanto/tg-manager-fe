@@ -8,12 +8,14 @@ import { discountsQueryOptions } from '../../api/queries';
 import { getColumns } from './columns';
 import type { MemberDiscount } from '../../api/types';
 import { useMemo } from 'react';
+import type { ReactNode } from 'react';
 
 interface DiscountTableProps {
   onEdit: (discount: MemberDiscount) => void;
+  toolbarActions?: ReactNode;
 }
 
-export function DiscountTable({ onEdit }: DiscountTableProps) {
+export function DiscountTable({ onEdit, toolbarActions }: DiscountTableProps) {
   const columns = useMemo(() => getColumns(onEdit), [onEdit]);
 
   const { data } = useSuspenseQuery(discountsQueryOptions());
@@ -32,8 +34,12 @@ export function DiscountTable({ onEdit }: DiscountTableProps) {
   });
 
   return (
-    <DataTable table={table}>
-      <DataTableToolbar table={table} />
+    <DataTable
+      table={table}
+      title='Daftar Diskon'
+      description='Kelola kode promo, nilai diskon, batas penggunaan, dan masa berlaku.'
+    >
+      <DataTableToolbar table={table}>{toolbarActions}</DataTableToolbar>
     </DataTable>
   );
 }

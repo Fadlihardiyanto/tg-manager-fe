@@ -1,6 +1,7 @@
 'use client';
 
 import { Icons, type Icon } from '@/components/icons';
+import Image from 'next/image';
 import {
   Table,
   TableBody,
@@ -115,22 +116,34 @@ export function TopProjectsTable() {
   ];
 
   return (
-    <Card className='w-full overflow-hidden pb-0 pt-6 gap-6'>
+    <Card className='w-full gap-6 overflow-hidden border-border/70 pt-6 pb-0 shadow-sm'>
       <CardHeader className='px-6'>
-        <CardTitle>Proyek Teratas</CardTitle>
+        <CardTitle className='text-base'>Proyek Teratas</CardTitle>
         <CardDescription>Lihat statistik proyek-proyek teratas</CardDescription>
       </CardHeader>
       <CardContent className='px-0'>
         <div className='overflow-x-auto'>
           <Table className='min-w-[800px]'>
             <TableHeader>
-              <TableRow className='hover:bg-transparent border-b border-border/80'>
-                <TableHead className='p-3 ps-6'>#</TableHead>
-                <TableHead className='p-2'>Nama Proyek</TableHead>
-                <TableHead className='p-2'>Anggaran</TableHead>
-                <TableHead className='p-2'>Penanggung Jawab</TableHead>
-                <TableHead className='p-2'>Progres</TableHead>
-                <TableHead className='p-3 pe-6 flex justify-end'>Aksi</TableHead>
+              <TableRow className='border-border/80 bg-muted/30 hover:bg-muted/30'>
+                <TableHead className='p-3 ps-6 text-xs font-semibold uppercase tracking-wider'>
+                  #
+                </TableHead>
+                <TableHead className='p-2 text-xs font-semibold uppercase tracking-wider'>
+                  Nama Proyek
+                </TableHead>
+                <TableHead className='p-2 text-xs font-semibold uppercase tracking-wider'>
+                  Anggaran
+                </TableHead>
+                <TableHead className='p-2 text-xs font-semibold uppercase tracking-wider'>
+                  Penanggung Jawab
+                </TableHead>
+                <TableHead className='p-2 text-xs font-semibold uppercase tracking-wider'>
+                  Progres
+                </TableHead>
+                <TableHead className='flex justify-end p-3 pe-6 text-xs font-semibold uppercase tracking-wider'>
+                  Aksi
+                </TableHead>
               </TableRow>
             </TableHeader>
 
@@ -138,11 +151,11 @@ export function TopProjectsTable() {
               {checkboxTableData.map((item, index) => (
                 <TableRow
                   key={index}
-                  className='group hover:bg-muted/50 transition-all duration-300'
+                  className='group transition-colors duration-200 hover:bg-muted/35'
                 >
                   {/* Checkbox */}
                   <TableCell className='whitespace-nowrap p-3 ps-6'>
-                    <Checkbox className='cursor-pointer border-muted-foreground/40 dark:border-muted-foreground/60 transition-colors' />
+                    <Checkbox className='border-muted-foreground/40 cursor-pointer transition-colors dark:border-muted-foreground/60' />
                   </TableCell>
 
                   {/* project */}
@@ -150,7 +163,7 @@ export function TopProjectsTable() {
                     <div className='flex items-center gap-3'>
                       <div
                         className={cn(
-                          'h-10 w-10 rounded-full flex items-center justify-center',
+                          'flex h-10 w-10 items-center justify-center rounded-lg ring-1 ring-inset ring-black/5',
                           item.iconbg
                         )}
                       >
@@ -165,16 +178,18 @@ export function TopProjectsTable() {
 
                   {/* Status Badge */}
                   <TableCell className='whitespace-nowrap p-3'>
-                    <p className='text-sm font-medium text-foreground'>${item.budget}</p>
+                    <p className='text-foreground text-sm font-semibold'>${item.budget}</p>
                   </TableCell>
 
                   {/* Customer */}
                   <TableCell className='whitespace-nowrap p-3'>
-                    <div className='flex gap-3 items-center'>
-                      <img
+                    <div className='flex items-center gap-3'>
+                      <Image
                         src={item.avatar}
                         alt='icon'
-                        className='h-9 w-9 rounded-full object-cover'
+                        width={36}
+                        height={36}
+                        className='h-9 w-9 rounded-full border object-cover shadow-xs'
                       />
                       <div className='truncate line-clamp-2 max-w-56'>
                         <h6 className='text-sm font-semibold'>{item.name}</h6>
@@ -195,10 +210,13 @@ export function TopProjectsTable() {
                   <TableCell className='whitespace-nowrap p-3 pe-6'>
                     <div className='flex items-center justify-end'>
                       <DropdownMenu>
-                        <DropdownMenuTrigger>
-                          <span className='flex justify-center items-center rounded-full p-2 hover:bg-muted cursor-pointer transition-colors'>
+                        <DropdownMenuTrigger asChild>
+                          <button
+                            type='button'
+                            className='flex cursor-pointer items-center justify-center rounded-full p-2 transition-colors hover:bg-muted'
+                          >
                             <Icons.ellipsis width={18} height={18} />
-                          </span>
+                          </button>
                         </DropdownMenuTrigger>
 
                         <DropdownMenuContent align='end'>

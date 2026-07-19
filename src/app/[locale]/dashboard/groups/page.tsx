@@ -7,10 +7,7 @@ export const metadata = {
 
 export default function GroupsPage() {
   return (
-    <PageContainer
-      pageTitle='Grup Telegram'
-      pageDescription='Kelola grup Telegram Anda, mulai dari pendaftaran, penugasan bot, hingga pantauan jumlah member.'
-    >
+    <PageContainer pageTitle='Groups'>
       <GroupListing />
     </PageContainer>
   );

@@ -3,9 +3,9 @@
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { VisuallyHidden as VisuallyHiddenPrimitive } from 'radix-ui';
-import { Menu } from 'lucide-react';
 import { Logo } from './logo';
 import { NavMenu } from './nav-menu';
+import { Icons } from '@/components/icons';
 import Link from 'next/link';
 
 export const NavigationSheet = () => {
@@ -16,7 +16,7 @@ export const NavigationSheet = () => {
       </VisuallyHiddenPrimitive.Root>
       <SheetTrigger asChild>
         <Button variant='outline' size='icon'>
-          <Menu />
+          <Icons.menu />
         </Button>
       </SheetTrigger>
       <SheetContent>

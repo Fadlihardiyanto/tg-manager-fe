@@ -95,6 +95,8 @@ export interface CheckoutBillingData {
 
 export type CheckoutBillingResponse = ApiResponse<CheckoutBillingData>;
 
+export type CancelPendingBillingResponse = ApiResponse<null>;
+
 export interface BillingHistoryFilters {
   page?: number;
   limit?: number;

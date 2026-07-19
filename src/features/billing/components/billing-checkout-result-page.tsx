@@ -17,8 +17,9 @@ import {
 import { Icons } from '@/components/icons';
 import { MidtransSnapCheckout } from '@/components/payments/midtrans-snap-checkout';
 import { formatDate, formatRupiah } from '@/lib/format';
-import { activeBillingQueryOptions } from '../api/queries';
+import { activeBillingQueryOptions, billingHistoryQueryOptions } from '../api/queries';
 import type { ActiveBilling, BillingCycle } from '../api/types';
+import { CancelPendingBillingButton } from './cancel-pending-billing-button';
 
 const MAX_AUTO_REFETCH = 4;
 
@@ -54,6 +55,8 @@ export function BillingCheckoutResultPage() {
   const [pollCount, setPollCount] = useState(0);
   const query = useQuery({
     ...activeBillingQueryOptions(),
+    staleTime: 0,
+    refetchOnMount: 'always',
     refetchInterval: (queryState) => {
       const billing = queryState.state.data?.success ? queryState.state.data.data : null;
       const status = billing?.status;
@@ -62,8 +65,22 @@ export function BillingCheckoutResultPage() {
       return isTerminal || pollCount >= MAX_AUTO_REFETCH ? false : 3000;
     }
   });
+  const pendingPaymentQuery = useQuery({
+    ...billingHistoryQueryOptions({ page: 1, limit: 5 }),
+    staleTime: 0,
+    refetchOnMount: 'always'
+  });
 
   const billing = query.data?.success ? query.data.data : null;
+  const pendingPayment = pendingPaymentQuery.data?.data?.find((item) => {
+    if (item.status !== 'pending' || (!item.snap_token && !item.payment_url)) return false;
+    if (!billing || billing.status !== 'active') return true;
+
+    const pendingTime = Date.parse(item.created_at || item.started_at);
+    const activeTime = Date.parse(billing.paid_at || billing.started_at);
+
+    return Number.isFinite(pendingTime) && Number.isFinite(activeTime) && pendingTime > activeTime;
+  });
   const status = billing?.status;
   const isTerminal = status === 'active' || status === 'expired' || status === 'failed';
 
@@ -101,6 +118,24 @@ export function BillingCheckoutResultPage() {
               status akan diperbarui otomatis sebentar lagi.
             </AlertDescription>
           </Alert>
+
+          {pendingPayment && (
+            <div className='flex flex-wrap gap-2'>
+              <MidtransSnapCheckout
+                snapToken={pendingPayment.snap_token}
+                paymentUrl={pendingPayment.payment_url}
+                clientKey={pendingPayment.client_key}
+                orderId={pendingPayment.order_id || pendingPayment.id}
+                successRedirectUrl='/dashboard/billing/checkout-result'
+                pendingRedirectUrl='/dashboard/billing/checkout-result'
+                fallbackLabel='Lanjutkan Pembayaran'
+                variant='outline'
+              >
+                Lanjutkan Pembayaran
+              </MidtransSnapCheckout>
+              <CancelPendingBillingButton label='Batalkan Pembayaran' />
+            </div>
+          )}
         </CardContent>
       )}
 
@@ -136,6 +171,24 @@ export function BillingCheckoutResultPage() {
               <p className='mt-1 text-lg font-semibold'>{formatDate(billing.expired_at)}</p>
             </div>
           </div>
+
+          {pendingPayment && (
+            <div className='flex flex-wrap gap-2'>
+              <MidtransSnapCheckout
+                snapToken={pendingPayment.snap_token}
+                paymentUrl={pendingPayment.payment_url}
+                clientKey={pendingPayment.client_key}
+                orderId={pendingPayment.order_id || pendingPayment.id}
+                successRedirectUrl='/dashboard/billing/checkout-result'
+                pendingRedirectUrl='/dashboard/billing/checkout-result'
+                fallbackLabel='Lanjutkan Pembayaran'
+                variant='outline'
+              >
+                Lanjutkan Pembayaran
+              </MidtransSnapCheckout>
+              <CancelPendingBillingButton label='Batalkan Pembayaran' />
+            </div>
+          )}
         </CardContent>
       )}
 
@@ -162,6 +215,24 @@ export function BillingCheckoutResultPage() {
               </p>
             </div>
           </div>
+
+          {pendingPayment && (
+            <div className='flex flex-wrap gap-2'>
+              <MidtransSnapCheckout
+                snapToken={pendingPayment.snap_token}
+                paymentUrl={pendingPayment.payment_url}
+                clientKey={pendingPayment.client_key}
+                orderId={pendingPayment.order_id || pendingPayment.id}
+                successRedirectUrl='/dashboard/billing/checkout-result'
+                pendingRedirectUrl='/dashboard/billing/checkout-result'
+                fallbackLabel='Lanjutkan Pembayaran'
+                variant='outline'
+              >
+                Lanjutkan Pembayaran
+              </MidtransSnapCheckout>
+              <CancelPendingBillingButton label='Batalkan Pembayaran' />
+            </div>
+          )}
         </CardContent>
       )}
 
@@ -176,18 +247,22 @@ export function BillingCheckoutResultPage() {
             </AlertDescription>
           </Alert>
 
-          {(billing?.snap_token || billing?.payment_url) && billing.status !== 'active' && (
-            <MidtransSnapCheckout
-              snapToken={billing.snap_token}
-              paymentUrl={billing.payment_url}
-              clientKey={billing.client_key}
-              orderId={billing.order_id || billing.id}
-              successRedirectUrl='/dashboard/billing/checkout-result'
-              fallbackLabel='Lanjutkan Pembayaran'
-              variant='outline'
-            >
-              Lanjutkan Pembayaran
-            </MidtransSnapCheckout>
+          {pendingPayment && (
+            <div className='flex flex-wrap gap-2'>
+              <MidtransSnapCheckout
+                snapToken={pendingPayment.snap_token}
+                paymentUrl={pendingPayment.payment_url}
+                clientKey={pendingPayment.client_key}
+                orderId={pendingPayment.order_id || pendingPayment.id}
+                successRedirectUrl='/dashboard/billing/checkout-result'
+                pendingRedirectUrl='/dashboard/billing/checkout-result'
+                fallbackLabel='Lanjutkan Pembayaran'
+                variant='outline'
+              >
+                Lanjutkan Pembayaran
+              </MidtransSnapCheckout>
+              <CancelPendingBillingButton label='Batalkan Pembayaran' />
+            </div>
           )}
         </CardContent>
       )}

@@ -24,6 +24,7 @@ import {
   SidebarRail
 } from '@/components/ui/sidebar';
 import type { NavGroup } from '@/types';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { logout } from '@/features/auth/api/service';
@@ -58,7 +59,23 @@ export default function AppSidebar({ navGroups }: { navGroups: NavGroup[] }) {
 
   return (
     <Sidebar collapsible='icon'>
-      <SidebarHeader />
+      <SidebarHeader>
+        <div className='flex items-center gap-3 px-2 py-1 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0'>
+          <div className='flex size-8 items-center justify-center overflow-hidden rounded-lg'>
+            <Image
+              src='/assets/uration-blue-logo.png'
+              alt='Urator'
+              width={28}
+              height={28}
+              className='size-7 object-contain'
+              priority
+            />
+          </div>
+          <div className='min-w-0 group-data-[collapsible=icon]:hidden'>
+            <p className='truncate text-base font-bold tracking-tight'>Urator</p>
+          </div>
+        </div>
+      </SidebarHeader>
       <SidebarContent className='overflow-x-hidden'>
         {navGroups.map((group) => (
           <SidebarGroup key={group.label || 'ungrouped'} className='py-0'>
@@ -108,9 +125,14 @@ export default function AppSidebar({ navGroups }: { navGroups: NavGroup[] }) {
                   </Collapsible>
                 ) : (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild tooltip={item.title} isActive={isItemActive}>
+                    <SidebarMenuButton
+                      asChild
+                      tooltip={item.title}
+                      isActive={isItemActive}
+                      className='transition-all duration-150 data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=true]:font-semibold'
+                    >
                       <Link href={item.url}>
-                        <Icon />
+                        <Icon className='size-4' />
                         <span className='group-data-[collapsible=icon]:hidden'>{item.title}</span>
                       </Link>
                     </SidebarMenuButton>
@@ -128,31 +150,36 @@ export default function AppSidebar({ navGroups }: { navGroups: NavGroup[] }) {
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton
                   size='lg'
-                  className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
+                  className='px-2 data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
                 >
-                  <Icons.user className='size-4' />
-                  <span className='truncate group-data-[collapsible=icon]:hidden'>Akun</span>
-                  <Icons.chevronsDown className='ml-auto size-4 group-data-[collapsible=icon]:hidden' />
+                  <div className='flex size-6 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-bold shrink-0'>
+                    A
+                  </div>
+                  <span className='truncate text-sm font-medium group-data-[collapsible=icon]:hidden'>
+                    Akun
+                  </span>
+                  <Icons.chevronsDown className='ml-auto size-4 text-muted-foreground group-data-[collapsible=icon]:hidden' />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent
-                className='w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg'
+                className='w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-xl'
                 side='bottom'
                 align='end'
-                sideOffset={4}
+                sideOffset={6}
               >
                 <DropdownMenuLabel className='p-0 font-normal'>
-                  <div className='text-muted-foreground px-1 py-1.5 text-sm'>
+                  <div className='text-muted-foreground px-2 py-1.5 text-sm'>
                     Masuk untuk mengelola akun Anda
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem className='rounded-lg'>
                   <Icons.notification className='mr-2 h-4 w-4' />
                   Notifikasi
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
+                  className='rounded-lg text-destructive focus:text-destructive'
                   onClick={async () => {
                     await logout();
                     useAuthStore.getState().clearAuth();

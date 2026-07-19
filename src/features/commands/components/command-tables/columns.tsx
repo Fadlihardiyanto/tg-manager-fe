@@ -161,15 +161,17 @@ export function getColumns(
               ? 'Group'
               : 'Semua chat';
 
+        const packageCount = cmd.package_ids?.length || 'semua';
+        const groupCount = cmd.group_ids?.length || 'semua';
+
         return (
-          <div className='space-y-1'>
-            <div className='flex flex-wrap gap-1'>
-              <Badge variant='secondary'>{accessLabel}</Badge>
-              <Badge variant='outline'>{chatLabel}</Badge>
-            </div>
-            <p className='text-muted-foreground text-xs'>
-              Paket: {cmd.package_ids?.length || 'semua'} • Grup: {cmd.group_ids?.length || 'semua'}
-            </p>
+          <div className='flex max-w-[220px] flex-wrap items-center gap-1.5'>
+            <Badge variant='secondary' className='rounded-full px-2 py-0 text-xs font-medium'>
+              {accessLabel} / {chatLabel}
+            </Badge>
+            <span className='text-muted-foreground truncate text-xs'>
+              Paket: {packageCount} · Grup: {groupCount}
+            </span>
           </div>
         );
       },

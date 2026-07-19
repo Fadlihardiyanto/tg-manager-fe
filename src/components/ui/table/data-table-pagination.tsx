@@ -10,7 +10,6 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
-import { ChevronLeftIcon, ChevronRightIcon } from '@radix-ui/react-icons';
 
 interface DataTablePaginationProps<TData> extends React.ComponentProps<'div'> {
   table: Table<TData>;
@@ -26,7 +25,7 @@ export function DataTablePagination<TData>({
   return (
     <div
       className={cn(
-        'flex w-full flex-wrap items-center justify-between gap-2 overflow-auto px-1 py-0.5 sm:gap-6',
+        'flex w-full flex-wrap items-center justify-between gap-2 overflow-auto sm:gap-6',
         className
       )}
       {...props}
@@ -50,7 +49,7 @@ export function DataTablePagination<TData>({
               table.setPageSize(Number(value));
             }}
           >
-            <SelectTrigger className='h-8 w-[4.5rem] [&[data-size]]:h-8'>
+            <SelectTrigger className='h-8 w-[4.5rem] rounded-full [&[data-size]]:h-8'>
               <SelectValue placeholder={table.getState().pagination.pageSize} />
             </SelectTrigger>
             <SelectContent side='top'>
@@ -62,7 +61,7 @@ export function DataTablePagination<TData>({
             </SelectContent>
           </Select>
         </div>
-        <div className='flex items-center justify-center text-xs font-medium whitespace-nowrap'>
+        <div className='bg-muted/50 flex h-8 items-center justify-center rounded-full px-3 text-xs font-medium whitespace-nowrap'>
           Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
         </div>
         <div className='flex items-center space-x-1'>
@@ -70,7 +69,7 @@ export function DataTablePagination<TData>({
             aria-label='Go to first page'
             variant='outline'
             size='icon'
-            className='hidden size-8 lg:flex'
+            className='hidden size-8 rounded-full lg:flex'
             onClick={() => table.setPageIndex(0)}
             disabled={!table.getCanPreviousPage()}
           >
@@ -80,27 +79,27 @@ export function DataTablePagination<TData>({
             aria-label='Go to previous page'
             variant='outline'
             size='icon'
-            className='size-8'
+            className='size-8 rounded-full'
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
-            <ChevronLeftIcon />
+            <Icons.chevronLeft />
           </Button>
           <Button
             aria-label='Go to next page'
             variant='outline'
             size='icon'
-            className='size-8'
+            className='size-8 rounded-full'
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            <ChevronRightIcon />
+            <Icons.chevronRight />
           </Button>
           <Button
             aria-label='Go to last page'
             variant='outline'
             size='icon'
-            className='hidden size-8 lg:flex'
+            className='hidden size-8 rounded-full lg:flex'
             onClick={() => table.setPageIndex(table.getPageCount() - 1)}
             disabled={!table.getCanNextPage()}
           >
