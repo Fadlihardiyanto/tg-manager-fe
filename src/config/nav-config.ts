@@ -45,13 +45,6 @@ export const navGroups: NavGroup[] = [
         shortcut: ['d', 'd'],
         items: []
       },
-      // {
-      //   title: "Billing Plan",
-      //   url: "/dashboard/billing",
-      //   icon: "billing",
-      //   isActive: false,
-      //   items: [],
-      // },
       {
         title: 'Midtrans',
         url: '/dashboard/midtrans',
@@ -105,13 +98,6 @@ export const navGroups: NavGroup[] = [
         isActive: false,
         items: []
       }
-      // {
-      //   title: "Discounts",
-      //   url: "/dashboard/discounts",
-      //   icon: "tag",
-      //   isActive: false,
-      //   items: [],
-      // },
     ]
   }
 ];

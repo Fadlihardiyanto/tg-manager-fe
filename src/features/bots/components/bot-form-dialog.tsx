@@ -143,7 +143,7 @@ export function BotFormDialog({ bot, open, onOpenChange }: BotFormDialogProps) {
             )}
 
             {isEdit && bot && (
-              <div className='rounded-md border bg-muted/50 p-3'>
+              <div className='rounded-xl border bg-muted/40 p-3.5'>
                 <div className='flex items-center gap-2 text-sm'>
                   <Icons.bot className='h-4 w-4 text-muted-foreground' />
                   <span className='font-medium'>@{bot.username}</span>

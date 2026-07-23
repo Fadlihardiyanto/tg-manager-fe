@@ -56,7 +56,12 @@ export function CellAction({ data, onEdit }: CellActionProps) {
         {onEdit && (
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant='ghost' size='icon' className='h-8 w-8' onClick={() => onEdit(data)}>
+              <Button
+                variant='ghost'
+                size='icon'
+                className='size-9 min-w-9 min-h-9'
+                onClick={() => onEdit(data)}
+              >
                 <Icons.edit className='h-4 w-4' />
               </Button>
             </TooltipTrigger>
@@ -68,7 +73,7 @@ export function CellAction({ data, onEdit }: CellActionProps) {
             <Button
               variant='ghost'
               size='icon'
-              className='h-8 w-8'
+              className='size-9 min-w-9 min-h-9'
               onClick={() =>
                 toggleActiveMutation.mutate({
                   id: data.id,
@@ -79,7 +84,7 @@ export function CellAction({ data, onEdit }: CellActionProps) {
               {data.is_active ? (
                 <Icons.circleX className='h-4 w-4 text-muted-foreground hover:text-destructive' />
               ) : (
-                <Icons.circleCheck className='h-4 w-4 text-green-500' />
+                <Icons.circleCheck className='h-4 w-4 text-emerald-500 dark:text-emerald-400' />
               )}
             </Button>
           </TooltipTrigger>
@@ -90,7 +95,7 @@ export function CellAction({ data, onEdit }: CellActionProps) {
             <Button
               variant='ghost'
               size='icon'
-              className='h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive'
+              className='size-9 min-w-9 min-h-9 text-destructive hover:bg-destructive/10 hover:text-destructive'
               onClick={() => setDeleteOpen(true)}
             >
               <Icons.trash className='h-4 w-4' />

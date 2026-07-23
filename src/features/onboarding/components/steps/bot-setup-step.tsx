@@ -38,18 +38,20 @@ export function BotSetupStep({ form }: StepProps) {
             </a>
           </div>
 
-          <div className='group relative flex aspect-video w-full cursor-pointer items-center justify-center overflow-hidden rounded-md border border-border bg-background/50 transition-colors hover:bg-background/80'>
-            <div className='absolute inset-0 flex items-center justify-center'>
-              <div className='flex size-12 items-center justify-center rounded-full bg-background/90 shadow-sm backdrop-blur transition-transform group-hover:scale-110'>
-                <Icons.play className='ml-1 size-5 fill-primary text-primary' />
-              </div>
-            </div>
-            <span className='absolute bottom-3 right-3 rounded bg-background/80 px-1.5 py-0.5 text-[10px] font-medium text-foreground backdrop-blur'>
-              0:12
+          <div className='flex items-center gap-2 rounded-md border border-dashed border-border bg-muted/20 px-4 py-3 text-sm text-muted-foreground'>
+            <Icons.info className='size-4 shrink-0' />
+            <span>
+              Buka{' '}
+              <a
+                href='https://t.me/BotFather'
+                target='_blank'
+                rel='noopener noreferrer'
+                className='font-medium text-primary hover:underline'
+              >
+                @BotFather
+              </a>{' '}
+              di Telegram, buat bot baru, lalu salin tokennya.
             </span>
-            <p className='absolute left-3 top-3 text-xs font-medium text-muted-foreground'>
-              [Video/GIF: Tutorial BotFather]
-            </p>
           </div>
         </AlertDescription>
       </Alert>
@@ -87,7 +89,7 @@ export function BotSetupStep({ form }: StepProps) {
               </button>
             }
           />
-          <div className='absolute right-0 top-0 flex items-center gap-1 text-xs text-muted-foreground'>
+          <div className='flex items-center gap-1 px-1 text-xs text-muted-foreground'>
             <Icons.lock className='size-3.5' />
             <span>Dienkripsi saat disimpan</span>
           </div>

@@ -40,16 +40,13 @@ export function useFormStepper(schemas: ZodTypeAny[], initialStep: number = 1) {
     setCurrentStep((prev) => Math.max(prev - 1, 1));
   }, []);
 
-  const goToStep = useCallback(
-    (target: number) => {
-      // Only allow navigating to completed steps (before current) or current step
-      setCurrentStep((prev) => {
-        if (target >= 1 && target <= prev) return target;
-        return prev;
-      });
-    },
-    []
-  );
+  const goToStep = useCallback((target: number) => {
+    // Only allow navigating to completed steps (before current) or current step
+    setCurrentStep((prev) => {
+      if (target >= 1 && target <= prev) return target;
+      return prev;
+    });
+  }, []);
 
   const step: StepState = {
     value: currentStep,
@@ -66,24 +63,14 @@ export function useFormStepper(schemas: ZodTypeAny[], initialStep: number = 1) {
   const triggerFormGroup = (form: AnyFormApi) => {
     const result = currentValidator.safeParse(form.state.values);
     if (!result.success) {
-      console.log('Validation failed:', result.error.issues);
-
-
-      // Manually set field-level errors
       result.error.issues.forEach((err) => {
         const fieldName = err.path.join('.');
         if (fieldName) {
-          console.log(`Setting error for ${fieldName}:`, err.message);
-          
-          form.setFieldMeta(fieldName as any, (prev) => {
-            const next = {
-              ...prev,
-              isTouched: true,
-              errors: [err.message]
-            };
-            console.log(`New meta for ${fieldName}:`, next);
-            return next;
-          });
+          form.setFieldMeta(fieldName as any, (prev) => ({
+            ...prev,
+            isTouched: true,
+            errors: [err.message]
+          }));
         }
       });
       return result;

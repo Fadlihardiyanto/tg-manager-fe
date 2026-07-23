@@ -25,6 +25,9 @@ export function MemberDetailDrawer() {
     <Sheet open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <SheetContent className='w-full sm:max-w-[450px] p-0 flex flex-col gap-0 border-l shadow-2xl overflow-hidden bg-background [&>button]:hidden'>
         <SheetTitle className='sr-only'>Detail Member</SheetTitle>
+        <SheetDescription className='sr-only'>
+          Lihat detail informasi member termasuk langganan aktif, riwayat, dan status grup.
+        </SheetDescription>
         {memberId && (
           <Suspense fallback={<MemberDetailSkeleton />}>
             <MemberDetail memberId={memberId} />

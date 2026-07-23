@@ -40,18 +40,20 @@ export function PaymentConfigStep({ form }: StepProps) {
             </a>
           </div>
 
-          <div className='group relative flex aspect-video w-full cursor-pointer items-center justify-center overflow-hidden rounded-md border border-border bg-background/50 shadow-sm transition-colors hover:bg-background/80'>
-            <div className='absolute inset-0 flex items-center justify-center'>
-              <div className='flex size-12 items-center justify-center rounded-full bg-background/90 shadow-sm backdrop-blur transition-transform group-hover:scale-110'>
-                <Icons.play className='ml-1 size-5 fill-primary text-primary' />
-              </div>
-            </div>
-            <span className='absolute bottom-3 right-3 rounded bg-background/80 px-1.5 py-0.5 text-[10px] font-medium text-foreground backdrop-blur'>
-              0:15
+          <div className='flex items-center gap-2 rounded-md border border-dashed border-border bg-muted/20 px-4 py-3 text-sm text-muted-foreground'>
+            <Icons.info className='size-4 shrink-0' />
+            <span>
+              Login ke{' '}
+              <a
+                href='https://dashboard.midtrans.com'
+                target='_blank'
+                rel='noopener noreferrer'
+                className='font-medium text-primary hover:underline'
+              >
+                dashboard Midtrans
+              </a>
+              , buka Setelan &rarr; Kunci Akses, lalu salin key yang diperlukan.
             </span>
-            <p className='absolute left-3 top-3 text-xs font-medium text-muted-foreground'>
-              [Video/GIF: Kunci API Midtrans]
-            </p>
           </div>
         </AlertDescription>
       </Alert>

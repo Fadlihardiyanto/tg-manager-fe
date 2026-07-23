@@ -25,12 +25,12 @@ export function MembersTable({ filters }: { filters: MemberFilters }) {
     parseAsString.withOptions({ shallow: true, history: 'replace' })
   );
 
-  const { data } = useQuery(membersQueryOptions(filters));
+  const { data, isLoading, isError } = useQuery(membersQueryOptions(filters));
   const { data: packagesData } = useQuery(packagesQueryOptions());
   const packages = packagesData?.data ?? [];
 
   const pageCount = data?.meta?.total_pages ?? 0;
-  const tableData = data?.data ?? [];
+  const tableData = isError ? [] : (data?.data ?? []);
 
   const { table } = useDataTable({
     data: tableData,

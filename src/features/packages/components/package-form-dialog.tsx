@@ -208,127 +208,133 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
         onOpenChange(v);
       }}
     >
-      <DialogContent className='sm:max-w-[520px] max-h-[85vh] overflow-y-auto'>
-        <DialogHeader>
-          <DialogTitle>{isEdit ? 'Ubah Paket' : 'Tambah Paket Baru'}</DialogTitle>
-          <DialogDescription>
-            {isEdit ? 'Perbarui detail paket.' : 'Buat paket langganan baru untuk akses grup.'}
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className='sm:max-w-[520px] max-h-[85vh] flex flex-col overflow-hidden p-0 gap-0'>
+        <div className='shrink-0 px-6 pt-6'>
+          <DialogHeader>
+            <DialogTitle>{isEdit ? 'Ubah Paket' : 'Tambah Paket Baru'}</DialogTitle>
+            <DialogDescription>
+              {isEdit ? 'Perbarui detail paket.' : 'Buat paket langganan baru untuk akses grup.'}
+            </DialogDescription>
+          </DialogHeader>
+        </div>
 
-        <form.AppForm>
-          <form.Form id='package-form-dialog' className='space-y-4'>
-            <FormTextField
-              name='name'
-              label='Nama Paket'
-              required
-              placeholder='1 Month VIP'
-              validators={{
-                onBlur: z.string().min(3, 'Nama paket harus minimal 3 karakter')
+        <div className='flex-1 min-h-0 overflow-y-auto px-6 py-4'>
+          <form.AppForm>
+            <form.Form id='package-form-dialog' className='space-y-4'>
+              <FormTextField
+                name='name'
+                label='Nama Paket'
+                required
+                placeholder='1 Month VIP'
+                validators={{
+                  onBlur: z.string().min(3, 'Nama paket harus minimal 3 karakter')
+                }}
+              />
+
+              <FormTextareaField
+                name='description'
+                label='Deskripsi'
+                placeholder='Akses VIP 30 hari untuk member grup premium.'
+                description='Opsional. Deskripsi ini akan ditampilkan ke member Telegram saat mereka melihat atau membeli paket ini.'
+                rows={4}
+              />
+
+              <FormTextField
+                name='price'
+                label='Harga (IDR)'
+                required
+                placeholder='150000'
+                description='Nominal dalam Rupiah Indonesia (mis. 150.000)'
+                formatDisplay={(val) => {
+                  const digits = String(val).replace(/\D/g, '');
+                  return digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                }}
+                validators={{
+                  onBlur: z
+                    .string()
+                    .min(1, 'Harga wajib diisi')
+                    .refine(
+                      (val) => !isNaN(Number(val)) && Number(val) > 0,
+                      'Harus berupa angka positif'
+                    )
+                }}
+              />
+
+              <FormTextField
+                name='duration_days'
+                label='Durasi (Hari)'
+                required
+                placeholder='30'
+                validators={{
+                  onBlur: z
+                    .string()
+                    .min(1, 'Durasi wajib diisi')
+                    .refine(
+                      (val) =>
+                        !isNaN(Number(val)) && Number.isInteger(Number(val)) && Number(val) >= 1,
+                      'Harus berupa bilangan bulat >= 1'
+                    )
+                }}
+              />
+
+              <FormSwitchField
+                name='is_all_access'
+                label='Akses Penuh'
+                description='Berikan akses ke semua grup tanpa batasan.'
+              />
+
+              {/* Group multi-select: show only when !is_all_access */}
+              {!isAllAccess && activeGroups.length > 0 && (
+                <FieldGroup>
+                  <FieldLabel>Hubungkan Grup</FieldLabel>
+                  <FieldDescription>
+                    Pilih grup Telegram mana yang bisa diakses oleh paket ini.
+                  </FieldDescription>
+                  <div className='flex flex-col gap-2 rounded-xl border bg-muted/30 p-4 max-h-[160px] overflow-y-auto'>
+                    {activeGroups.map((group) => (
+                      <label key={group.id} className='flex items-center gap-2 cursor-pointer'>
+                        <Checkbox
+                          className='border'
+                          checked={selectedGroupIds.includes(group.id)}
+                          onCheckedChange={() => toggleGroup(group.id)}
+                        />
+                        <span className='text-sm font-medium'>{group.name}</span>
+                        <span className='text-xs text-muted-foreground'>
+                          ({group.member_count} anggota)
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </FieldGroup>
+              )}
+            </form.Form>
+          </form.AppForm>
+        </div>
+
+        <div className='shrink-0 border-t border-border/70 px-6 py-4 bg-background'>
+          <DialogFooter>
+            <Button
+              type='button'
+              variant='outline'
+              onClick={() => {
+                form.reset();
+                setSelectedGroupIds([]);
+                onOpenChange(false);
               }}
-            />
-
-            <FormTextareaField
-              name='description'
-              label='Deskripsi'
-              placeholder='Akses VIP 30 hari untuk member grup premium.'
-              description='Opsional. Deskripsi ini akan ditampilkan ke member Telegram saat mereka melihat atau membeli paket ini.'
-              rows={4}
-            />
-
-            <FormTextField
-              name='price'
-              label='Harga (IDR)'
-              required
-              placeholder='150000'
-              description='Nominal dalam Rupiah Indonesia (mis. 150.000)'
-              formatDisplay={(val) => {
-                const digits = String(val).replace(/\D/g, '');
-                return digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-              }}
-              validators={{
-                onBlur: z
-                  .string()
-                  .min(1, 'Harga wajib diisi')
-                  .refine(
-                    (val) => !isNaN(Number(val)) && Number(val) > 0,
-                    'Harus berupa angka positif'
-                  )
-              }}
-            />
-
-            <FormTextField
-              name='duration_days'
-              label='Durasi (Hari)'
-              required
-              placeholder='30'
-              validators={{
-                onBlur: z
-                  .string()
-                  .min(1, 'Durasi wajib diisi')
-                  .refine(
-                    (val) =>
-                      !isNaN(Number(val)) && Number.isInteger(Number(val)) && Number(val) >= 1,
-                    'Harus berupa bilangan bulat >= 1'
-                  )
-              }}
-            />
-
-            <FormSwitchField
-              name='is_all_access'
-              label='Akses Penuh'
-              description='Berikan akses ke semua grup tanpa batasan.'
-            />
-
-            {/* Group multi-select: show only when !is_all_access */}
-            {!isAllAccess && activeGroups.length > 0 && (
-              <FieldGroup>
-                <FieldLabel>Hubungkan Grup</FieldLabel>
-                <FieldDescription>
-                  Pilih grup Telegram mana yang bisa diakses oleh paket ini.
-                </FieldDescription>
-                <div className='flex flex-col gap-2 rounded-md border p-3 max-h-[160px] overflow-y-auto'>
-                  {activeGroups.map((group) => (
-                    <label key={group.id} className='flex items-center gap-2 cursor-pointer'>
-                      <Checkbox
-                        className='border'
-                        checked={selectedGroupIds.includes(group.id)}
-                        onCheckedChange={() => toggleGroup(group.id)}
-                      />
-                      <span className='text-sm font-medium'>{group.name}</span>
-                      <span className='text-xs text-muted-foreground'>
-                        ({group.member_count} anggota)
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </FieldGroup>
-            )}
-          </form.Form>
-        </form.AppForm>
-
-        <DialogFooter>
-          <Button
-            type='button'
-            variant='outline'
-            onClick={() => {
-              form.reset();
-              setSelectedGroupIds([]);
-              onOpenChange(false);
-            }}
-          >
-            Batal
-          </Button>
-          <Button
-            type='submit'
-            form='package-form-dialog'
-            isLoading={isPending}
-            disabled={!canCreatePackage}
-          >
-            <Icons.check className='mr-2 h-4 w-4' />
-            {isEdit ? 'Perbarui Paket' : 'Tambah Paket'}
-          </Button>
-        </DialogFooter>
+            >
+              Batal
+            </Button>
+            <Button
+              type='submit'
+              form='package-form-dialog'
+              isLoading={isPending}
+              disabled={!canCreatePackage}
+            >
+              <Icons.check className='mr-2 h-4 w-4' />
+              {isEdit ? 'Perbarui Paket' : 'Tambah Paket'}
+            </Button>
+          </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );

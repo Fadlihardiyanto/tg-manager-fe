@@ -267,92 +267,98 @@ export function ImportMigrationMembersDialog({
           Import CSV
         </Button>
       </DialogTrigger>
-      <DialogContent className='max-h-[85vh] overflow-y-auto sm:max-w-[560px]'>
-        <DialogHeader>
-          <DialogTitle>Import migration members</DialogTitle>
-          <DialogDescription>
-            Download template, pilih package, lalu upload CSV maksimal 1000 baris.
-          </DialogDescription>
-        </DialogHeader>
-        <div className='space-y-5'>
-          <ImportStep
-            step={1}
-            title='Download template'
-            description='Gunakan header `username,expired_at`.'
-            action={
-              <Button
-                variant='outline'
-                onClick={handleTemplateDownload}
-                isLoading={isTemplateLoading}
-              >
-                Download
-              </Button>
-            }
-          />
-
-          <ImportStep
-            step={2}
-            title='Select package'
-            description='Pilih package tujuan untuk semua member di file ini.'
-          >
-            <div className='space-y-2'>
-              <Label htmlFor='migration-package'>Package</Label>
-              <Select value={selectedPackageId} onValueChange={setSelectedPackageId}>
-                <SelectTrigger id='migration-package'>
-                  <SelectValue placeholder='Select a package' />
-                </SelectTrigger>
-                <SelectContent>
-                  {packages.map((pkg) => (
-                    <SelectItem key={pkg.id} value={pkg.id}>
-                      {pkg.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </ImportStep>
-
-          <ImportStep
-            step={3}
-            title='Upload CSV'
-            description='Pilih satu file CSV. Setelah valid, file siap diimport.'
-          >
-            <div className='space-y-3'>
-              <FileUploader
-                value={selectedFiles}
-                onValueChange={setSelectedFiles}
-                accept={{ 'text/csv': ['.csv'] }}
-                maxFiles={1}
-                multiple={false}
-                className='h-40'
-              />
-              {parseError ? (
-                <Alert variant='destructive'>
-                  <Icons.close />
-                  <AlertTitle>CSV tidak valid</AlertTitle>
-                  <AlertDescription>{parseError}</AlertDescription>
-                </Alert>
-              ) : null}
-              <Alert>
-                <Icons.fileTypeXls />
-                <AlertTitle>File status</AlertTitle>
-                <AlertDescription>
-                  {selectedFiles[0]
-                    ? `${selectedFiles[0].name} - ${parsedRows.length} rows parsed`
-                    : 'Belum ada file yang dipilih'}
-                </AlertDescription>
-              </Alert>
-            </div>
-          </ImportStep>
+      <DialogContent className='max-h-[85vh] flex flex-col overflow-hidden p-0 gap-0 sm:max-w-[560px]'>
+        <div className='shrink-0 px-6 pt-6'>
+          <DialogHeader>
+            <DialogTitle>Import migration members</DialogTitle>
+            <DialogDescription>
+              Download template, pilih package, lalu upload CSV maksimal 1000 baris.
+            </DialogDescription>
+          </DialogHeader>
         </div>
-        <DialogFooter>
-          <Button variant='outline' onClick={() => setOpen(false)}>
-            Cancel
-          </Button>
-          <Button onClick={handleSubmit} isLoading={importMutation.isPending}>
-            Submit Import
-          </Button>
-        </DialogFooter>
+        <div className='flex-1 min-h-0 overflow-y-auto px-6 py-4'>
+          <div className='space-y-5'>
+            <ImportStep
+              step={1}
+              title='Download template'
+              description='Gunakan header `username,expired_at`.'
+              action={
+                <Button
+                  variant='outline'
+                  onClick={handleTemplateDownload}
+                  isLoading={isTemplateLoading}
+                >
+                  Download
+                </Button>
+              }
+            />
+
+            <ImportStep
+              step={2}
+              title='Select package'
+              description='Pilih package tujuan untuk semua member di file ini.'
+            >
+              <div className='space-y-2'>
+                <Label htmlFor='migration-package'>Package</Label>
+                <Select value={selectedPackageId} onValueChange={setSelectedPackageId}>
+                  <SelectTrigger id='migration-package'>
+                    <SelectValue placeholder='Select a package' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {packages.map((pkg) => (
+                      <SelectItem key={pkg.id} value={pkg.id}>
+                        {pkg.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </ImportStep>
+
+            <ImportStep
+              step={3}
+              title='Upload CSV'
+              description='Pilih satu file CSV. Setelah valid, file siap diimport.'
+            >
+              <div className='space-y-3'>
+                <FileUploader
+                  value={selectedFiles}
+                  onValueChange={setSelectedFiles}
+                  accept={{ 'text/csv': ['.csv'] }}
+                  maxFiles={1}
+                  multiple={false}
+                  className='h-40'
+                />
+                {parseError ? (
+                  <Alert variant='destructive'>
+                    <Icons.close />
+                    <AlertTitle>CSV tidak valid</AlertTitle>
+                    <AlertDescription>{parseError}</AlertDescription>
+                  </Alert>
+                ) : null}
+                <Alert>
+                  <Icons.fileTypeXls />
+                  <AlertTitle>File status</AlertTitle>
+                  <AlertDescription>
+                    {selectedFiles[0]
+                      ? `${selectedFiles[0].name} - ${parsedRows.length} rows parsed`
+                      : 'Belum ada file yang dipilih'}
+                  </AlertDescription>
+                </Alert>
+              </div>
+            </ImportStep>
+          </div>
+        </div>
+        <div className='shrink-0 border-t border-border/70 px-6 py-4 bg-background'>
+          <DialogFooter>
+            <Button variant='outline' onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSubmit} isLoading={importMutation.isPending}>
+              Submit Import
+            </Button>
+          </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );

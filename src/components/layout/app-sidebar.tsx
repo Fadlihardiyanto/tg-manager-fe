@@ -53,6 +53,17 @@ function isActivePath(pathname: string, url: string) {
   return currentPath === targetPath || currentPath.startsWith(`${targetPath}/`);
 }
 
+function AvatarInitial() {
+  const user = useAuthStore((s) => s.user);
+  const initial = user?.name?.charAt(0)?.toUpperCase() || 'U';
+
+  return (
+    <div className='flex size-6 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-bold shrink-0'>
+      {initial}
+    </div>
+  );
+}
+
 export default function AppSidebar({ navGroups }: { navGroups: NavGroup[] }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -150,11 +161,10 @@ export default function AppSidebar({ navGroups }: { navGroups: NavGroup[] }) {
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton
                   size='lg'
+                  aria-label='Menu akun'
                   className='px-2 data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
                 >
-                  <div className='flex size-6 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-bold shrink-0'>
-                    A
-                  </div>
+                  <AvatarInitial />
                   <span className='truncate text-sm font-medium group-data-[collapsible=icon]:hidden'>
                     Akun
                   </span>
@@ -168,9 +178,7 @@ export default function AppSidebar({ navGroups }: { navGroups: NavGroup[] }) {
                 sideOffset={6}
               >
                 <DropdownMenuLabel className='p-0 font-normal'>
-                  <div className='text-muted-foreground px-2 py-1.5 text-sm'>
-                    Masuk untuk mengelola akun Anda
-                  </div>
+                  <div className='text-muted-foreground px-2 py-1.5 text-sm'>Kelola akun Anda</div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className='rounded-lg'>

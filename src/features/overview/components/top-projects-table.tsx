@@ -123,11 +123,11 @@ export function TopProjectsTable() {
       </CardHeader>
       <CardContent className='px-0'>
         <div className='overflow-x-auto'>
-          <Table className='min-w-[800px]'>
+          <Table className='min-w-full'>
             <TableHeader>
               <TableRow className='border-border/80 bg-muted/30 hover:bg-muted/30'>
                 <TableHead className='p-3 ps-6 text-xs font-semibold uppercase tracking-wider'>
-                  #
+                  <span aria-label='Nomor'>#</span>
                 </TableHead>
                 <TableHead className='p-2 text-xs font-semibold uppercase tracking-wider'>
                   Nama Proyek
@@ -148,9 +148,9 @@ export function TopProjectsTable() {
             </TableHeader>
 
             <TableBody className='divide-y divide-border/80'>
-              {checkboxTableData.map((item, index) => (
+              {checkboxTableData.map((item) => (
                 <TableRow
-                  key={index}
+                  key={item.project}
                   className='group transition-colors duration-200 hover:bg-muted/35'
                 >
                   {/* Checkbox */}
@@ -186,7 +186,7 @@ export function TopProjectsTable() {
                     <div className='flex items-center gap-3'>
                       <Image
                         src={item.avatar}
-                        alt='icon'
+                        alt={`${item.name} avatar`}
                         width={36}
                         height={36}
                         className='h-9 w-9 rounded-full border object-cover shadow-xs'
@@ -214,6 +214,7 @@ export function TopProjectsTable() {
                           <button
                             type='button'
                             className='flex cursor-pointer items-center justify-center rounded-full p-2 transition-colors hover:bg-muted'
+                            aria-label='Aksi'
                           >
                             <Icons.ellipsis width={18} height={18} />
                           </button>

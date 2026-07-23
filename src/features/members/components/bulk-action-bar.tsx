@@ -128,6 +128,7 @@ export function BulkActionBar({
         <Button
           variant='ghost'
           size='sm'
+          aria-label='Hapus pilihan'
           className='size-8 p-0 ml-1 rounded-full text-muted-foreground hover:text-foreground'
           onClick={onClearSelection}
         >

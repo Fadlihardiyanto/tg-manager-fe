@@ -30,6 +30,7 @@ import { logout } from '@/features/auth/api/service';
 import { useAuthStore } from '@/stores/auth-store';
 import { ONBOARDING_STEPS } from '../constants';
 import { CheckIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import {
   businessProfileSchema,
   telegramBotSchema,
@@ -89,15 +90,6 @@ function OnboardingHeader({ currentStep }: { currentStep: number }) {
       </div>
 
       <div className='flex items-center gap-2'>
-        <Button
-          variant='ghost'
-          size='sm'
-          className='hidden text-muted-foreground hover:text-primary sm:flex'
-        >
-          <Icons.help />
-          Butuh Bantuan?
-        </Button>
-
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant='ghost' size='sm' className='flex items-center gap-2'>
@@ -124,11 +116,6 @@ function OnboardingHeader({ currentStep }: { currentStep: number }) {
                 </div>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Icons.notification />
-              Notifikasi
-            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={async () => {
@@ -382,7 +369,22 @@ export default function OnboardingFlow() {
       <main className='ml-0 flex flex-1 flex-col md:ml-64'>
         <OnboardingHeader currentStep={currentStep} />
 
-        <div ref={scrollRef} className='mt-16 flex-1 overflow-y-auto'>
+        <div className='flex md:hidden items-center gap-2 border-b border-border bg-muted/20 px-4 py-2'>
+          <div className='flex flex-1 gap-1'>
+            {[1, 2, 3, 4].map((s) => (
+              <div
+                key={s}
+                className={cn(
+                  'h-1 flex-1 rounded-full transition-colors',
+                  s <= currentStep ? 'bg-primary' : 'bg-border'
+                )}
+              />
+            ))}
+          </div>
+          <span className='shrink-0 text-xs text-muted-foreground'>Langkah {currentStep}/4</span>
+        </div>
+
+        <div ref={scrollRef} className='mt-16 flex-1 overflow-y-auto md:mt-16'>
           <div className='mx-auto flex w-full max-w-[760px] flex-col px-4 pt-10 pb-10 md:px-8'>
             <form.AppForm>
               <form.Form id='onboarding-form' className='mx-0 gap-0 p-0'>

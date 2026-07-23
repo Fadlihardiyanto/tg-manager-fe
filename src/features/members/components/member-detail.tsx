@@ -8,11 +8,11 @@ import { format } from 'date-fns';
 import { Icons } from '@/components/icons';
 import { MemberDetailSkeleton } from './member-detail-drawer';
 import { useQueryState } from 'nuqs';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
-import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 
 interface MemberDetailProps {
@@ -34,8 +34,6 @@ function getSubscriptionDateText(sub: Subscription) {
 export function MemberDetail({ memberId }: MemberDetailProps) {
   const [_, setMemberId] = useQueryState('memberId');
   const [tab, setTab] = useState('overview');
-  const [groupState, setGroupState] = useState<Record<string, boolean>>({});
-
   const { data, isLoading } = useQuery(memberDetailQueryOptions(memberId));
 
   if (isLoading || !data) {
@@ -61,12 +59,15 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
   return (
     <Tabs value={tab} onValueChange={setTab} className='flex flex-col h-full bg-background'>
       <div className='p-6 pb-0 border-b border-border relative bg-background shrink-0'>
-        <button
-          className='absolute top-6 right-6 p-2 hover:bg-muted rounded-full transition-colors'
+        <Button
+          variant='ghost'
+          size='icon'
+          aria-label='Tutup detail member'
+          className='absolute top-6 right-6 rounded-full'
           onClick={() => setMemberId(null)}
         >
-          <Icons.close className='size-5 text-muted-foreground' />
-        </button>
+          <Icons.close className='size-5' />
+        </Button>
 
         <div className='flex items-center gap-4 mb-6'>
           <div className='size-16 rounded-2xl bg-primary/20 text-primary flex items-center justify-center font-bold text-3xl shadow-lg border-2 border-background'>
@@ -121,17 +122,21 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
               <div className='grid grid-cols-2 gap-4'>
                 <Card>
                   <CardContent className='p-4'>
-                    <p className='text-[11px] font-medium text-muted-foreground mb-1'>
-                      Telegram ID
-                    </p>
+                    <div className='flex items-center gap-1.5 mb-1'>
+                      <Icons.telegram className='size-3.5 text-muted-foreground' />
+                      <p className='text-[11px] font-medium text-muted-foreground'>Telegram ID</p>
+                    </div>
                     <p className='text-sm font-bold text-foreground'>{member.telegram_user_id}</p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardContent className='p-4'>
-                    <p className='text-[11px] font-medium text-muted-foreground mb-1'>
-                      Tanggal Bergabung
-                    </p>
+                    <div className='flex items-center gap-1.5 mb-1'>
+                      <Icons.calendar className='size-3.5 text-muted-foreground' />
+                      <p className='text-[11px] font-medium text-muted-foreground'>
+                        Tanggal Bergabung
+                      </p>
+                    </div>
                     <p className='text-sm font-bold text-foreground'>
                       {member.created_at
                         ? format(new Date(member.created_at), 'dd MMM, yyyy')
@@ -141,15 +146,19 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
                 </Card>
                 <Card>
                   <CardContent className='p-4'>
-                    <p className='text-[11px] font-medium text-muted-foreground mb-1'>
-                      Total Pesanan
-                    </p>
+                    <div className='flex items-center gap-1.5 mb-1'>
+                      <Icons.clipboardList className='size-3.5 text-muted-foreground' />
+                      <p className='text-[11px] font-medium text-muted-foreground'>Total Pesanan</p>
+                    </div>
                     <p className='text-sm font-bold text-primary'>{member.total_orders}</p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardContent className='p-4'>
-                    <p className='text-[11px] font-medium text-muted-foreground mb-1'>Telepon</p>
+                    <div className='flex items-center gap-1.5 mb-1'>
+                      <Icons.phone className='size-3.5 text-muted-foreground' />
+                      <p className='text-[11px] font-medium text-muted-foreground'>Telepon</p>
+                    </div>
                     <p className='text-sm font-bold text-foreground'>{member.phone || '-'}</p>
                   </CardContent>
                 </Card>
@@ -167,7 +176,7 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
                   activeSubs.map((sub: Subscription) => (
                     <div
                       key={sub.id}
-                      className='flex items-center justify-between p-4 bg-background border border-border rounded-xl shadow-sm'
+                      className='flex items-center justify-between p-4 bg-primary/5 border border-primary/10 rounded-xl'
                     >
                       <div className='flex items-center gap-3'>
                         <div className='p-2 bg-primary/10 rounded-lg'>
@@ -180,7 +189,7 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
                           </p>
                         </div>
                       </div>
-                      <span className='text-sm font-bold text-foreground'>Aktif</span>
+                      <Badge variant='secondary'>Aktif</Badge>
                     </div>
                   ))
                 ) : (
@@ -190,15 +199,6 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
                 )}
               </div>
             </section>
-
-            <Alert>
-              <Icons.warning className='size-4' />
-              <AlertTitle>Analisis Risiko</AlertTitle>
-              <AlertDescription>
-                Member ini tercatat memiliki {member.total_orders} masalah penagihan dalam 6 bulan
-                terakhir. Tingkat keterlibatan tinggi.
-              </AlertDescription>
-            </Alert>
           </div>
         </TabsContent>
 
@@ -210,7 +210,7 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
             <div className='flex flex-col gap-2'>
               {groups.length > 0 ? (
                 groups.map((group) => {
-                  const isActive = groupState[group.id] ?? group.status === 'active';
+                  const isActive = group.status === 'active';
 
                   return (
                     <div
@@ -226,27 +226,17 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
                         <Icons.chat className='size-5 shrink-0 text-primary' />
                         <div className='min-w-0'>
                           <p className='truncate text-sm font-medium'>{group.package_name}</p>
-                          <p className='text-xs text-muted-foreground'>
-                            {isActive ? 'Active' : 'Inactive'}
-                          </p>
+                          <Badge variant={isActive ? 'secondary' : 'outline'} className='text-xs'>
+                            {isActive ? 'Aktif' : 'Nonaktif'}
+                          </Badge>
                         </div>
                       </div>
-                      <Switch
-                        checked={isActive}
-                        onCheckedChange={(checked) =>
-                          setGroupState((prev) => ({
-                            ...prev,
-                            [group.id]: checked
-                          }))
-                        }
-                        aria-label={`${isActive ? 'Deactivate' : 'Activate'} ${group.package_name}`}
-                      />
                     </div>
                   );
                 })
               ) : (
                 <div className='text-center p-4 border border-dashed rounded-xl text-muted-foreground text-sm'>
-                  No groups found
+                  Tidak ada grup
                 </div>
               )}
             </div>
@@ -265,7 +255,11 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
                     <div
                       className={cn(
                         'absolute -left-[9px] top-1 size-4 rounded-full border-2 border-background',
-                        sub.status === 'active' ? 'bg-primary' : 'bg-muted-foreground'
+                        sub.status === 'active'
+                          ? 'bg-emerald-500'
+                          : sub.status === 'cancelled'
+                            ? 'bg-red-400'
+                            : 'bg-amber-400'
                       )}
                     />
                     <p className='text-[11px] font-medium text-muted-foreground'>
@@ -289,12 +283,21 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
 
       <Separator />
       <div className='p-6 bg-muted/20 flex gap-3 shrink-0'>
-        <button className='flex-1 py-3 bg-primary text-primary-foreground rounded-xl text-[13px] font-bold hover:shadow-lg transition-all active:scale-[0.98]'>
+        <Button
+          className='flex-1 rounded-xl text-[13px] font-bold'
+          aria-label='Kirim pesan ke member'
+        >
           Kirim Pesan
-        </button>
-        <button className='p-3 border border-border rounded-xl hover:bg-muted transition-colors'>
-          <Icons.close className='size-5 text-foreground' />
-        </button>
+        </Button>
+        <Button
+          variant='outline'
+          size='icon'
+          className='rounded-xl'
+          aria-label='Tutup detail member'
+          onClick={() => setMemberId(null)}
+        >
+          <Icons.close className='size-5' />
+        </Button>
       </div>
     </Tabs>
   );

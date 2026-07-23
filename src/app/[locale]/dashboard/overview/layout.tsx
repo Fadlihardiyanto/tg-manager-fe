@@ -1,5 +1,4 @@
 import PageContainer from '@/components/layout/page-container';
-import { TopProjectsTable } from '@/features/overview/components/top-projects-table';
 import { StatsCards } from '@/features/overview/components/stats-cards';
 import { getAnalyticsOverview } from '@/features/overview/api/service';
 import React from 'react';

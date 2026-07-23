@@ -35,7 +35,7 @@ const RegisterForm = () => {
       confirmPassword: ''
     } as TenantRegisterInput,
     validators: {
-      onChange: tenantRegisterSchema
+      onBlur: tenantRegisterSchema
     },
     onSubmit: async ({ value }) => {
       try {

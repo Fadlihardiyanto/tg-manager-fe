@@ -9,24 +9,23 @@ interface StepProps {
 }
 
 export function BusinessProfileStep({ form }: StepProps) {
-  const { FormTextField, FormSelectField } =
-    useFormFields<any>();
+  const { FormTextField, FormSelectField } = useFormFields<any>();
 
   return (
     <div className='flex flex-col gap-8'>
       <Heading
-        title='Create Your Workspace'
-        description='Set up your business profile to get started with TG-Manager.'
+        title='Buat Ruang Kerja'
+        description='Konfigurasi profil bisnis Anda untuk memulai dengan TG-Manager.'
       />
 
       <div className='flex flex-col gap-5'>
-        <h4 className='text-lg font-semibold'>Business Details</h4>
+        <h4 className='text-lg font-semibold'>Detail Bisnis</h4>
 
         <FormTextField
           name='businessName'
-          label='Business / Community Name'
+          label='Nama Bisnis / Komunitas'
           required
-          placeholder='e.g. Crypto VIP Signal'
+          placeholder='mis. KOMUNITAS ANDA'
           validators={{
             onChange: businessProfileSchema.shape.businessName
           }}
@@ -48,15 +47,11 @@ export function BusinessProfileStep({ form }: StepProps) {
 
         <FormTextField
           name='businessSlug'
-          label='URL Slug'
+          label='Tautan'
           required
-          placeholder='crypto-vip-signal'
+          placeholder='nama-bisnis-anda'
           className='pl-[68px]'
-          leftIcon={
-            <span className='text-sm text-muted-foreground select-none'>
-              tg.app/
-            </span>
-          }
+          leftIcon={<span className='text-sm text-muted-foreground select-none'>tg.app/</span>}
           validators={{
             onChange: businessProfileSchema.shape.businessSlug
           }}
@@ -64,21 +59,19 @@ export function BusinessProfileStep({ form }: StepProps) {
             onChange: ({ value, fieldApi }: any) => {
               const strValue = value as string;
               if (strValue) {
-                const formatted = strValue
-                  .toLowerCase()
-                  .replace(/[^a-z0-9-]/g, '');
+                const formatted = strValue.toLowerCase().replace(/[^a-z0-9-]/g, '');
                 if (strValue !== formatted) {
                   fieldApi.setValue(formatted);
                 }
               }
             }
           }}
-          description="This will be your community's unique link"
+          description='Ini akan menjadi tautan unik komunitas Anda'
         />
 
         <FormSelectField
           name='category'
-          label='Community Category'
+          label='Kategori Komunitas'
           required
           validators={{
             onChange: businessProfileSchema.shape.category

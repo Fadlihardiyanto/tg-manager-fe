@@ -235,231 +235,239 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
           onOpenChange(v);
         }}
       >
-        <DialogContent className='sm:max-w-[560px] max-h-[85vh] overflow-y-auto'>
-          <DialogHeader>
-            <DialogTitle>Buat Siaran Baru</DialogTitle>
-            <DialogDescription>Kirim pesan massal ke seluruh grup atau member.</DialogDescription>
-          </DialogHeader>
+        <DialogContent className='sm:max-w-[560px] max-h-[85vh] flex flex-col overflow-hidden p-0 gap-0'>
+          <div className='shrink-0 px-6 pt-6'>
+            <DialogHeader>
+              <DialogTitle>Buat Siaran Baru</DialogTitle>
+              <DialogDescription>Kirim pesan massal ke seluruh grup atau member.</DialogDescription>
+            </DialogHeader>
+          </div>
 
-          <form.AppForm>
-            <form.Form id='broadcast-form' className='space-y-4'>
-              <FormSelectField
-                name='target_type'
-                label='Tujuan Pengiriman'
-                required
-                options={TARGET_OPTIONS}
-                placeholder='Pilih tujuan'
-                validators={{
-                  onBlur: z.string().min(1, 'Pilih target')
-                }}
-              />
-
-              <FormSelectField
-                name='message_type'
-                label='Tipe Pesan'
-                required
-                options={allowMediaBroadcast ? TYPE_OPTIONS : [TYPE_OPTIONS[0]]}
-                placeholder='Pilih tipe pesan'
-                validators={{
-                  onBlur: z.string().min(1, 'Pilih tipe')
-                }}
-              />
-
-              {!allowMediaBroadcast && (
-                <Alert>
-                  <Icons.lock />
-                  <AlertTitle>Media broadcast belum tersedia</AlertTitle>
-                  <AlertDescription>
-                    Paket aktif Anda hanya mengizinkan siaran teks.
-                  </AlertDescription>
-                </Alert>
-              )}
-
-              <div className='space-y-1'>
-                <div className='flex items-center gap-1'>
-                  {messageType !== 'text' && (
-                    <p className='text-xs text-muted-foreground'>
-                      Teks ini akan menjadi caption untuk{' '}
-                      {messageType === 'photo' ? 'gambar' : 'dokumen'}.
-                    </p>
-                  )}
-                </div>
-
-                <div className='flex items-center gap-1 border rounded-md p-1'>
-                  <button
-                    type='button'
-                    className='hover:bg-muted rounded px-2 py-1 text-sm font-bold'
-                    onClick={() => handleFormat('b')}
-                    title='Tebal'
-                  >
-                    <Icons.bold className='size-4' />
-                  </button>
-                  <button
-                    type='button'
-                    className='hover:bg-muted rounded px-2 py-1 text-sm italic'
-                    onClick={() => handleFormat('i')}
-                    title='Miring'
-                  >
-                    <Icons.italic className='size-4' />
-                  </button>
-                  <button
-                    type='button'
-                    className='hover:bg-muted rounded px-2 py-1 text-sm underline'
-                    onClick={() => handleFormat('u')}
-                    title='Garis Bawah'
-                  >
-                    <Icons.underline className='size-4' />
-                  </button>
-                  <span className='text-muted-foreground mx-1'>|</span>
-                  <Popover open={isLinkPopoverOpen} onOpenChange={setIsLinkPopoverOpen}>
-                    <PopoverTrigger asChild>
-                      <button
-                        type='button'
-                        className='hover:bg-muted rounded px-2 py-1 text-sm'
-                        onClick={() => {
-                          const el = document.getElementById('message_text') as HTMLTextAreaElement;
-                          if (!el) return;
-                          setLinkSelection({
-                            start: el.selectionStart,
-                            end: el.selectionEnd
-                          });
-                        }}
-                        title='Tautan'
-                      >
-                        <Icons.link className='size-4' />
-                      </button>
-                    </PopoverTrigger>
-                    <PopoverContent className='w-80 space-y-3' align='start'>
-                      <div className='space-y-1'>
-                        <p className='text-sm font-medium'>Masukkan URL</p>
-                        <Input
-                          type='url'
-                          placeholder='https://example.com'
-                          value={linkUrl}
-                          onChange={(event) => setLinkUrl(event.target.value)}
-                          onKeyDown={(event) => {
-                            if (event.key === 'Enter') {
-                              event.preventDefault();
-                              handleLinkApply();
-                            }
-                          }}
-                        />
-                      </div>
-                      <div className='flex justify-end gap-2'>
-                        <Button
-                          type='button'
-                          variant='outline'
-                          size='sm'
-                          onClick={() => {
-                            setIsLinkPopoverOpen(false);
-                            setLinkUrl('');
-                            setLinkSelection(null);
-                          }}
-                        >
-                          Batal
-                        </Button>
-                        <Button
-                          type='button'
-                          size='sm'
-                          disabled={!linkUrl.trim()}
-                          onClick={handleLinkApply}
-                        >
-                          Sisipkan
-                        </Button>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                  <button
-                    type='button'
-                    className='hover:bg-muted rounded px-2 py-1 text-sm'
-                    onClick={() => handleFormat('code')}
-                    title='Kode'
-                  >
-                    <Icons.code className='size-4' />
-                  </button>
-                  <button
-                    type='button'
-                    className='hover:bg-muted rounded px-2 py-1 text-sm'
-                    onClick={() => handleFormat('s')}
-                    title='Coret'
-                  >
-                    <Icons.slash className='size-4' />
-                  </button>
-                </div>
-
-                <FormTextareaField
-                  name='message_text'
-                  label={
-                    messageType === 'photo' || messageType === 'document'
-                      ? 'Keterangan'
-                      : 'Isi Pesan'
-                  }
+          <div className='flex-1 min-h-0 overflow-y-auto px-6 py-4'>
+            <form.AppForm>
+              <form.Form id='broadcast-form' className='space-y-4'>
+                <FormSelectField
+                  name='target_type'
+                  label='Tujuan Pengiriman'
                   required
-                  placeholder={messageType === 'text' ? 'Tulis siaran...' : 'Tulis keterangan...'}
-                  className='min-h-[120px]'
+                  options={TARGET_OPTIONS}
+                  placeholder='Pilih tujuan'
                   validators={{
-                    onBlur: z.string().min(1, 'Isi pesan wajib diisi')
+                    onBlur: z.string().min(1, 'Pilih target')
                   }}
                 />
 
-                <div
-                  className={`text-right text-xs ${
-                    remaining < 0
-                      ? 'text-destructive font-medium'
-                      : remaining < 50
-                        ? 'text-yellow-600'
-                        : 'text-muted-foreground'
-                  }`}
-                >
-                  {remaining} karakter tersisa
-                </div>
-              </div>
-
-              {(messageType === 'photo' || messageType === 'document') && (
-                <FormFileUploadField
-                  name='file'
-                  label={messageType === 'photo' ? 'Upload Gambar' : 'Upload Dokumen'}
-                  maxFiles={1}
-                  maxSize={messageType === 'document' ? 5 * 1024 * 1024 : 2 * 1024 * 1024}
-                  accept={
-                    messageType === 'document'
-                      ? { 'application/pdf': [] }
-                      : { 'image/png': [], 'image/jpeg': [], 'image/webp': [] }
-                  }
+                <FormSelectField
+                  name='message_type'
+                  label='Tipe Pesan'
+                  required
+                  options={allowMediaBroadcast ? TYPE_OPTIONS : [TYPE_OPTIONS[0]]}
+                  placeholder='Pilih tipe pesan'
+                  validators={{
+                    onBlur: z.string().min(1, 'Pilih tipe')
+                  }}
                 />
-              )}
 
-              <FormTextField
-                name='scheduled_at'
-                label='Jadwalkan (opsional)'
-                placeholder='Kosongkan untuk kirim sekarang'
-                description='Format: YYYY-MM-DD HH:MM (waktu lokal). Minimal 1 menit dari sekarang.'
-                type='text'
-              />
-            </form.Form>
-          </form.AppForm>
+                {!allowMediaBroadcast && (
+                  <Alert>
+                    <Icons.lock />
+                    <AlertTitle>Media broadcast belum tersedia</AlertTitle>
+                    <AlertDescription>
+                      Paket aktif Anda hanya mengizinkan siaran teks.
+                    </AlertDescription>
+                  </Alert>
+                )}
 
-          <DialogFooter>
-            <Button
-              type='button'
-              variant='outline'
-              onClick={() => {
-                form.reset();
-                onOpenChange(false);
-              }}
-            >
-              Batal
-            </Button>
-            <Button
-              type='submit'
-              form='broadcast-form'
-              isLoading={isPending}
-              disabled={!canCreateBroadcast}
-            >
-              <Icons.send className='mr-2 h-4 w-4' />
-              {isPending ? 'Mengirim...' : 'Kirim Siaran'}
-            </Button>
-          </DialogFooter>
+                <div className='space-y-1'>
+                  <div className='flex items-center gap-1'>
+                    {messageType !== 'text' && (
+                      <p className='text-xs text-muted-foreground'>
+                        Teks ini akan menjadi caption untuk{' '}
+                        {messageType === 'photo' ? 'gambar' : 'dokumen'}.
+                      </p>
+                    )}
+                  </div>
+
+                  <div className='flex items-center gap-1 rounded-xl border bg-muted/30 p-1.5'>
+                    <button
+                      type='button'
+                      className='hover:bg-muted rounded px-2 py-1 text-sm font-bold'
+                      onClick={() => handleFormat('b')}
+                      title='Tebal'
+                    >
+                      <Icons.bold className='size-4' />
+                    </button>
+                    <button
+                      type='button'
+                      className='hover:bg-muted rounded px-2 py-1 text-sm italic'
+                      onClick={() => handleFormat('i')}
+                      title='Miring'
+                    >
+                      <Icons.italic className='size-4' />
+                    </button>
+                    <button
+                      type='button'
+                      className='hover:bg-muted rounded px-2 py-1 text-sm underline'
+                      onClick={() => handleFormat('u')}
+                      title='Garis Bawah'
+                    >
+                      <Icons.underline className='size-4' />
+                    </button>
+                    <span className='text-muted-foreground mx-1'>|</span>
+                    <Popover open={isLinkPopoverOpen} onOpenChange={setIsLinkPopoverOpen}>
+                      <PopoverTrigger asChild>
+                        <button
+                          type='button'
+                          className='hover:bg-muted rounded px-2 py-1 text-sm'
+                          onClick={() => {
+                            const el = document.getElementById(
+                              'message_text'
+                            ) as HTMLTextAreaElement;
+                            if (!el) return;
+                            setLinkSelection({
+                              start: el.selectionStart,
+                              end: el.selectionEnd
+                            });
+                          }}
+                          title='Tautan'
+                        >
+                          <Icons.link className='size-4' />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent className='w-80 space-y-3' align='start'>
+                        <div className='space-y-1'>
+                          <p className='text-sm font-medium'>Masukkan URL</p>
+                          <Input
+                            type='url'
+                            placeholder='https://example.com'
+                            value={linkUrl}
+                            onChange={(event) => setLinkUrl(event.target.value)}
+                            onKeyDown={(event) => {
+                              if (event.key === 'Enter') {
+                                event.preventDefault();
+                                handleLinkApply();
+                              }
+                            }}
+                          />
+                        </div>
+                        <div className='flex justify-end gap-2'>
+                          <Button
+                            type='button'
+                            variant='outline'
+                            size='sm'
+                            onClick={() => {
+                              setIsLinkPopoverOpen(false);
+                              setLinkUrl('');
+                              setLinkSelection(null);
+                            }}
+                          >
+                            Batal
+                          </Button>
+                          <Button
+                            type='button'
+                            size='sm'
+                            disabled={!linkUrl.trim()}
+                            onClick={handleLinkApply}
+                          >
+                            Sisipkan
+                          </Button>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                    <button
+                      type='button'
+                      className='hover:bg-muted rounded px-2 py-1 text-sm'
+                      onClick={() => handleFormat('code')}
+                      title='Kode'
+                    >
+                      <Icons.code className='size-4' />
+                    </button>
+                    <button
+                      type='button'
+                      className='hover:bg-muted rounded px-2 py-1 text-sm'
+                      onClick={() => handleFormat('s')}
+                      title='Coret'
+                    >
+                      <Icons.slash className='size-4' />
+                    </button>
+                  </div>
+
+                  <FormTextareaField
+                    name='message_text'
+                    label={
+                      messageType === 'photo' || messageType === 'document'
+                        ? 'Keterangan'
+                        : 'Isi Pesan'
+                    }
+                    required
+                    placeholder={messageType === 'text' ? 'Tulis siaran...' : 'Tulis keterangan...'}
+                    className='min-h-[120px]'
+                    validators={{
+                      onBlur: z.string().min(1, 'Isi pesan wajib diisi')
+                    }}
+                  />
+
+                  <div
+                    className={`text-right text-xs ${
+                      remaining < 0
+                        ? 'text-destructive font-medium'
+                        : remaining < 50
+                          ? 'text-yellow-600'
+                          : 'text-muted-foreground'
+                    }`}
+                  >
+                    {remaining} karakter tersisa
+                  </div>
+                </div>
+
+                {(messageType === 'photo' || messageType === 'document') && (
+                  <FormFileUploadField
+                    name='file'
+                    label={messageType === 'photo' ? 'Upload Gambar' : 'Upload Dokumen'}
+                    maxFiles={1}
+                    maxSize={messageType === 'document' ? 5 * 1024 * 1024 : 2 * 1024 * 1024}
+                    accept={
+                      messageType === 'document'
+                        ? { 'application/pdf': [] }
+                        : { 'image/png': [], 'image/jpeg': [], 'image/webp': [] }
+                    }
+                  />
+                )}
+
+                <FormTextField
+                  name='scheduled_at'
+                  label='Jadwalkan (opsional)'
+                  placeholder='Kosongkan untuk kirim sekarang'
+                  description='Format: YYYY-MM-DD HH:MM (waktu lokal). Minimal 1 menit dari sekarang.'
+                  type='text'
+                />
+              </form.Form>
+            </form.AppForm>
+          </div>
+
+          <div className='shrink-0 border-t border-border/70 px-6 py-4 bg-background'>
+            <DialogFooter>
+              <Button
+                type='button'
+                variant='outline'
+                onClick={() => {
+                  form.reset();
+                  onOpenChange(false);
+                }}
+              >
+                Batal
+              </Button>
+              <Button
+                type='submit'
+                form='broadcast-form'
+                isLoading={isPending}
+                disabled={!canCreateBroadcast}
+              >
+                <Icons.send className='mr-2 h-4 w-4' />
+                {isPending ? 'Mengirim...' : 'Kirim Siaran'}
+              </Button>
+            </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
 

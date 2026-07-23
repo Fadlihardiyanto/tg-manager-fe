@@ -108,7 +108,7 @@ export function DataTable<TData>({
                     colSpan={table.getAllColumns().length}
                     className='text-muted-foreground h-32 text-center'
                   >
-                    No results.
+                    Tidak ada hasil.
                   </TableCell>
                 </TableRow>
               )}

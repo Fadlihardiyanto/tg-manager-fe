@@ -19,7 +19,7 @@ export function QuotaCard({ resource, title, className }: QuotaCardProps) {
   if (isLoading) return null;
 
   const quota = getQuota(resource);
-  if (!quota || quota.isUnlimited) return null;
+  if (!quota || quota.isUnlimited || quota.hasQuota) return null;
 
   const slotLabel = title.toLowerCase().replace(/^kuota\s+/, 'slot ');
 

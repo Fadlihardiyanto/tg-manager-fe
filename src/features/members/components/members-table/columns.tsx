@@ -13,11 +13,11 @@ import { Checkbox } from '@/components/ui/checkbox';
 
 function getSubscriptionBadgeClass(status: Subscription['status']) {
   if (status === 'active') {
-    return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+    return 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800';
   }
 
   if (status === 'cancelled') {
-    return 'bg-amber-50 text-amber-700 border-amber-200';
+    return 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-800';
   }
 
   return 'bg-muted text-muted-foreground border-border';

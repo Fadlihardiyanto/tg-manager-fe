@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Icons } from '@/components/icons';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -33,7 +34,13 @@ export default function LoginPageLayout() {
 
         <div className='relative z-10 flex flex-col items-center text-center max-w-sm'>
           <div className='mb-10'>
-            <img src='/uration-landscape.png' alt='Urator' className='h-8 w-auto object-contain' />
+            <Image
+              src='/uration-landscape.png'
+              alt='Urator Logo'
+              width={160}
+              height={32}
+              className='h-8 w-auto object-contain'
+            />
           </div>
 
           <h2 className='text-2xl lg:text-3xl font-bold tracking-tight mb-3 leading-tight'>

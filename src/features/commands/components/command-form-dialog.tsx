@@ -304,397 +304,413 @@ export function CommandFormDialog({ command, open, onOpenChange }: CommandFormDi
         onOpenChange(v);
       }}
     >
-      <DialogContent className='sm:max-w-[520px] max-h-[80vh] overflow-y-auto'>
-        <DialogHeader>
-          <DialogTitle>{isEdit ? 'Edit Perintah' : 'Tambah Perintah Baru'}</DialogTitle>
-          <DialogDescription>
-            {isEdit
-              ? 'Perbarui perintah custom bot.'
-              : 'Buat perintah baru untuk respon otomatis bot.'}
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className='sm:max-w-[520px] max-h-[80vh] flex flex-col overflow-hidden p-0 gap-0'>
+        <div className='shrink-0 px-6 pt-6'>
+          <DialogHeader>
+            <DialogTitle>{isEdit ? 'Edit Perintah' : 'Tambah Perintah Baru'}</DialogTitle>
+            <DialogDescription>
+              {isEdit
+                ? 'Perbarui perintah custom bot.'
+                : 'Buat perintah baru untuk respon otomatis bot.'}
+            </DialogDescription>
+          </DialogHeader>
+        </div>
 
-        <form.AppForm>
-          <form.Form id='command-form-dialog' className='space-y-4'>
-            {isEdit ? (
-              <FieldGroup>
-                <FieldLabel>Bot</FieldLabel>
-                <div className='rounded-md border bg-muted/30 px-3 py-2 text-sm font-medium'>
-                  {formatBotUsername(command?.bot_username)}
-                </div>
-                <FieldDescription>Bot tidak bisa diubah saat edit perintah.</FieldDescription>
-              </FieldGroup>
-            ) : (
-              <FormSelectField
-                name='bot_id'
-                label='Bot'
-                required
-                options={bots.map((b) => ({ value: b.id, label: `@${b.username}` }))}
-                placeholder='Pilih bot'
-                validators={{
-                  onBlur: z.string().min(1, 'Pilih bot')
-                }}
-              />
-            )}
-
-            <FormTextField
-              name='command_trigger'
-              label='Perintah'
-              required
-              placeholder='rules'
-              description='Hanya huruf kecil, angka, dan underscore. Akan otomatis ditambahkan tanda /'
-              sanitize={(val) => val.toLowerCase().replace(/[^a-z0-9_]/g, '')}
-              validators={{
-                onBlur: z
-                  .string()
-                  .min(1, 'Nama perintah wajib diisi')
-                  .max(49, 'Maksimal 49 karakter')
-              }}
-            />
-
-            <FormSelectField
-              name='response_type'
-              label='Tipe Respon'
-              required
-              options={[
-                { value: 'text', label: 'Text' },
-                { value: 'photo', label: 'Photo' },
-                { value: 'document', label: 'Document' }
-              ]}
-              placeholder='Pilih tipe respon'
-            />
-
-            <FormSelectField
-              name='access_scope'
-              label='Siapa yang Bisa Akses'
-              required
-              options={[
-                { value: 'public', label: 'Public / Umum' },
-                { value: 'admin', label: 'Admin / Owner' },
-                { value: 'member', label: 'Member' }
-              ]}
-              placeholder='Pilih akses'
-              description='Atur command ini bisa dipakai oleh siapa.'
-            />
-
-            <FormSelectField
-              name='chat_type_scope'
-              label='Tipe Chat'
-              required
-              options={[
-                { value: 'all', label: 'Semua Chat' },
-                { value: 'dm_only', label: 'DM Saja' },
-                { value: 'group_only', label: 'Group Saja' }
-              ]}
-              placeholder='Pilih tipe chat'
-              description='Batasi command hanya di DM, hanya di group, atau keduanya.'
-            />
-
-            {accessScope === 'member' && (
-              <form.AppField name='package_ids'>
-                {(field) => {
-                  const value = (field.state.value as string[]) ?? [];
-
-                  return (
-                    <FieldGroup>
-                      <FieldLabel>Paket yang Diizinkan</FieldLabel>
-                      <FieldDescription>
-                        Opsional. Kosongkan jika semua paket member boleh memakai command ini.
-                      </FieldDescription>
-                      <div className='flex max-h-[160px] flex-col gap-2 overflow-y-auto rounded-md border p-3'>
-                        {isPackagesLoading ? (
-                          <p className='text-muted-foreground text-sm'>Memuat paket...</p>
-                        ) : packages.length === 0 ? (
-                          <p className='text-muted-foreground text-sm'>Belum ada paket tersedia.</p>
-                        ) : (
-                          packages.map((pkg) => {
-                            const checked = value.includes(pkg.id);
-
-                            return (
-                              <label
-                                key={pkg.id}
-                                className='flex cursor-pointer items-center gap-2'
-                              >
-                                <Checkbox
-                                  checked={checked}
-                                  onCheckedChange={() => {
-                                    field.handleChange(
-                                      checked
-                                        ? value.filter((id) => id !== pkg.id)
-                                        : [...value, pkg.id]
-                                    );
-                                  }}
-                                />
-                                <span className='text-sm font-medium'>{pkg.name}</span>
-                                {!pkg.is_active && (
-                                  <span className='text-muted-foreground text-xs'>(nonaktif)</span>
-                                )}
-                              </label>
-                            );
-                          })
-                        )}
-                      </div>
-                    </FieldGroup>
-                  );
-                }}
-              </form.AppField>
-            )}
-
-            {chatTypeScope !== 'dm_only' && (
-              <form.AppField name='group_ids'>
-                {(field) => {
-                  const value = (field.state.value as string[]) ?? [];
-
-                  return (
-                    <FieldGroup>
-                      <FieldLabel>Grup yang Diizinkan</FieldLabel>
-                      <FieldDescription>
-                        Opsional. Kosongkan jika semua grup boleh memakai command ini.
-                      </FieldDescription>
-                      <div className='flex max-h-[180px] flex-col gap-2 overflow-y-auto rounded-md border p-3'>
-                        {isGroupsLoading ? (
-                          <p className='text-muted-foreground text-sm'>Memuat grup...</p>
-                        ) : groups.length === 0 ? (
-                          <p className='text-muted-foreground text-sm'>Belum ada grup tersedia.</p>
-                        ) : (
-                          groups.map((group) => {
-                            const checked = value.includes(group.id);
-
-                            return (
-                              <label
-                                key={group.id}
-                                className='flex cursor-pointer items-center gap-2'
-                              >
-                                <Checkbox
-                                  checked={checked}
-                                  onCheckedChange={() => {
-                                    field.handleChange(
-                                      checked
-                                        ? value.filter((id) => id !== group.id)
-                                        : [...value, group.id]
-                                    );
-                                  }}
-                                />
-                                <span className='text-sm font-medium'>{group.name}</span>
-                                <span className='text-muted-foreground text-xs'>
-                                  ({group.member_count} member)
-                                </span>
-                                {!group.is_active && (
-                                  <span className='text-muted-foreground text-xs'>(nonaktif)</span>
-                                )}
-                              </label>
-                            );
-                          })
-                        )}
-                      </div>
-                    </FieldGroup>
-                  );
-                }}
-              </form.AppField>
-            )}
-
-            <div className='space-y-1'>
-              <div className='flex items-center gap-1'>
-                {responseType !== 'text' && (
-                  <p className='text-xs text-muted-foreground'>
-                    Teks ini akan menjadi caption untuk{' '}
-                    {responseType === 'photo' ? 'gambar' : 'dokumen'}.
-                  </p>
-                )}
-              </div>
-
-              <div className='flex items-center gap-1 rounded-md border p-1'>
-                <button
-                  type='button'
-                  className='hover:bg-muted rounded px-2 py-1 text-sm font-bold'
-                  onClick={() => handleFormat('b')}
-                  title='Bold'
-                >
-                  <Icons.bold className='size-4' />
-                </button>
-                <button
-                  type='button'
-                  className='hover:bg-muted rounded px-2 py-1 text-sm italic'
-                  onClick={() => handleFormat('i')}
-                  title='Italic'
-                >
-                  <Icons.italic className='size-4' />
-                </button>
-                <button
-                  type='button'
-                  className='hover:bg-muted rounded px-2 py-1 text-sm underline'
-                  onClick={() => handleFormat('u')}
-                  title='Underline'
-                >
-                  <Icons.underline className='size-4' />
-                </button>
-                <span className='text-muted-foreground mx-1'>|</span>
-                <Popover open={isLinkPopoverOpen} onOpenChange={setIsLinkPopoverOpen}>
-                  <PopoverTrigger asChild>
-                    <button
-                      type='button'
-                      className='hover:bg-muted rounded px-2 py-1 text-sm'
-                      onClick={() => {
-                        const el = document.getElementById('response_text') as HTMLTextAreaElement;
-                        if (!el) return;
-                        setLinkSelection({
-                          start: el.selectionStart,
-                          end: el.selectionEnd
-                        });
-                      }}
-                      title='Link'
-                    >
-                      <Icons.link className='size-4' />
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent className='w-80 space-y-3' align='start'>
-                    <div className='space-y-1'>
-                      <p className='text-sm font-medium'>Masukkan URL</p>
-                      <Input
-                        type='url'
-                        placeholder='https://example.com'
-                        value={linkUrl}
-                        onChange={(event) => setLinkUrl(event.target.value)}
-                        onKeyDown={(event) => {
-                          if (event.key === 'Enter') {
-                            event.preventDefault();
-                            handleLinkApply();
-                          }
-                        }}
-                      />
-                    </div>
-                    <div className='flex justify-end gap-2'>
-                      <Button
-                        type='button'
-                        variant='outline'
-                        size='sm'
-                        onClick={() => {
-                          setIsLinkPopoverOpen(false);
-                          setLinkUrl('');
-                          setLinkSelection(null);
-                        }}
-                      >
-                        Batal
-                      </Button>
-                      <Button
-                        type='button'
-                        size='sm'
-                        disabled={!linkUrl.trim()}
-                        onClick={handleLinkApply}
-                      >
-                        Sisipkan
-                      </Button>
-                    </div>
-                  </PopoverContent>
-                </Popover>
-                <button
-                  type='button'
-                  className='hover:bg-muted rounded px-2 py-1 text-sm'
-                  onClick={() => handleFormat('code')}
-                  title='Code'
-                >
-                  <Icons.code className='size-4' />
-                </button>
-                <button
-                  type='button'
-                  className='hover:bg-muted rounded px-2 py-1 text-sm'
-                  onClick={() => handleFormat('s')}
-                  title='Strikethrough'
-                >
-                  <Icons.slash className='size-4' />
-                </button>
-              </div>
-
-              <FormTextareaField
-                name='response_text'
-                label={
-                  responseType === 'photo'
-                    ? 'Keterangan Gambar (Caption)'
-                    : responseType === 'document'
-                      ? 'Keterangan Dokumen (Caption)'
-                      : 'Isi Pesan Balasan'
-                }
-                required
-                placeholder={
-                  responseType === 'photo'
-                    ? 'Tulis caption untuk gambar...'
-                    : responseType === 'document'
-                      ? 'Tulis caption untuk dokumen...'
-                      : 'Tulis pesan balasan...'
-                }
-                className='min-h-[120px]'
-                validators={{
-                  onBlur: z.string().min(1, 'Isi pesan wajib diisi')
-                }}
-              />
-
-              <div
-                className={`text-right text-xs ${
-                  remaining < 0
-                    ? 'text-destructive font-medium'
-                    : remaining < 50
-                      ? 'text-yellow-600'
-                      : 'text-muted-foreground'
-                }`}
-              >
-                {remaining} karakter tersisa
-              </div>
-            </div>
-
-            {!canCreateCommand && (
-              <Alert variant='warning'>
-                <Icons.warning />
-                <AlertTitle>Quota custom command penuh</AlertTitle>
-                <AlertDescription>
-                  Upgrade plan Anda untuk menambahkan command baru.
-                </AlertDescription>
-              </Alert>
-            )}
-
-            {(responseType === 'photo' || responseType === 'document') && (
-              <div className='space-y-2'>
-                <FormFileUploadField
-                  name='file'
-                  label={responseType === 'photo' ? 'Upload Gambar' : 'Upload Dokumen'}
-                  maxFiles={1}
-                  maxSize={responseType === 'document' ? 5 * 1024 * 1024 : 2 * 1024 * 1024}
-                  accept={
-                    responseType === 'document'
-                      ? { 'application/pdf': [] }
-                      : { 'image/png': [], 'image/jpeg': [], 'image/webp': [] }
-                  }
+        <div className='flex-1 min-h-0 overflow-y-auto px-6 py-4'>
+          <form.AppForm>
+            <form.Form id='command-form-dialog' className='space-y-4'>
+              {isEdit ? (
+                <FieldGroup>
+                  <FieldLabel>Bot</FieldLabel>
+                  <div className='rounded-md border bg-muted/30 px-3 py-2 text-sm font-medium'>
+                    {formatBotUsername(command?.bot_username)}
+                  </div>
+                  <FieldDescription>Bot tidak bisa diubah saat edit perintah.</FieldDescription>
+                </FieldGroup>
+              ) : (
+                <FormSelectField
+                  name='bot_id'
+                  label='Bot'
+                  required
+                  options={bots.map((b) => ({ value: b.id, label: `@${b.username}` }))}
+                  placeholder='Pilih bot'
+                  validators={{
+                    onBlur: z.string().min(1, 'Pilih bot')
+                  }}
                 />
-                {isEdit && command?.file_url && (
-                  <p className='text-muted-foreground text-xs'>
-                    File saat ini: {command.file_url.split('/').pop()}
-                  </p>
-                )}
-              </div>
-            )}
-          </form.Form>
-        </form.AppForm>
+              )}
 
-        <DialogFooter>
-          <Button
-            type='button'
-            variant='outline'
-            onClick={() => {
-              form.reset();
-              onOpenChange(false);
-            }}
-          >
-            Batal
-          </Button>
-          <Button
-            type='submit'
-            form='command-form-dialog'
-            isLoading={isPending}
-            disabled={!canCreateCommand}
-          >
-            <Icons.check className='mr-2 h-4 w-4' />
-            {isEdit ? 'Perbarui' : 'Tambah'}
-          </Button>
-        </DialogFooter>
+              <FormTextField
+                name='command_trigger'
+                label='Perintah'
+                required
+                placeholder='rules'
+                description='Hanya huruf kecil, angka, dan underscore. Akan otomatis ditambahkan tanda /'
+                sanitize={(val) => val.toLowerCase().replace(/[^a-z0-9_]/g, '')}
+                validators={{
+                  onBlur: z
+                    .string()
+                    .min(1, 'Nama perintah wajib diisi')
+                    .max(49, 'Maksimal 49 karakter')
+                }}
+              />
+
+              <FormSelectField
+                name='response_type'
+                label='Tipe Respon'
+                required
+                options={[
+                  { value: 'text', label: 'Text' },
+                  { value: 'photo', label: 'Photo' },
+                  { value: 'document', label: 'Document' }
+                ]}
+                placeholder='Pilih tipe respon'
+              />
+
+              <FormSelectField
+                name='access_scope'
+                label='Siapa yang Bisa Akses'
+                required
+                options={[
+                  { value: 'public', label: 'Public / Umum' },
+                  { value: 'admin', label: 'Admin / Owner' },
+                  { value: 'member', label: 'Member' }
+                ]}
+                placeholder='Pilih akses'
+                description='Atur command ini bisa dipakai oleh siapa.'
+              />
+
+              <FormSelectField
+                name='chat_type_scope'
+                label='Tipe Chat'
+                required
+                options={[
+                  { value: 'all', label: 'Semua Chat' },
+                  { value: 'dm_only', label: 'DM Saja' },
+                  { value: 'group_only', label: 'Group Saja' }
+                ]}
+                placeholder='Pilih tipe chat'
+                description='Batasi command hanya di DM, hanya di group, atau keduanya.'
+              />
+
+              {accessScope === 'member' && (
+                <form.AppField name='package_ids'>
+                  {(field) => {
+                    const value = (field.state.value as string[]) ?? [];
+
+                    return (
+                      <FieldGroup>
+                        <FieldLabel>Paket yang Diizinkan</FieldLabel>
+                        <FieldDescription>
+                          Opsional. Kosongkan jika semua paket member boleh memakai command ini.
+                        </FieldDescription>
+                        <div className='flex max-h-[160px] flex-col gap-2 overflow-y-auto rounded-xl border bg-muted/30 p-4'>
+                          {isPackagesLoading ? (
+                            <p className='text-muted-foreground text-sm'>Memuat paket...</p>
+                          ) : packages.length === 0 ? (
+                            <p className='text-muted-foreground text-sm'>
+                              Belum ada paket tersedia.
+                            </p>
+                          ) : (
+                            packages.map((pkg) => {
+                              const checked = value.includes(pkg.id);
+
+                              return (
+                                <label
+                                  key={pkg.id}
+                                  className='flex cursor-pointer items-center gap-2'
+                                >
+                                  <Checkbox
+                                    checked={checked}
+                                    onCheckedChange={() => {
+                                      field.handleChange(
+                                        checked
+                                          ? value.filter((id) => id !== pkg.id)
+                                          : [...value, pkg.id]
+                                      );
+                                    }}
+                                  />
+                                  <span className='text-sm font-medium'>{pkg.name}</span>
+                                  {!pkg.is_active && (
+                                    <span className='text-muted-foreground text-xs'>
+                                      (nonaktif)
+                                    </span>
+                                  )}
+                                </label>
+                              );
+                            })
+                          )}
+                        </div>
+                      </FieldGroup>
+                    );
+                  }}
+                </form.AppField>
+              )}
+
+              {chatTypeScope !== 'dm_only' && (
+                <form.AppField name='group_ids'>
+                  {(field) => {
+                    const value = (field.state.value as string[]) ?? [];
+
+                    return (
+                      <FieldGroup>
+                        <FieldLabel>Grup yang Diizinkan</FieldLabel>
+                        <FieldDescription>
+                          Opsional. Kosongkan jika semua grup boleh memakai command ini.
+                        </FieldDescription>
+                        <div className='flex max-h-[180px] flex-col gap-2 overflow-y-auto rounded-xl border bg-muted/30 p-4'>
+                          {isGroupsLoading ? (
+                            <p className='text-muted-foreground text-sm'>Memuat grup...</p>
+                          ) : groups.length === 0 ? (
+                            <p className='text-muted-foreground text-sm'>
+                              Belum ada grup tersedia.
+                            </p>
+                          ) : (
+                            groups.map((group) => {
+                              const checked = value.includes(group.id);
+
+                              return (
+                                <label
+                                  key={group.id}
+                                  className='flex cursor-pointer items-center gap-2'
+                                >
+                                  <Checkbox
+                                    checked={checked}
+                                    onCheckedChange={() => {
+                                      field.handleChange(
+                                        checked
+                                          ? value.filter((id) => id !== group.id)
+                                          : [...value, group.id]
+                                      );
+                                    }}
+                                  />
+                                  <span className='text-sm font-medium'>{group.name}</span>
+                                  <span className='text-muted-foreground text-xs'>
+                                    ({group.member_count} member)
+                                  </span>
+                                  {!group.is_active && (
+                                    <span className='text-muted-foreground text-xs'>
+                                      (nonaktif)
+                                    </span>
+                                  )}
+                                </label>
+                              );
+                            })
+                          )}
+                        </div>
+                      </FieldGroup>
+                    );
+                  }}
+                </form.AppField>
+              )}
+
+              <div className='space-y-1'>
+                <div className='flex items-center gap-1'>
+                  {responseType !== 'text' && (
+                    <p className='text-xs text-muted-foreground'>
+                      Teks ini akan menjadi caption untuk{' '}
+                      {responseType === 'photo' ? 'gambar' : 'dokumen'}.
+                    </p>
+                  )}
+                </div>
+
+                <div className='flex items-center gap-1 rounded-xl border bg-muted/30 p-1.5'>
+                  <button
+                    type='button'
+                    className='hover:bg-muted rounded px-2 py-1 text-sm font-bold'
+                    onClick={() => handleFormat('b')}
+                    title='Bold'
+                  >
+                    <Icons.bold className='size-4' />
+                  </button>
+                  <button
+                    type='button'
+                    className='hover:bg-muted rounded px-2 py-1 text-sm italic'
+                    onClick={() => handleFormat('i')}
+                    title='Italic'
+                  >
+                    <Icons.italic className='size-4' />
+                  </button>
+                  <button
+                    type='button'
+                    className='hover:bg-muted rounded px-2 py-1 text-sm underline'
+                    onClick={() => handleFormat('u')}
+                    title='Underline'
+                  >
+                    <Icons.underline className='size-4' />
+                  </button>
+                  <span className='text-muted-foreground mx-1'>|</span>
+                  <Popover open={isLinkPopoverOpen} onOpenChange={setIsLinkPopoverOpen}>
+                    <PopoverTrigger asChild>
+                      <button
+                        type='button'
+                        className='hover:bg-muted rounded px-2 py-1 text-sm'
+                        onClick={() => {
+                          const el = document.getElementById(
+                            'response_text'
+                          ) as HTMLTextAreaElement;
+                          if (!el) return;
+                          setLinkSelection({
+                            start: el.selectionStart,
+                            end: el.selectionEnd
+                          });
+                        }}
+                        title='Link'
+                      >
+                        <Icons.link className='size-4' />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className='w-80 space-y-3' align='start'>
+                      <div className='space-y-1'>
+                        <p className='text-sm font-medium'>Masukkan URL</p>
+                        <Input
+                          type='url'
+                          placeholder='https://example.com'
+                          value={linkUrl}
+                          onChange={(event) => setLinkUrl(event.target.value)}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter') {
+                              event.preventDefault();
+                              handleLinkApply();
+                            }
+                          }}
+                        />
+                      </div>
+                      <div className='flex justify-end gap-2'>
+                        <Button
+                          type='button'
+                          variant='outline'
+                          size='sm'
+                          onClick={() => {
+                            setIsLinkPopoverOpen(false);
+                            setLinkUrl('');
+                            setLinkSelection(null);
+                          }}
+                        >
+                          Batal
+                        </Button>
+                        <Button
+                          type='button'
+                          size='sm'
+                          disabled={!linkUrl.trim()}
+                          onClick={handleLinkApply}
+                        >
+                          Sisipkan
+                        </Button>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                  <button
+                    type='button'
+                    className='hover:bg-muted rounded px-2 py-1 text-sm'
+                    onClick={() => handleFormat('code')}
+                    title='Code'
+                  >
+                    <Icons.code className='size-4' />
+                  </button>
+                  <button
+                    type='button'
+                    className='hover:bg-muted rounded px-2 py-1 text-sm'
+                    onClick={() => handleFormat('s')}
+                    title='Strikethrough'
+                  >
+                    <Icons.slash className='size-4' />
+                  </button>
+                </div>
+
+                <FormTextareaField
+                  name='response_text'
+                  label={
+                    responseType === 'photo'
+                      ? 'Keterangan Gambar (Caption)'
+                      : responseType === 'document'
+                        ? 'Keterangan Dokumen (Caption)'
+                        : 'Isi Pesan Balasan'
+                  }
+                  required
+                  placeholder={
+                    responseType === 'photo'
+                      ? 'Tulis caption untuk gambar...'
+                      : responseType === 'document'
+                        ? 'Tulis caption untuk dokumen...'
+                        : 'Tulis pesan balasan...'
+                  }
+                  className='min-h-[120px]'
+                  validators={{
+                    onBlur: z.string().min(1, 'Isi pesan wajib diisi')
+                  }}
+                />
+
+                <div
+                  className={`text-right text-xs ${
+                    remaining < 0
+                      ? 'text-destructive font-medium'
+                      : remaining < 50
+                        ? 'text-yellow-600'
+                        : 'text-muted-foreground'
+                  }`}
+                >
+                  {remaining} karakter tersisa
+                </div>
+              </div>
+
+              {!canCreateCommand && (
+                <Alert variant='warning'>
+                  <Icons.warning />
+                  <AlertTitle>Quota custom command penuh</AlertTitle>
+                  <AlertDescription>
+                    Upgrade plan Anda untuk menambahkan command baru.
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {(responseType === 'photo' || responseType === 'document') && (
+                <div className='space-y-2'>
+                  <FormFileUploadField
+                    name='file'
+                    label={responseType === 'photo' ? 'Upload Gambar' : 'Upload Dokumen'}
+                    maxFiles={1}
+                    maxSize={responseType === 'document' ? 5 * 1024 * 1024 : 2 * 1024 * 1024}
+                    accept={
+                      responseType === 'document'
+                        ? { 'application/pdf': [] }
+                        : { 'image/png': [], 'image/jpeg': [], 'image/webp': [] }
+                    }
+                  />
+                  {isEdit && command?.file_url && (
+                    <p className='text-muted-foreground text-xs'>
+                      File saat ini: {command.file_url.split('/').pop()}
+                    </p>
+                  )}
+                </div>
+              )}
+            </form.Form>
+          </form.AppForm>
+        </div>
+
+        <div className='shrink-0 border-t border-border/70 px-6 py-4 bg-background'>
+          <DialogFooter>
+            <Button
+              type='button'
+              variant='outline'
+              onClick={() => {
+                form.reset();
+                onOpenChange(false);
+              }}
+            >
+              Batal
+            </Button>
+            <Button
+              type='submit'
+              form='command-form-dialog'
+              isLoading={isPending}
+              disabled={!canCreateCommand}
+            >
+              <Icons.check className='mr-2 h-4 w-4' />
+              {isEdit ? 'Perbarui' : 'Tambah'}
+            </Button>
+          </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );

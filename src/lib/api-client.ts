@@ -1,4 +1,5 @@
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080';
+const FETCH_TIMEOUT_MS = 15_000;
 
 export async function apiClient<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const headers = new Headers(options?.headers);
@@ -6,15 +7,21 @@ export async function apiClient<T>(endpoint: string, options?: RequestInit): Pro
     headers.set('Content-Type', 'application/json');
   }
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort('Request timeout'), FETCH_TIMEOUT_MS);
+
   let res: Response;
   try {
     res = await fetch(`${BASE_URL}${endpoint}`, {
       ...options,
-      headers
+      headers,
+      signal: controller.signal
     });
   } catch (error) {
     console.error(`[API Client Network Error] ${endpoint}:`, error);
     throw error;
+  } finally {
+    clearTimeout(timeoutId);
   }
 
   if (!res.ok) {

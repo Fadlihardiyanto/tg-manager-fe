@@ -210,8 +210,8 @@ export function ReviewStep({ form, onBack, botUsername }: StepProps) {
             scrollToFirstError();
           }}
         >
-          Ke Dashboard
-          <Icons.arrowRight />
+          Selesaikan Setup
+          <Icons.check />
         </Button>
       </div>
     </div>

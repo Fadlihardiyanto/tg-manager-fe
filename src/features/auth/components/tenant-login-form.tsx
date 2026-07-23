@@ -67,7 +67,7 @@ export function TenantLoginForm({ className, ...props }: React.ComponentProps<'f
       password: ''
     } as TenantLoginInput,
     validators: {
-      onChange: tenantLoginSchema
+      onBlur: tenantLoginSchema
     },
     onSubmit: async ({ value }) => {
       try {
@@ -196,6 +196,7 @@ export function TenantLoginForm({ className, ...props }: React.ComponentProps<'f
                   <button
                     type='button'
                     tabIndex={-1}
+                    aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
                     onClick={() => setShowPassword(!showPassword)}
                     className='cursor-pointer text-muted-foreground hover:text-foreground transition-colors'
                   >

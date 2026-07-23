@@ -112,7 +112,7 @@ export function GroupFormDialog({ group, open, onOpenChange }: GroupFormDialogPr
             />
 
             {group && (
-              <div className='rounded-md border bg-muted/50 p-3'>
+              <div className='rounded-xl border bg-muted/40 p-3.5'>
                 <div className='flex items-center gap-2 text-sm'>
                   <Icons.teams className='h-4 w-4 text-muted-foreground' />
                   <span className='text-muted-foreground'>Chat ID:</span>

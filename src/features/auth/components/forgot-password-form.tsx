@@ -19,7 +19,7 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
       email: ''
     } as ForgotPasswordInput,
     validators: {
-      onChange: forgotPasswordSchema
+      onBlur: forgotPasswordSchema
     },
     onSubmit: async ({ value }) => {
       setIsSubmitting(true);
