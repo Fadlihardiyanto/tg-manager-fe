@@ -197,7 +197,7 @@ function BotEditTabs({
   canCreateBot
 }: {
   bot: TelegramBot;
-  form: ReturnType<typeof useAppForm>;
+  form: any;
   isPending: boolean;
   canCreateBot: boolean;
 }) {
