@@ -40,7 +40,9 @@
     ".next-build-verify-1500/types/**/*.ts",
     ".next-build-verify-1500/dev/types/**/*.ts",
     ".next-build-verify-929/types/**/*.ts",
-    ".next-build-verify-929/dev/types/**/*.ts"
+    ".next-build-verify-929/dev/types/**/*.ts",
+    ".next-build-verify-2522/types/**/*.ts",
+    ".next-build-verify-2522/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
