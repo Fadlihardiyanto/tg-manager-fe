@@ -1,6 +1,5 @@
 import { DashboardShell } from '@/components/layout/dashboard-shell';
 import type { Metadata } from 'next';
-import { cookies } from 'next/headers';
 import { getMe } from '@/features/auth/api/service';
 import { navGroups } from '@/config/nav-config';
 import { filterNavGroups } from '@/lib/filter-nav';
@@ -21,11 +20,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const role = userData?.role ?? null;
   const filteredGroups = filterNavGroups(navGroups, permissions, role);
 
-  const cookieStore = await cookies();
-  const defaultOpen = cookieStore.get('sidebar_state')?.value === 'true';
-
   return (
-    <DashboardShell navGroups={filteredGroups} defaultOpen={defaultOpen}>
+    <DashboardShell navGroups={filteredGroups} defaultOpen={false}>
       {children}
     </DashboardShell>
   );

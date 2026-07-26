@@ -1,6 +1,7 @@
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 import type { RecentOrder } from '../api/types';
 
 function formatRp(value: string) {
@@ -27,6 +28,21 @@ function initials(name: string) {
     .join('')
     .toUpperCase()
     .slice(0, 2);
+}
+
+function getStatusBadgeClass(status: string) {
+  const statusLower = status.toLowerCase();
+
+  if (statusLower.includes('expired') || statusLower.includes('kadaluarsa')) {
+    return 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-300';
+  }
+
+  if (statusLower.includes('cancel') || statusLower.includes('batal')) {
+    return 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-900/60 dark:bg-rose-950/40 dark:text-rose-300';
+  }
+
+  // Default: active/success/paid
+  return 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-300';
 }
 
 export function RecentSales({ data }: { data: RecentOrder[] }) {
@@ -61,7 +77,7 @@ export function RecentSales({ data }: { data: RecentOrder[] }) {
                 <p className='text-sm font-medium'>{formatRp(order.amount)}</p>
                 <Badge
                   variant='outline'
-                  className='border-emerald-200 bg-emerald-50 text-xs text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-300'
+                  className={cn('text-xs', getStatusBadgeClass(order.status))}
                 >
                   {order.status}
                 </Badge>

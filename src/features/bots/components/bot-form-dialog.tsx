@@ -10,21 +10,15 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Icons } from '@/components/icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActivePlan } from '@/features/billing/components/active-plan-provider';
 import { createBotMutation, updateBotMutation } from '../api/mutations';
 import { botKeys } from '../api/queries';
 import type { TelegramBot, BotRole } from '../api/types';
+import { BOT_ROLE_OPTIONS } from '../api/types';
 import { toast } from 'sonner';
 import * as z from 'zod';
-
-const BOT_ROLE_OPTIONS = [
-  { value: 'all_in_one', label: 'Semua Fungsi' },
-  { value: 'sales_only', label: 'Hanya Penjualan' },
-  { value: 'gatekeeper_only', label: 'Hanya Gatekeeper' }
-];
 
 type BotFormValues = {
   token: string;
@@ -33,7 +27,7 @@ type BotFormValues = {
 };
 
 const botFormSchema = z.object({
-  token: z.string(),
+  token: z.string().min(10, 'Token bot minimal 10 karakter'),
   bot_role: z.string().min(1, 'Silakan pilih peran bot'),
   is_active: z.string()
 });

@@ -87,9 +87,11 @@ export function getColumns(onEdit?: (pkg: Package) => void): ColumnDef<Package>[
       accessorKey: 'name',
       header: ({ column }) => <DataTableColumnHeader column={column} title='Nama' />,
       cell: ({ row }) => (
-        <div className={cn('flex items-center gap-2', !row.original.is_active && 'opacity-60')}>
-          <Icons.product className='size-4 text-muted-foreground' />
-          <span className='font-medium'>{row.getValue('name')}</span>
+        <div className={cn('flex items-center gap-3', !row.original.is_active && 'opacity-60')}>
+          <div className='flex size-9 items-center justify-center rounded-lg bg-gradient-to-br from-amber-500/15 to-amber-500/5 ring-1 ring-amber-500/20'>
+            <Icons.product className='size-4 text-amber-600 dark:text-amber-400' />
+          </div>
+          <span className='font-semibold'>{row.getValue('name')}</span>
         </div>
       ),
       meta: {
@@ -107,7 +109,11 @@ export function getColumns(onEdit?: (pkg: Package) => void): ColumnDef<Package>[
       header: ({ column }) => <DataTableColumnHeader column={column} title='Harga' />,
       cell: ({ cell }) => {
         const price = cell.getValue<number>();
-        return <span className='font-semibold tabular-nums'>{formatRupiah(price)}</span>;
+        return (
+          <span className='font-bold tabular-nums text-emerald-600 dark:text-emerald-400'>
+            {formatRupiah(price)}
+          </span>
+        );
       },
       enableSorting: true,
       enableColumnFilter: false
@@ -176,11 +182,13 @@ export function getColumns(onEdit?: (pkg: Package) => void): ColumnDef<Package>[
           <Badge
             variant={isAllAccess ? 'default' : 'outline'}
             className={cn(
+              'gap-1.5 font-medium',
               isAllAccess
-                ? 'bg-primary/10 text-primary border-transparent'
+                ? 'bg-violet-500/10 text-violet-600 border-violet-500/20 dark:text-violet-400'
                 : 'text-muted-foreground'
             )}
           >
+            {isAllAccess && <Icons.check className='size-3' />}
             {isAllAccess ? 'Ya' : 'Tidak'}
           </Badge>
         );

@@ -68,13 +68,7 @@ export default async function RootLayout({
         </a>
         <NuqsAdapter>
           <NextIntlClientProvider messages={messages}>
-            <ThemeProvider
-              attribute='class'
-              defaultTheme='light'
-              enableSystem
-              disableTransitionOnChange
-              enableColorScheme
-            >
+            <ThemeProvider>
               <Providers>
                 <Toaster />
                 {children}

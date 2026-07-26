@@ -14,9 +14,13 @@ import { botsQueryOptions } from '../api/queries';
 import { BotListingContent } from './bot-listing-content';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export default function BotListing() {
+export default async function BotListing() {
   const queryClient = getQueryClient();
-  void queryClient.prefetchQuery(botsQueryOptions());
+  try {
+    await queryClient.prefetchQuery(botsQueryOptions());
+  } catch {
+    /* prefetch failed — client will fetch */
+  }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

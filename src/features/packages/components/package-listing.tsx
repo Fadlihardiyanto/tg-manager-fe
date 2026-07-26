@@ -10,10 +10,18 @@ import { groupsQueryOptions } from '@/features/groups/api/queries';
 import { PackageListingContent } from './package-listing-content';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export default function PackageListing() {
+export default async function PackageListing() {
   const queryClient = getQueryClient();
-  void queryClient.prefetchQuery(packagesQueryOptions());
-  void queryClient.prefetchQuery(groupsQueryOptions());
+  try {
+    await queryClient.prefetchQuery(packagesQueryOptions());
+  } catch {
+    /* prefetch failed */
+  }
+  try {
+    await queryClient.prefetchQuery(groupsQueryOptions());
+  } catch {
+    /* prefetch failed */
+  }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

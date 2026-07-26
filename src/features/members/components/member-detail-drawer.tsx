@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription
-} from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { useQueryState } from 'nuqs';
 import { MemberDetail } from './member-detail';
 import { Suspense } from 'react';

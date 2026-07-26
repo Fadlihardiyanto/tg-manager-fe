@@ -4,7 +4,6 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Carousel, CarouselApi, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import { cn } from '@/lib/utils';
 import { StarIcon } from 'lucide-react';
-import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 const testimonials = [
@@ -109,6 +108,7 @@ const Testimonial = () => {
             <button
               key={index}
               onClick={() => api?.scrollTo(index)}
+              aria-label={`Ulasan ${index + 1}`}
               className={cn('h-3.5 w-3.5 rounded-full border-2', {
                 'bg-primary border-primary': current === index + 1
               })}
@@ -130,6 +130,7 @@ const TestimonialCard = ({ testimonial }: { testimonial: (typeof testimonials)[n
           loop
           muted
           playsInline
+          aria-label='Demo Urator'
           className='absolute inset-0 w-full h-full object-cover rounded-xl'
         />
 

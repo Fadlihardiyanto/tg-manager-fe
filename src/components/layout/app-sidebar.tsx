@@ -50,7 +50,7 @@ function isActivePath(pathname: string, url: string) {
   const currentPath = normalizePathname(pathname);
   const targetPath = normalizePathname(url);
 
-  return currentPath === targetPath || currentPath.startsWith(`${targetPath}/`);
+  return currentPath === targetPath;
 }
 
 function AvatarInitial() {

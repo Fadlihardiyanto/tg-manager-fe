@@ -161,21 +161,79 @@ html {
   opacity: 0;
 }
 
+/* Scale-in animation for modals and cards */
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s ease-out forwards;
+}
+
+/* Slide-in from right */
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.4s ease-out forwards;
+}
+
+/* Shimmer effect for loading states */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 0%,
+    hsl(var(--muted-foreground) / 0.1) 50%,
+    hsl(var(--muted)) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-up,
   .animate-fade-up-delay-1,
   .animate-fade-up-delay-2,
-  .animate-fade-up-delay-3 {
+  .animate-fade-up-delay-3,
+  .animate-scale-in,
+  .animate-slide-in-right {
     animation: none;
     opacity: 1;
+    transform: none;
   }
-}
 
-@media (prefers-reduced-motion: reduce) {
   .animate-float-y,
   .animate-float-y-delay-1,
   .animate-float-y-delay-2,
   .animate-float-y-delay-3 {
+    animation: none;
+  }
+
+  .animate-shimmer {
     animation: none;
   }
 }

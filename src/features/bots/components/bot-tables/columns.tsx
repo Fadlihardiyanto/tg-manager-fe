@@ -2,17 +2,18 @@
 
 import { Badge } from '@/components/ui/badge';
 import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-header';
-import type { TelegramBot } from '../../api/types';
+import type { TelegramBot, BotRole } from '../../api/types';
 import type { Column, ColumnDef } from '@tanstack/react-table';
+import { BOT_ROLE_LABELS, BOT_ROLE_OPTIONS } from '../../api/types';
 import { Icons } from '@/components/icons';
 import { cn } from '@/lib/utils';
 import { formatDate } from '@/lib/format';
 import { CellAction } from './cell-action';
 
-const BOT_ROLE_LABELS: Record<string, string> = {
-  sales_only: 'Penjualan Saja',
-  gatekeeper_only: 'Penjaga',
-  all_in_one: 'Semua dalam Satu'
+const BOT_ROLE_STYLES: Record<BotRole, string> = {
+  sales_only: 'bg-sky-500/10 text-sky-600 border-sky-500/20 dark:text-sky-400',
+  gatekeeper_only: 'bg-violet-500/10 text-violet-600 border-violet-500/20 dark:text-violet-400',
+  all_in_one: 'bg-amber-500/10 text-amber-600 border-amber-500/20 dark:text-amber-400'
 };
 
 export function getColumns(onEdit: (bot: TelegramBot) => void): ColumnDef<TelegramBot>[] {
@@ -27,12 +28,28 @@ export function getColumns(onEdit: (bot: TelegramBot) => void): ColumnDef<Telegr
         const bot = row.original;
         return (
           <div className='flex items-center gap-3'>
-            <div
-              className={cn(
-                'flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10'
-              )}
-            >
-              <Icons.bot width={20} height={20} className='text-primary' />
+            <div className='relative'>
+              <div
+                className={cn(
+                  'flex size-10 shrink-0 items-center justify-center rounded-full transition-colors',
+                  bot.is_active
+                    ? 'bg-gradient-to-br from-primary/20 to-primary/5 ring-1 ring-primary/20'
+                    : 'bg-muted'
+                )}
+              >
+                <Icons.bot
+                  width={20}
+                  height={20}
+                  className={cn(bot.is_active ? 'text-primary' : 'text-muted-foreground')}
+                />
+              </div>
+              {/* Connection status indicator */}
+              <span
+                className={cn(
+                  'absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-background',
+                  bot.is_active ? 'bg-emerald-500' : 'bg-muted-foreground/40'
+                )}
+              />
             </div>
             <div>
               <h6 className='text-sm font-semibold'>@{bot.username}</h6>
@@ -59,20 +76,19 @@ export function getColumns(onEdit: (bot: TelegramBot) => void): ColumnDef<Telegr
       cell: ({ cell }) => {
         const role = cell.getValue<TelegramBot['bot_role']>();
         return (
-          <Badge variant='outline' className='capitalize'>
+          <Badge
+            variant='outline'
+            className={cn('capitalize font-medium', BOT_ROLE_STYLES[role] ?? '')}
+          >
             {BOT_ROLE_LABELS[role] ?? role}
           </Badge>
         );
       },
       enableColumnFilter: true,
       meta: {
-        label: 'Role',
+        label: 'Peran',
         variant: 'multiSelect',
-        options: [
-          { label: 'Sales Saja', value: 'sales_only' },
-          { label: 'Gatekeeper', value: 'gatekeeper_only' },
-          { label: 'Semua dalam Satu', value: 'all_in_one' }
-        ]
+        options: BOT_ROLE_OPTIONS
       }
     },
     {
@@ -90,7 +106,10 @@ export function getColumns(onEdit: (bot: TelegramBot) => void): ColumnDef<Telegr
           <Badge
             variant={isActive ? 'default' : 'outline'}
             className={cn(
-              isActive ? 'bg-primary/10 text-primary border-transparent' : 'text-muted-foreground'
+              'gap-1.5 font-medium transition-all',
+              isActive
+                ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500/15 dark:text-emerald-400'
+                : 'text-muted-foreground hover:bg-muted/50'
             )}
           >
             <StatusIcon className='size-3' />

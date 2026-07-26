@@ -6,10 +6,18 @@ import { botsQueryOptions } from '@/features/bots/api/queries';
 import { CommandListingContent } from './command-listing-content';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export default function CommandListing() {
+export default async function CommandListing() {
   const queryClient = getQueryClient();
-  void queryClient.prefetchQuery(commandsQueryOptions());
-  void queryClient.prefetchQuery(botsQueryOptions());
+  try {
+    await queryClient.prefetchQuery(commandsQueryOptions());
+  } catch {
+    /* prefetch failed */
+  }
+  try {
+    await queryClient.prefetchQuery(botsQueryOptions());
+  } catch {
+    /* prefetch failed */
+  }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

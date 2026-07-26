@@ -9,9 +9,13 @@ import { groupsQueryOptions } from '../api/queries';
 import { GroupListingContent } from './group-listing-content';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export default function GroupListing() {
+export default async function GroupListing() {
   const queryClient = getQueryClient();
-  void queryClient.prefetchQuery(groupsQueryOptions());
+  try {
+    await queryClient.prefetchQuery(groupsQueryOptions());
+  } catch {
+    /* prefetch failed — client will fetch */
+  }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

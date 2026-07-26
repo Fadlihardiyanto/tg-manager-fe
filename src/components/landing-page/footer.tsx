@@ -1,6 +1,7 @@
 import { Separator } from '@/components/ui/separator';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 import { Icons } from '@/components/icons';
 
 const Footer = () => {
@@ -40,9 +41,11 @@ const Footer = () => {
         <div className='flex flex-col max-w-sm'>
           {/* Logo */}
           <Link href='/'>
-            <img
+            <Image
               src='/uration-landscape.png'
               alt='Urator Logo'
+              width={160}
+              height={32}
               className='h-12 w-auto object-contain -ml-2'
             />
           </Link>
@@ -87,10 +90,20 @@ const Footer = () => {
 
         {/* Social Icons */}
         <div className='flex items-center gap-5 text-muted-foreground'>
-          <Link href='#' target='_blank' className='hover:text-sky-500 transition-colors'>
+          <Link
+            href='https://t.me/urator'
+            target='_blank'
+            rel='noopener noreferrer'
+            className='hover:text-sky-500 transition-colors'
+          >
             <Icons.telegram className='h-5 w-5' />
           </Link>
-          <Link href='#' target='_blank' className='hover:text-foreground transition-colors'>
+          <Link
+            href='https://twitter.com/urator'
+            target='_blank'
+            rel='noopener noreferrer'
+            className='hover:text-foreground transition-colors'
+          >
             <Icons.twitter className='h-5 w-5' />
           </Link>
         </div>

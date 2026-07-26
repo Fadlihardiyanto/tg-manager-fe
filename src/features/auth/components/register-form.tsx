@@ -3,8 +3,8 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { useStore } from '@tanstack/react-form';
-import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import { useAppForm } from '@/components/ui/tanstack-form';
 import { TextField } from '@/components/forms/fields';
@@ -78,9 +78,11 @@ const RegisterForm = () => {
       {/* BEGIN: Header Section */}
       <header className='flex flex-col items-center text-center mb-6'>
         <div className='relative flex items-center justify-center mb-4 h-16 w-full max-w-[250px]'>
-          <img
+          <Image
             src='/uration-blue-version.png'
             alt='Urator Logo'
+            width={160}
+            height={32}
             className='relative h-full w-auto object-contain'
           />
         </div>

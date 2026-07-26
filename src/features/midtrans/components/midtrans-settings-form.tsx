@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { toast } from 'sonner';
 import { useStore } from '@tanstack/react-form';
 import { useEffect, useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAppForm } from '@/components/ui/tanstack-form';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -21,10 +21,22 @@ import { Icons } from '@/components/icons';
 import { TextField } from '@/components/forms/fields';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
 import {
   initiatePaymentKeyExchange,
-  updateEncryptedPaymentSettings
+  updateEncryptedPaymentSettings,
+  updatePaymentSettings
 } from '@/features/onboarding/api/service';
 import {
   paymentSettingsKeys,
@@ -74,6 +86,10 @@ export function MidtransSettingsForm() {
 
   const [showSandboxKey, setShowSandboxKey] = useState(false);
   const [showProductionKey, setShowProductionKey] = useState(false);
+  const [showSwitchDialog, setShowSwitchDialog] = useState(false);
+  const [pendingEnvironment, setPendingEnvironment] = useState<'sandbox' | 'production' | null>(
+    null
+  );
 
   const settings = settingsResponse?.data;
 
@@ -88,6 +104,45 @@ export function MidtransSettingsForm() {
     settings?.has_production_client_key &&
     settings?.has_production_server_key
   );
+
+  // Environment switch mutation
+  const switchEnvironmentMutation = useMutation({
+    mutationFn: (isSandbox: boolean) => updatePaymentSettings({ is_sandbox: isSandbox }),
+    onSuccess: (res, isSandbox) => {
+      if (res.success) {
+        toast.success(`Berhasil switch ke ${isSandbox ? 'Sandbox' : 'Production'}`);
+        void queryClient.invalidateQueries({ queryKey: paymentSettingsKeys.all });
+        setShowSwitchDialog(false);
+        setPendingEnvironment(null);
+      } else {
+        toast.error(res.message || 'Gagal switch environment');
+      }
+    },
+    onError: () => {
+      toast.error('Gagal switch environment');
+      setShowSwitchDialog(false);
+      setPendingEnvironment(null);
+    }
+  });
+
+  const handleEnvironmentSwitch = (newEnv: 'sandbox' | 'production') => {
+    // Check if target environment is configured
+    const isConfigured = newEnv === 'sandbox' ? sandboxConfigured : productionConfigured;
+
+    if (!isConfigured) {
+      toast.error(`Kredensial ${newEnv === 'sandbox' ? 'Sandbox' : 'Production'} belum lengkap`);
+      return;
+    }
+
+    setPendingEnvironment(newEnv);
+    setShowSwitchDialog(true);
+  };
+
+  const confirmSwitch = () => {
+    if (pendingEnvironment) {
+      switchEnvironmentMutation.mutate(pendingEnvironment === 'sandbox');
+    }
+  };
 
   const form = useAppForm({
     defaultValues: {
@@ -216,7 +271,7 @@ export function MidtransSettingsForm() {
                 <form.AppField name='midtransEnvironment'>
                   {(field) => (
                     <div className='flex flex-col gap-2'>
-                      <Label className='text-sm font-medium'>Lingkungan Aktif</Label>
+                      <Label className='text-sm font-medium'>Edit Kredensial Environment</Label>
                       <div className='inline-flex items-center gap-2 rounded-full border bg-muted/50 p-0.5 w-fit'>
                         <button
                           type='button'
@@ -255,6 +310,9 @@ export function MidtransSettingsForm() {
                           Production
                         </button>
                       </div>
+                      <p className='text-xs text-muted-foreground'>
+                        Pilih environment yang ingin Anda edit kredensialnya
+                      </p>
                     </div>
                   )}
                 </form.AppField>
@@ -399,6 +457,98 @@ export function MidtransSettingsForm() {
 
       {/* ────── Sidebar ────── */}
       <div className='flex flex-col gap-6'>
+        {/* Quick Switch Card */}
+        <Card className='rounded-2xl border-border/70 shadow-sm'>
+          <CardHeader>
+            <CardTitle className='text-sm font-semibold'>Environment Aktif</CardTitle>
+            <CardDescription>Switch antara Sandbox dan Production</CardDescription>
+          </CardHeader>
+          <CardContent className='space-y-4'>
+            <div className='flex items-center justify-between'>
+              <div className='flex items-center gap-3'>
+                <div
+                  className={cn(
+                    'flex h-10 w-10 items-center justify-center rounded-lg',
+                    settings?.is_sandbox
+                      ? 'bg-sky-500/10 ring-1 ring-sky-500/20'
+                      : 'bg-violet-500/10 ring-1 ring-violet-500/20'
+                  )}
+                >
+                  {settings?.is_sandbox ? (
+                    <Icons.flask className='h-5 w-5 text-sky-600 dark:text-sky-400' />
+                  ) : (
+                    <Icons.rocket className='h-5 w-5 text-violet-600 dark:text-violet-400' />
+                  )}
+                </div>
+                <div>
+                  <p className='text-sm font-semibold'>
+                    {settings?.is_sandbox ? 'Sandbox' : 'Production'}
+                  </p>
+                  <p className='text-xs text-muted-foreground'>
+                    {settings?.is_sandbox ? 'Testing environment' : 'Live environment'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            <div className='space-y-3'>
+              <Label className='text-xs font-medium text-muted-foreground'>Switch ke:</Label>
+              <div className='flex flex-col gap-2'>
+                <Button
+                  type='button'
+                  variant='outline'
+                  size='sm'
+                  disabled={settings?.is_sandbox === true || switchEnvironmentMutation.isPending}
+                  onClick={() => handleEnvironmentSwitch('sandbox')}
+                  className={cn(
+                    'justify-start gap-2',
+                    !settings?.is_sandbox &&
+                      sandboxConfigured &&
+                      'border-sky-500/30 bg-sky-500/5 hover:bg-sky-500/10'
+                  )}
+                >
+                  <Icons.flask className='h-4 w-4 text-sky-600 dark:text-sky-400' />
+                  Sandbox
+                  {!sandboxConfigured && (
+                    <Badge variant='outline' className='ml-auto text-[10px]'>
+                      Belum lengkap
+                    </Badge>
+                  )}
+                </Button>
+                <Button
+                  type='button'
+                  variant='outline'
+                  size='sm'
+                  disabled={settings?.is_sandbox === false || switchEnvironmentMutation.isPending}
+                  onClick={() => handleEnvironmentSwitch('production')}
+                  className={cn(
+                    'justify-start gap-2',
+                    settings?.is_sandbox &&
+                      productionConfigured &&
+                      'border-violet-500/30 bg-violet-500/5 hover:bg-violet-500/10'
+                  )}
+                >
+                  <Icons.rocket className='h-4 w-4 text-violet-600 dark:text-violet-400' />
+                  Production
+                  {!productionConfigured && (
+                    <Badge variant='outline' className='ml-auto text-[10px]'>
+                      Belum lengkap
+                    </Badge>
+                  )}
+                </Button>
+              </div>
+              {switchEnvironmentMutation.isPending && (
+                <p className='text-xs text-muted-foreground flex items-center gap-1.5'>
+                  <Icons.spinner className='h-3 w-3 animate-spin' />
+                  Switching environment...
+                </p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Status Card */}
         <Card className='rounded-2xl border-border/70 shadow-sm'>
           <CardHeader>
@@ -443,13 +593,6 @@ export function MidtransSettingsForm() {
               ) : (
                 <span className='text-xs text-muted-foreground'>Belum diatur</span>
               )}
-            </div>
-            <Separator />
-            <div className='flex items-center justify-between'>
-              <span className='text-sm text-muted-foreground'>Lingkungan Aktif</span>
-              <Badge variant='secondary' className='text-xs font-medium'>
-                {env === 'sandbox' ? 'Sandbox' : 'Production'}
-              </Badge>
             </div>
           </CardContent>
         </Card>
@@ -512,6 +655,57 @@ export function MidtransSettingsForm() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Confirmation Dialog */}
+      <AlertDialog open={showSwitchDialog} onOpenChange={setShowSwitchDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Switch Environment?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Anda akan switch ke{' '}
+              <strong className='text-foreground'>
+                {pendingEnvironment === 'sandbox' ? 'Sandbox' : 'Production'}
+              </strong>
+              .
+              {pendingEnvironment === 'production' && (
+                <span className='block mt-2 text-amber-600 dark:text-amber-400 font-medium'>
+                  ⚠️ Production environment akan memproses transaksi nyata dengan uang asli.
+                </span>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={switchEnvironmentMutation.isPending}>
+              Batal
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmSwitch}
+              disabled={switchEnvironmentMutation.isPending}
+              className={cn(
+                pendingEnvironment === 'production'
+                  ? 'bg-violet-600 hover:bg-violet-700'
+                  : 'bg-sky-600 hover:bg-sky-700'
+              )}
+            >
+              {switchEnvironmentMutation.isPending ? (
+                <>
+                  <Icons.spinner className='mr-2 h-4 w-4 animate-spin' />
+                  Switching...
+                </>
+              ) : (
+                <>
+                  {pendingEnvironment === 'production' ? (
+                    <Icons.rocket className='mr-2 h-4 w-4' />
+                  ) : (
+                    <Icons.flask className='mr-2 h-4 w-4' />
+                  )}
+                  Switch ke {pendingEnvironment === 'sandbox' ? 'Sandbox' : 'Production'}
+                </>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

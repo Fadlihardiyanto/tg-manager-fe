@@ -1,0 +1,228 @@
+// ============================================================
+// Bot Card Grid — Client Component (card grid view)
+// ============================================================
+'use client';
+
+import { useState } from 'react';
+import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { toast } from 'sonner';
+
+import { AlertModal } from '@/components/modal/alert-modal';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+import { Icons } from '@/components/icons';
+import { cn } from '@/lib/utils';
+import { formatDate } from '@/lib/format';
+
+import { deleteBotMutation, updateBotMutation } from '../api/mutations';
+import { botKeys, botsQueryOptions } from '../api/queries';
+import type { BotRole, TelegramBot } from '../api/types';
+import { BOT_ROLE_LABELS } from '../api/types';
+
+const BOT_ROLE_STYLES: Record<BotRole, string> = {
+  sales_only: 'bg-sky-500/10 text-sky-600 border-sky-500/20 dark:text-sky-400',
+  gatekeeper_only: 'bg-violet-500/10 text-violet-600 border-violet-500/20 dark:text-violet-400',
+  all_in_one: 'bg-amber-500/10 text-amber-600 border-amber-500/20 dark:text-amber-400'
+};
+
+interface BotCardGridProps {
+  onEdit: (bot: TelegramBot) => void;
+}
+
+export function BotCardGrid({ onEdit }: BotCardGridProps) {
+  const { data } = useSuspenseQuery(botsQueryOptions());
+  const bots = data.data ?? [];
+
+  if (bots.length === 0) {
+    return (
+      <div className='flex flex-col items-center justify-center rounded-xl border border-dashed border-border/70 bg-muted/20 p-10 text-center'>
+        <div className='flex size-12 items-center justify-center rounded-full bg-muted'>
+          <Icons.bot className='size-6 text-muted-foreground' />
+        </div>
+        <p className='mt-3 font-medium text-foreground'>Belum ada bot</p>
+        <p className='mt-1 text-sm text-muted-foreground'>
+          Tambahkan bot Telegram pertama Anda untuk mulai mengelola grup.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className='grid gap-4 sm:grid-cols-2 xl:grid-cols-3'>
+      {bots.map((bot) => (
+        <BotCard key={bot.id} bot={bot} onEdit={onEdit} />
+      ))}
+    </div>
+  );
+}
+
+interface BotCardProps {
+  bot: TelegramBot;
+  onEdit: (bot: TelegramBot) => void;
+}
+
+function BotCard({ bot, onEdit }: BotCardProps) {
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [toggleOpen, setToggleOpen] = useState(false);
+  const queryClient = useQueryClient();
+
+  const deleteMutation = useMutation({
+    ...deleteBotMutation,
+    onSuccess: () => {
+      toast.success('Bot berhasil dihapus');
+      setDeleteOpen(false);
+      void queryClient.invalidateQueries({ queryKey: botKeys.all });
+    },
+    onError: () => {
+      toast.error('Gagal menghapus bot');
+    }
+  });
+
+  const toggleActiveMutation = useMutation({
+    ...updateBotMutation,
+    onSuccess: () => {
+      toast.success(bot.is_active ? 'Bot berhasil dinonaktifkan' : 'Bot berhasil diaktifkan');
+      setToggleOpen(false);
+      void queryClient.invalidateQueries({ queryKey: botKeys.all });
+    },
+    onError: () => {
+      toast.error('Gagal memperbarui status bot');
+    }
+  });
+
+  const StatusIcon = bot.is_active ? Icons.circleCheck : Icons.xCircle;
+
+  return (
+    <>
+      <AlertModal
+        isOpen={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        onConfirm={() => deleteMutation.mutate(bot.id)}
+        loading={deleteMutation.isPending}
+      />
+      <AlertModal
+        isOpen={toggleOpen}
+        onClose={() => setToggleOpen(false)}
+        onConfirm={() =>
+          toggleActiveMutation.mutate({
+            id: bot.id,
+            values: { is_active: !bot.is_active }
+          })
+        }
+        loading={toggleActiveMutation.isPending}
+      />
+
+      <div className='group flex flex-col rounded-xl border border-border/70 bg-card p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md'>
+        {/* Top row: avatar + identity + dropdown */}
+        <div className='flex items-start justify-between'>
+          <div className='flex items-center gap-3'>
+            <div className='relative'>
+              <div
+                className={cn(
+                  'flex size-11 shrink-0 items-center justify-center rounded-xl transition-colors',
+                  bot.is_active
+                    ? 'bg-gradient-to-br from-primary/20 to-primary/5 ring-1 ring-primary/20'
+                    : 'bg-muted'
+                )}
+              >
+                <Icons.bot
+                  width={22}
+                  height={22}
+                  className={cn(bot.is_active ? 'text-primary' : 'text-muted-foreground')}
+                />
+              </div>
+              <span
+                className={cn(
+                  'absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-background',
+                  bot.is_active ? 'bg-emerald-500' : 'bg-muted-foreground/40'
+                )}
+              />
+            </div>
+            <div>
+              <h6 className='text-sm font-semibold'>@{bot.username}</h6>
+              <p className='text-xs text-muted-foreground'>ID: {bot.telegram_bot_id}</p>
+            </div>
+          </div>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant='ghost' size='icon' className='size-8 opacity-60 hover:opacity-100'>
+                <Icons.ellipsis className='size-4' />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align='end'>
+              <DropdownMenuItem onClick={() => onEdit(bot)}>
+                <Icons.edit className='mr-2 size-4' />
+                Ubah
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setToggleOpen(true)}>
+                {bot.is_active ? (
+                  <Icons.circleX className='mr-2 size-4' />
+                ) : (
+                  <Icons.circleCheck className='mr-2 size-4' />
+                )}
+                {bot.is_active ? 'Nonaktifkan' : 'Aktifkan'}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className='text-destructive focus:text-destructive'
+                onClick={() => setDeleteOpen(true)}
+              >
+                <Icons.trash className='mr-2 size-4' />
+                Hapus
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        {/* Middle row: status + role badges */}
+        <div className='mt-4 flex items-center justify-between'>
+          <Badge
+            variant={bot.is_active ? 'default' : 'outline'}
+            className={cn(
+              'gap-1.5 font-medium transition-all',
+              bot.is_active
+                ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500/15 dark:text-emerald-400'
+                : 'text-muted-foreground hover:bg-muted/50'
+            )}
+          >
+            <StatusIcon className='size-3' />
+            {bot.is_active ? 'Aktif' : 'Nonaktif'}
+          </Badge>
+          <Badge
+            variant='outline'
+            className={cn('font-medium', BOT_ROLE_STYLES[bot.bot_role] ?? '')}
+          >
+            {BOT_ROLE_LABELS[bot.bot_role] ?? bot.bot_role}
+          </Badge>
+        </div>
+
+        {/* Footer: created date + Kelola */}
+        <div className='mt-4 flex items-center justify-between border-t border-border/70 pt-3 text-xs text-muted-foreground'>
+          <span>
+            Dibuat{' '}
+            {formatDate(bot.created_at, {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric'
+            })}
+          </span>
+          <button
+            type='button'
+            className='font-medium text-primary hover:underline'
+            onClick={() => onEdit(bot)}
+          >
+            Kelola
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}

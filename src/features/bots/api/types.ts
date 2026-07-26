@@ -59,3 +59,17 @@ export type BotsListResponse = ApiResponse<TelegramBot[]>;
 // ─── Single Response ────────────────────────────────────────────────
 
 export type BotResponse = ApiResponse<TelegramBot>;
+
+// ─── Shared Display Constants ───────────────────────────────────────
+
+export const BOT_ROLE_LABELS: Record<BotRole, string> = {
+  sales_only: 'Penjualan',
+  gatekeeper_only: 'Gatekeeper',
+  all_in_one: 'Semua Fungsi'
+};
+
+export const BOT_ROLE_OPTIONS = [
+  { value: 'sales_only', label: 'Penjualan' },
+  { value: 'gatekeeper_only', label: 'Gatekeeper' },
+  { value: 'all_in_one', label: 'Semua Fungsi' }
+];

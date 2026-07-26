@@ -19,6 +19,7 @@ interface CellActionProps {
 
 export function CellAction({ data, onEdit }: CellActionProps) {
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [toggleOpen, setToggleOpen] = useState(false);
   const queryClient = useQueryClient();
 
   const deleteMutation = useMutation({
@@ -37,6 +38,7 @@ export function CellAction({ data, onEdit }: CellActionProps) {
     ...updateBotMutation,
     onSuccess: () => {
       toast.success(data.is_active ? 'Bot berhasil dinonaktifkan' : 'Bot berhasil diaktifkan');
+      setToggleOpen(false);
       void queryClient.invalidateQueries({ queryKey: botKeys.all });
     },
     onError: () => {
@@ -51,6 +53,17 @@ export function CellAction({ data, onEdit }: CellActionProps) {
         onClose={() => setDeleteOpen(false)}
         onConfirm={() => deleteMutation.mutate(data.id)}
         loading={deleteMutation.isPending}
+      />
+      <AlertModal
+        isOpen={toggleOpen}
+        onClose={() => setToggleOpen(false)}
+        onConfirm={() =>
+          toggleActiveMutation.mutate({
+            id: data.id,
+            values: { is_active: !data.is_active }
+          })
+        }
+        loading={toggleActiveMutation.isPending}
       />
       <div className='flex items-center gap-2'>
         {onEdit && (
@@ -74,12 +87,7 @@ export function CellAction({ data, onEdit }: CellActionProps) {
               variant='ghost'
               size='icon'
               className='size-9 min-w-9 min-h-9'
-              onClick={() =>
-                toggleActiveMutation.mutate({
-                  id: data.id,
-                  values: { is_active: !data.is_active }
-                })
-              }
+              onClick={() => setToggleOpen(true)}
             >
               {data.is_active ? (
                 <Icons.circleX className='h-4 w-4 text-muted-foreground hover:text-destructive' />

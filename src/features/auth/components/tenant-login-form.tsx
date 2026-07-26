@@ -28,7 +28,7 @@ function isUnverifiedEmailError(message: string): boolean {
   );
 }
 
-export function TenantLoginForm({ className, ...props }: React.ComponentProps<'form'>) {
+export function TenantLoginForm({ ...props }: React.ComponentProps<'form'>) {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const loginMutation = useLoginMutation();

@@ -82,8 +82,17 @@ export const columns: ColumnDef<Member>[] = [
         `${row.original.first_name?.[0] || ''}${row.original.last_name?.[0] || ''}`.toUpperCase();
       return (
         <div className='flex gap-3 items-center'>
-          <div className='flex size-8 items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-[12px]'>
-            {initials}
+          <div className='relative'>
+            <div className='flex size-10 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/5 ring-2 ring-primary/10 text-primary font-bold text-sm'>
+              {initials}
+            </div>
+            {/* Online indicator */}
+            <span
+              className={cn(
+                'absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-background',
+                row.original.global_status ? 'bg-emerald-500' : 'bg-muted-foreground/40'
+              )}
+            />
           </div>
           <div className='max-w-56 truncate'>
             <p className='text-sm font-bold text-foreground'>

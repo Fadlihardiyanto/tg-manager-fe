@@ -167,12 +167,15 @@ export function ConnectGroupModal({ open, onOpenChange }: ConnectGroupModalProps
                 preload='metadata'
               >
                 Browser tidak mendukung video.
+                <track kind='captions' />
               </video>
             </div>
           )}
 
           <div className='space-y-2'>
-            <label className='text-sm font-medium'>Pilih Bot</label>
+            <label htmlFor='connect-select-bot' className='text-sm font-medium'>
+              Pilih Bot
+            </label>
             <Select
               value={selectedBotId}
               onValueChange={(v) => {

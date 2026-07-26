@@ -25,7 +25,7 @@ export function MembersTable({ filters }: { filters: MemberFilters }) {
     parseAsString.withOptions({ shallow: true, history: 'replace' })
   );
 
-  const { data, isLoading, isError } = useQuery(membersQueryOptions(filters));
+  const { data, isError } = useQuery(membersQueryOptions(filters));
   const { data: packagesData } = useQuery(packagesQueryOptions());
   const packages = packagesData?.data ?? [];
 

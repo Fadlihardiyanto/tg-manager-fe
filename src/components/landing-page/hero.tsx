@@ -49,6 +49,7 @@ const Hero = () => {
               loop
               muted
               playsInline
+              aria-label='Demo Urator platform'
               className='absolute inset-0 w-full h-full object-cover'
             />
           </div>

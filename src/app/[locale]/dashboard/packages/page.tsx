@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function PackagesPage() {
   return (
-    <PageContainer pageTitle='Packages'>
+    <PageContainer pageTitle='Packages' pageDescription='Kelola paket langganan dan harga'>
       <PackageListing />
     </PageContainer>
   );

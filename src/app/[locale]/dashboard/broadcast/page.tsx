@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function BroadcastPage() {
   return (
-    <PageContainer pageTitle='Broadcast'>
+    <PageContainer pageTitle='Broadcast' pageDescription='Kirim pesan broadcast ke semua member'>
       <BroadcastListingContent />
     </PageContainer>
   );

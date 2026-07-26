@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import { useAppForm } from '@/components/ui/tanstack-form';
@@ -9,7 +10,7 @@ import { TextField } from '@/components/forms/fields';
 import { forgotPasswordSchema, type ForgotPasswordInput } from '../schemas/auth-schema';
 import { forgotPassword } from '../api/service';
 
-export function ForgotPasswordForm({ className, ...props }: React.ComponentProps<'form'>) {
+export function ForgotPasswordForm({ ...props }: React.ComponentProps<'form'>) {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -81,9 +82,11 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
       {/* BEGIN: Header Section */}
       <header className='flex flex-col items-center text-center mb-6'>
         <div className='relative flex items-center justify-center mb-4 h-16 w-full max-w-[250px]'>
-          <img
+          <Image
             src='/uration-blue-version.png'
             alt='Urator Logo'
+            width={160}
+            height={32}
             className='relative h-full w-auto object-contain'
           />
         </div>
@@ -98,7 +101,7 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
           {/* Email */}
           <form.AppField
             name='email'
-            children={(field) => (
+            children={(_field) => (
               <TextField
                 label=''
                 type='email'

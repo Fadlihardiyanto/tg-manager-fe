@@ -5,6 +5,7 @@
 
 import { useCallback, useState } from 'react';
 import { BotTable } from './bot-tables';
+import { BotStats } from './bot-stats';
 import { BotFormDialog } from './bot-form-dialog';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
@@ -38,20 +39,23 @@ export function BotListingContent() {
 
   return (
     <div className='flex min-h-0 flex-1 flex-col gap-4'>
-      <BotTable
-        onEdit={handleEdit}
-        notice={<QuotaCard resource='bots' title='Kuota bot' />}
-        toolbarActions={
-          <Button onClick={handleAdd} size='sm' disabled={!canCreateBot} className='rounded-full'>
-            {canCreateBot ? (
-              <Icons.add className='mr-2 h-4 w-4' />
-            ) : (
-              <Icons.lock className='mr-2 h-4 w-4' />
-            )}
-            {canCreateBot ? 'Tambah Bot' : 'Limit Tercapai'}
-          </Button>
-        }
-      />
+      <BotStats />
+      <div className='animate-fade-up-delay-3 flex min-h-0 flex-1 flex-col'>
+        <BotTable
+          onEdit={handleEdit}
+          notice={<QuotaCard resource='bots' title='Kuota bot' />}
+          toolbarActions={
+            <Button onClick={handleAdd} size='sm' disabled={!canCreateBot} className='rounded-full'>
+              {canCreateBot ? (
+                <Icons.add className='mr-2 h-4 w-4' />
+              ) : (
+                <Icons.lock className='mr-2 h-4 w-4' />
+              )}
+              {canCreateBot ? 'Tambah Bot' : 'Limit Tercapai'}
+            </Button>
+          }
+        />
+      </div>
 
       <BotFormDialog bot={editingBot} open={dialogOpen} onOpenChange={handleDialogChange} />
     </div>

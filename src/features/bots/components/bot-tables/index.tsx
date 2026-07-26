@@ -34,12 +34,7 @@ export function BotTable({ onEdit, toolbarActions, notice }: BotTableProps) {
   });
 
   return (
-    <DataTable
-      table={table}
-      notice={notice}
-      title='Daftar Bot'
-      description='Kelola bot Telegram, peran, dan status koneksinya.'
-    >
+    <DataTable table={table} notice={notice}>
       <DataTableToolbar table={table}>{toolbarActions}</DataTableToolbar>
     </DataTable>
   );

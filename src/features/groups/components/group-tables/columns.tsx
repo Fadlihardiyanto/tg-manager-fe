@@ -22,9 +22,11 @@ export function getColumns(onEdit?: (group: TelegramGroup) => void): ColumnDef<T
       accessorKey: 'name',
       header: ({ column }) => <DataTableColumnHeader column={column} title='Nama Grup' />,
       cell: ({ row }) => (
-        <div className='flex items-center gap-2'>
-          <Icons.teams className='size-4 text-muted-foreground' />
-          <span className='font-medium'>{row.getValue('name')}</span>
+        <div className='flex items-center gap-3'>
+          <div className='flex size-9 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500/15 to-violet-500/5 ring-1 ring-violet-500/20'>
+            <Icons.teams className='size-4 text-violet-600 dark:text-violet-400' />
+          </div>
+          <span className='font-semibold'>{row.getValue('name')}</span>
         </div>
       ),
       meta: {
@@ -70,7 +72,24 @@ export function getColumns(onEdit?: (group: TelegramGroup) => void): ColumnDef<T
       id: 'member_count',
       accessorKey: 'member_count',
       header: ({ column }) => <DataTableColumnHeader column={column} title='Member' />,
-      cell: ({ cell }) => <Badge variant='secondary'>{cell.getValue<number>()}</Badge>,
+      cell: ({ cell }) => {
+        const count = cell.getValue<number>();
+        return (
+          <Badge
+            variant='secondary'
+            className={cn(
+              'font-semibold tabular-nums',
+              count >= 100
+                ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:text-emerald-400'
+                : count >= 50
+                  ? 'bg-sky-500/10 text-sky-600 border-sky-500/20 dark:text-sky-400'
+                  : ''
+            )}
+          >
+            {count}
+          </Badge>
+        );
+      },
       enableSorting: true,
       enableColumnFilter: false
     },
@@ -85,7 +104,10 @@ export function getColumns(onEdit?: (group: TelegramGroup) => void): ColumnDef<T
           <Badge
             variant={isActive ? 'default' : 'outline'}
             className={cn(
-              isActive ? 'bg-primary/10 text-primary border-transparent' : 'text-muted-foreground'
+              'gap-1.5 font-medium transition-all',
+              isActive
+                ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500/15 dark:text-emerald-400'
+                : 'text-muted-foreground hover:bg-muted/50'
             )}
           >
             <Icon className='size-3' />

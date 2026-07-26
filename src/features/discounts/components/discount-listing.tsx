@@ -9,9 +9,13 @@ import { discountsQueryOptions } from '../api/queries';
 import { DiscountListingContent } from './discount-listing-content';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export default function DiscountListing() {
+export default async function DiscountListing() {
   const queryClient = getQueryClient();
-  void queryClient.prefetchQuery(discountsQueryOptions());
+  try {
+    await queryClient.prefetchQuery(discountsQueryOptions());
+  } catch {
+    /* prefetch failed — client will fetch */
+  }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
