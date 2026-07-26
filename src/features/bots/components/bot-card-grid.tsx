@@ -23,6 +23,7 @@ import { formatDate } from '@/lib/format';
 
 import { deleteBotMutation, updateBotMutation } from '../api/mutations';
 import { botKeys, botsQueryOptions } from '../api/queries';
+import { groupsQueryOptions } from '@/features/groups/api/queries';
 import type { BotRole, TelegramBot } from '../api/types';
 import { BOT_ROLE_LABELS } from '../api/types';
 
@@ -32,13 +33,28 @@ const BOT_ROLE_STYLES: Record<BotRole, string> = {
   all_in_one: 'bg-amber-500/10 text-amber-600 border-amber-500/20 dark:text-amber-400'
 };
 
+const BOT_ROLE_STRIPE: Record<BotRole, string> = {
+  sales_only: 'from-sky-400 to-sky-500',
+  gatekeeper_only: 'from-violet-400 to-violet-500',
+  all_in_one: 'from-amber-400 to-amber-500'
+};
+
 interface BotCardGridProps {
   onEdit: (bot: TelegramBot) => void;
 }
 
 export function BotCardGrid({ onEdit }: BotCardGridProps) {
-  const { data } = useSuspenseQuery(botsQueryOptions());
-  const bots = data.data ?? [];
+  const { data: botsData } = useSuspenseQuery(botsQueryOptions());
+  const { data: groupsData } = useSuspenseQuery(groupsQueryOptions());
+
+  const bots = botsData.data ?? [];
+  const groups = groupsData.data ?? [];
+
+  // Compute group counts per bot
+  const groupCountByBotId = new Map<string, number>();
+  for (const group of groups) {
+    groupCountByBotId.set(group.bot_id, (groupCountByBotId.get(group.bot_id) ?? 0) + 1);
+  }
 
   if (bots.length === 0) {
     return (
@@ -55,9 +71,15 @@ export function BotCardGrid({ onEdit }: BotCardGridProps) {
   }
 
   return (
-    <div className='grid gap-4 sm:grid-cols-2 xl:grid-cols-3'>
-      {bots.map((bot) => (
-        <BotCard key={bot.id} bot={bot} onEdit={onEdit} />
+    <div className='grid gap-5 sm:grid-cols-2 xl:grid-cols-3'>
+      {bots.map((bot, i) => (
+        <BotCard
+          key={bot.id}
+          bot={bot}
+          groupCount={groupCountByBotId.get(bot.id) ?? 0}
+          onEdit={onEdit}
+          index={i}
+        />
       ))}
     </div>
   );
@@ -65,10 +87,12 @@ export function BotCardGrid({ onEdit }: BotCardGridProps) {
 
 interface BotCardProps {
   bot: TelegramBot;
+  groupCount: number;
   onEdit: (bot: TelegramBot) => void;
+  index: number;
 }
 
-function BotCard({ bot, onEdit }: BotCardProps) {
+function BotCard({ bot, groupCount, onEdit, index }: BotCardProps) {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [toggleOpen, setToggleOpen] = useState(false);
   const queryClient = useQueryClient();
@@ -97,7 +121,12 @@ function BotCard({ bot, onEdit }: BotCardProps) {
     }
   });
 
-  const StatusIcon = bot.is_active ? Icons.circleCheck : Icons.xCircle;
+  const StatusIcon = bot.is_active ? Icons.circleCheck : Icons.circleX;
+  const animClass = index < 4 ? `animate-fade-up-delay-${index}` : 'animate-fade-up';
+  const toggleTitle = bot.is_active ? 'Nonaktifkan bot?' : 'Aktifkan bot?';
+  const toggleDesc = bot.is_active
+    ? `Bot @${bot.username} akan berhenti memproses pesan. Anda dapat mengaktifkannya kembali kapan saja.`
+    : `Bot @${bot.username} akan mulai memproses pesan. Anda dapat menonaktifkannya kapan saja.`;
 
   return (
     <>
@@ -117,110 +146,146 @@ function BotCard({ bot, onEdit }: BotCardProps) {
           })
         }
         loading={toggleActiveMutation.isPending}
+        confirmVariant='default'
+        title={toggleTitle}
+        description={toggleDesc}
       />
 
-      <div className='group flex flex-col rounded-xl border border-border/70 bg-card p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md'>
-        {/* Top row: avatar + identity + dropdown */}
-        <div className='flex items-start justify-between'>
-          <div className='flex items-center gap-3'>
-            <div className='relative'>
-              <div
-                className={cn(
-                  'flex size-11 shrink-0 items-center justify-center rounded-xl transition-colors',
-                  bot.is_active
-                    ? 'bg-gradient-to-br from-primary/20 to-primary/5 ring-1 ring-primary/20'
-                    : 'bg-muted'
-                )}
-              >
-                <Icons.bot
-                  width={22}
-                  height={22}
-                  className={cn(bot.is_active ? 'text-primary' : 'text-muted-foreground')}
+      <div
+        className={cn(
+          'group relative flex flex-col rounded-xl border border-border/70 bg-card shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-primary/20',
+          !bot.is_active && 'opacity-75',
+          animClass
+        )}
+      >
+        {/* Role accent stripe */}
+        <div
+          className={cn(
+            'h-1.5 w-full rounded-t-xl bg-gradient-to-r',
+            BOT_ROLE_STRIPE[bot.bot_role]
+          )}
+        />
+
+        <div className='flex flex-1 flex-col p-5'>
+          {/* Top row: avatar + identity + dropdown */}
+          <div className='flex items-start justify-between'>
+            <div className='flex items-center gap-3'>
+              <div className='relative'>
+                <div
+                  className={cn(
+                    'flex size-12 shrink-0 items-center justify-center rounded-xl transition-colors',
+                    bot.is_active
+                      ? 'bg-gradient-to-br from-primary/20 to-primary/5 ring-1 ring-primary/20'
+                      : 'bg-muted'
+                  )}
+                >
+                  <Icons.bot
+                    className={cn(
+                      'size-7',
+                      bot.is_active ? 'text-primary' : 'text-muted-foreground'
+                    )}
+                  />
+                </div>
+                <span
+                  className={cn(
+                    'absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-background',
+                    bot.is_active ? 'bg-emerald-500' : 'bg-muted-foreground/40'
+                  )}
                 />
               </div>
-              <span
-                className={cn(
-                  'absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-background',
-                  bot.is_active ? 'bg-emerald-500' : 'bg-muted-foreground/40'
-                )}
-              />
+              <div>
+                <h6 className='text-base font-semibold'>@{bot.username}</h6>
+                <p className='text-xs text-muted-foreground'>ID: {bot.telegram_bot_id}</p>
+              </div>
             </div>
-            <div>
-              <h6 className='text-sm font-semibold'>@{bot.username}</h6>
-              <p className='text-xs text-muted-foreground'>ID: {bot.telegram_bot_id}</p>
-            </div>
+
+            <DropdownMenu modal={false}>
+              <DropdownMenuTrigger asChild>
+                <Button variant='ghost' size='icon' className='size-8 opacity-60 hover:opacity-100'>
+                  <Icons.ellipsis className='size-4' />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align='end'>
+                <DropdownMenuItem onClick={() => onEdit(bot)}>
+                  <Icons.edit className='mr-2 size-4' />
+                  Ubah
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setToggleOpen(true)}>
+                  {bot.is_active ? (
+                    <Icons.circleX className='mr-2 size-4' />
+                  ) : (
+                    <Icons.circleCheck className='mr-2 size-4' />
+                  )}
+                  {bot.is_active ? 'Nonaktifkan' : 'Aktifkan'}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className='text-destructive focus:text-destructive'
+                  onClick={() => setDeleteOpen(true)}
+                >
+                  <Icons.trash className='mr-2 size-4' />
+                  Hapus
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant='ghost' size='icon' className='size-8 opacity-60 hover:opacity-100'>
-                <Icons.ellipsis className='size-4' />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align='end'>
-              <DropdownMenuItem onClick={() => onEdit(bot)}>
-                <Icons.edit className='mr-2 size-4' />
-                Ubah
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setToggleOpen(true)}>
-                {bot.is_active ? (
-                  <Icons.circleX className='mr-2 size-4' />
-                ) : (
-                  <Icons.circleCheck className='mr-2 size-4' />
-                )}
-                {bot.is_active ? 'Nonaktifkan' : 'Aktifkan'}
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className='text-destructive focus:text-destructive'
-                onClick={() => setDeleteOpen(true)}
-              >
-                <Icons.trash className='mr-2 size-4' />
-                Hapus
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+          {/* Badges: status + role */}
+          <div className='mt-4 flex items-center gap-2.5'>
+            <Badge
+              variant={bot.is_active ? 'default' : 'outline'}
+              className={cn(
+                'gap-1.5 font-medium transition-all',
+                bot.is_active
+                  ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500/15 dark:text-emerald-400'
+                  : 'text-muted-foreground hover:bg-muted/50'
+              )}
+            >
+              <StatusIcon className='size-3' />
+              {bot.is_active ? 'Aktif' : 'Nonaktif'}
+            </Badge>
+            <Badge
+              variant='outline'
+              className={cn('font-medium', BOT_ROLE_STYLES[bot.bot_role] ?? '')}
+            >
+              {BOT_ROLE_LABELS[bot.bot_role] ?? bot.bot_role}
+            </Badge>
+          </div>
 
-        {/* Middle row: status + role badges */}
-        <div className='mt-4 flex items-center justify-between'>
-          <Badge
-            variant={bot.is_active ? 'default' : 'outline'}
-            className={cn(
-              'gap-1.5 font-medium transition-all',
-              bot.is_active
-                ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500/15 dark:text-emerald-400'
-                : 'text-muted-foreground hover:bg-muted/50'
-            )}
-          >
-            <StatusIcon className='size-3' />
-            {bot.is_active ? 'Aktif' : 'Nonaktif'}
-          </Badge>
-          <Badge
-            variant='outline'
-            className={cn('font-medium', BOT_ROLE_STYLES[bot.bot_role] ?? '')}
-          >
-            {BOT_ROLE_LABELS[bot.bot_role] ?? bot.bot_role}
-          </Badge>
-        </div>
+          {/* Group count */}
+          <div className='mt-3'>
+            <span className='inline-flex items-center gap-1.5 rounded-md bg-muted/40 px-2 py-1 text-xs text-muted-foreground'>
+              <Icons.groups className='size-3.5' />
+              {groupCount > 0 ? (
+                <>
+                  <span className='font-medium text-foreground tabular-nums'>{groupCount}</span>
+                  grup
+                </>
+              ) : (
+                'Belum ada grup'
+              )}
+            </span>
+          </div>
 
-        {/* Footer: created date + Kelola */}
-        <div className='mt-4 flex items-center justify-between border-t border-border/70 pt-3 text-xs text-muted-foreground'>
-          <span>
-            Dibuat{' '}
-            {formatDate(bot.created_at, {
-              month: 'short',
-              day: 'numeric',
-              year: 'numeric'
-            })}
-          </span>
-          <button
-            type='button'
-            className='font-medium text-primary hover:underline'
-            onClick={() => onEdit(bot)}
-          >
-            Kelola
-          </button>
+          {/* Footer: created date + Kelola */}
+          <div className='mt-auto flex items-center justify-between border-t border-border/40 pt-4 text-xs text-muted-foreground'>
+            <span className='flex items-center gap-1.5'>
+              <Icons.calendar className='size-3' />
+              {formatDate(bot.created_at, {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+              })}
+            </span>
+            <button
+              type='button'
+              className='flex items-center gap-1 font-medium text-primary transition-colors hover:text-primary/80'
+              onClick={() => onEdit(bot)}
+            >
+              Kelola
+              <Icons.chevronRight className='size-3' />
+            </button>
+          </div>
         </div>
       </div>
     </>

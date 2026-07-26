@@ -11,13 +11,17 @@ import { Suspense } from 'react';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { getQueryClient } from '@/lib/query-client';
 import { botsQueryOptions } from '../api/queries';
+import { groupsQueryOptions } from '@/features/groups/api/queries';
 import { BotListingContent } from './bot-listing-content';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default async function BotListing() {
   const queryClient = getQueryClient();
   try {
-    await queryClient.prefetchQuery(botsQueryOptions());
+    await Promise.all([
+      queryClient.prefetchQuery(botsQueryOptions()),
+      queryClient.prefetchQuery(groupsQueryOptions())
+    ]);
   } catch {
     /* prefetch failed — client will fetch */
   }

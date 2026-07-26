@@ -4,7 +4,7 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { BotTable } from './bot-tables';
+import { BotCardGrid } from './bot-card-grid';
 import { BotStats } from './bot-stats';
 import { BotFormDialog } from './bot-form-dialog';
 import { Button } from '@/components/ui/button';
@@ -27,7 +27,6 @@ export function BotListingContent() {
   const handleDialogChange = useCallback((open: boolean) => {
     setDialogOpen(open);
     if (!open) {
-      // Delay clearing to avoid flash
       setTimeout(() => setEditingBot(null), 200);
     }
   }, []);
@@ -40,21 +39,23 @@ export function BotListingContent() {
   return (
     <div className='flex min-h-0 flex-1 flex-col gap-4'>
       <BotStats />
+
+      <div className='animate-fade-up-delay-3 flex items-center justify-between gap-3'>
+        <div className='flex-1'>
+          <QuotaCard resource='bots' title='Kuota bot' />
+        </div>
+        <Button onClick={handleAdd} disabled={!canCreateBot} className='rounded-full shrink-0'>
+          {canCreateBot ? (
+            <Icons.add className='mr-2 h-4 w-4' />
+          ) : (
+            <Icons.lock className='mr-2 h-4 w-4' />
+          )}
+          {canCreateBot ? 'Tambah Bot' : 'Limit Tercapai'}
+        </Button>
+      </div>
+
       <div className='animate-fade-up-delay-3 flex min-h-0 flex-1 flex-col'>
-        <BotTable
-          onEdit={handleEdit}
-          notice={<QuotaCard resource='bots' title='Kuota bot' />}
-          toolbarActions={
-            <Button onClick={handleAdd} size='sm' disabled={!canCreateBot} className='rounded-full'>
-              {canCreateBot ? (
-                <Icons.add className='mr-2 h-4 w-4' />
-              ) : (
-                <Icons.lock className='mr-2 h-4 w-4' />
-              )}
-              {canCreateBot ? 'Tambah Bot' : 'Limit Tercapai'}
-            </Button>
-          }
-        />
+        <BotCardGrid onEdit={handleEdit} />
       </div>
 
       <BotFormDialog bot={editingBot} open={dialogOpen} onOpenChange={handleDialogChange} />

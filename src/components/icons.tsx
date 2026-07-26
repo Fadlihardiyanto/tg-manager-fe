@@ -118,6 +118,7 @@ import {
   IconCoin,
   IconUsersGroup
 } from '@tabler/icons-react';
+import { Bot } from 'lucide-react';
 
 export type Icon = React.ComponentType<IconProps>;
 
@@ -273,7 +274,7 @@ export const Icons = {
   bolt: IconBolt,
   messages: IconMessages,
   clipboardCopy: IconClipboardCopy,
-  bot: IconRobot,
+  bot: Bot,
   shieldLock: IconShieldLock,
   clipboardList: IconClipboardList,
   command: IconCommand,
