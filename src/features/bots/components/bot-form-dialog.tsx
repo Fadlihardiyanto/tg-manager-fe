@@ -197,6 +197,7 @@ function BotEditTabs({
   canCreateBot
 }: {
   bot: TelegramBot;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- form API type is invariant in its type parameter
   form: any;
   isPending: boolean;
   canCreateBot: boolean;
