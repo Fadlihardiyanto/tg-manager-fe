@@ -100,6 +100,8 @@ export function BulkActionBar({
         setIsKickModalOpen(false);
         setKickMode('all');
         setSelectedPackageId('');
+      } else {
+        toast.error(res.message || 'Gagal mengeluarkan member');
       }
     } catch {
       toast.error('Gagal mengeluarkan member');

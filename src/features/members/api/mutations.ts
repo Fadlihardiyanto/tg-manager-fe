@@ -29,7 +29,10 @@ export const manualSyncMutation = mutationOptions({
 
 export const resendLinkMutation = mutationOptions({
   mutationFn: ({ id, subscriptionId }: { id: string; subscriptionId?: string }) =>
-    resendLink(id, subscriptionId)
+    resendLink(id, subscriptionId),
+  onSuccess: () => {
+    getQueryClient().invalidateQueries({ queryKey: membersKeys.all });
+  }
 });
 
 export const bulkKickMembersMutation = mutationOptions({

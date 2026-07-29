@@ -87,8 +87,9 @@ export function BillingHistoryTab() {
     placeholderData: (previous) => previous
   });
 
-  const items = query.data?.data ?? [];
-  const meta = query.data?.meta;
+  const { data, isLoading, isError } = query;
+  const items = data?.data ?? [];
+  const meta = data?.meta;
   const pageCount = Math.max(meta?.total_pages ?? 1, 1);
   const columns = useMemo<ColumnDef<BillingHistoryItem>[]>(
     () => [
@@ -154,11 +155,17 @@ export function BillingHistoryTab() {
 
   return (
     <div className='flex min-h-0 flex-1 flex-col gap-4'>
-      {query.data?.success === false ? (
+      {isError ? (
+        <Alert variant='destructive'>
+          <Icons.warning />
+          <AlertTitle>Gagal memuat riwayat pembayaran</AlertTitle>
+          <AlertDescription>Jaringan bermasalah atau server tidak tersedia.</AlertDescription>
+        </Alert>
+      ) : data?.success === false ? (
         <Alert variant='warning'>
           <Icons.warning />
           <AlertTitle>Riwayat pembayaran belum bisa dimuat</AlertTitle>
-          <AlertDescription>{query.data.message}</AlertDescription>
+          <AlertDescription>{data.message}</AlertDescription>
         </Alert>
       ) : null}
 
@@ -166,6 +173,27 @@ export function BillingHistoryTab() {
         table={table}
         title='Riwayat Pembayaran'
         description='Daftar transaksi penagihan tenant, termasuk kuitansi dan pembayaran yang masih menunggu.'
+        notice={
+          isLoading && !data ? (
+            <div className='flex items-center justify-center py-6'>
+              <div className='flex items-center gap-2 text-sm text-muted-foreground'>
+                <svg className='animate-spin h-4 w-4' viewBox='0 0 24 24'>
+                  <circle
+                    cx='12'
+                    cy='12'
+                    r='10'
+                    stroke='currentColor'
+                    strokeWidth='4'
+                    fill='none'
+                    opacity='0.25'
+                  />
+                  <path d='M4 12a8 8 0 018-8' stroke='currentColor' strokeWidth='4' fill='none' />
+                </svg>
+                Memuat...
+              </div>
+            </div>
+          ) : undefined
+        }
       />
     </div>
   );

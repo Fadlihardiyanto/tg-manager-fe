@@ -45,7 +45,10 @@ export function MigrationMembersTable({
     [params]
   );
 
-  const { data } = useQuery(migrationMembersQueryOptions(filters));
+  const { data, isLoading, isError } = useQuery({
+    ...migrationMembersQueryOptions(filters),
+    placeholderData: (previous) => previous
+  });
   const { data: packagesData } = useQuery({
     ...packagesQueryOptions(),
     staleTime: 0,
@@ -74,6 +77,7 @@ export function MigrationMembersTable({
 
   const rows = data?.data ?? [];
   const pageCount = Math.max(data?.meta?.total_pages ?? 0, 1);
+  const isFirstLoad = isLoading && !data;
 
   const { table } = useDataTable({
     data: rows,
@@ -91,7 +95,13 @@ export function MigrationMembersTable({
 
   return (
     <>
-      {data?.success === false ? (
+      {isError ? (
+        <Alert variant='destructive'>
+          <Icons.close />
+          <AlertTitle>Gagal memuat data migrasi</AlertTitle>
+          <AlertDescription>Jaringan bermasalah atau server tidak tersedia.</AlertDescription>
+        </Alert>
+      ) : data?.success === false ? (
         <Alert variant='destructive'>
           <Icons.close />
           <AlertTitle>Failed to load migration members</AlertTitle>
@@ -103,6 +113,27 @@ export function MigrationMembersTable({
         table={table}
         title='Migration & Import'
         description='Kelola migrasi member dari sistem lama ke sistem baru. Anda dapat menambahkan member secara manual atau mengimpor dari file CSV.'
+        notice={
+          isFirstLoad ? (
+            <div className='flex items-center justify-center py-6'>
+              <div className='flex items-center gap-2 text-sm text-muted-foreground'>
+                <svg className='animate-spin h-4 w-4' viewBox='0 0 24 24'>
+                  <circle
+                    cx='12'
+                    cy='12'
+                    r='10'
+                    stroke='currentColor'
+                    strokeWidth='4'
+                    fill='none'
+                    opacity='0.25'
+                  />
+                  <path d='M4 12a8 8 0 018-8' stroke='currentColor' strokeWidth='4' fill='none' />
+                </svg>
+                Memuat...
+              </div>
+            </div>
+          ) : undefined
+        }
       >
         <DataTableToolbar table={table}>
           <ImportMigrationMembersDialog onImported={onImported} />
