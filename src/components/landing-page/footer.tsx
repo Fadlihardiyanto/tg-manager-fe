@@ -28,14 +28,14 @@ const Footer = () => {
     {
       title: t('legal'),
       links: [
-        { title: t('termsOfService'), href: '#' },
-        { title: t('privacyPolicy'), href: '#' }
+        { title: t('termsOfService'), href: '#' as const },
+        { title: t('privacyPolicy'), href: '#' as const }
       ]
     }
   ];
 
   return (
-    <footer className='mt-20 dark bg-background border-t'>
+    <footer className='mt-20 bg-background border-t'>
       <div className='max-w-(--breakpoint-xl) mx-auto py-12 flex flex-col md:flex-row justify-between gap-10 px-6'>
         {/* Brand Section */}
         <div className='flex flex-col max-w-sm'>
@@ -60,16 +60,36 @@ const Footer = () => {
             <div key={title} className='flex flex-col gap-4'>
               <h6 className='font-semibold text-foreground'>{title}</h6>
               <ul className='space-y-3'>
-                {links.map(({ title, href }) => (
-                  <li key={title}>
-                    <Link
-                      href={href as any}
-                      className='text-sm text-muted-foreground hover:text-foreground transition-colors'
-                    >
-                      {title}
-                    </Link>
-                  </li>
-                ))}
+                {links.map(({ title, href }) =>
+                  href === '#' ? (
+                    <li key={title}>
+                      <span className='inline-flex items-center gap-1.5 text-sm text-muted-foreground/60 cursor-not-allowed'>
+                        {title}
+                        <span className='text-[10px] bg-muted px-1.5 py-0.5 rounded-full font-medium text-muted-foreground'>
+                          Segera
+                        </span>
+                      </span>
+                    </li>
+                  ) : (
+                    <li key={title}>
+                      <Link
+                        href={
+                          href as
+                            | '/'
+                            | '/login'
+                            | '/register-tenant'
+                            | '#features'
+                            | '#pricing'
+                            | '#faq'
+                            | 'https://t.me/UrationSupportBot'
+                        }
+                        className='text-sm text-muted-foreground hover:text-foreground transition-colors'
+                      >
+                        {title}
+                      </Link>
+                    </li>
+                  )
+                )}
               </ul>
             </div>
           ))}

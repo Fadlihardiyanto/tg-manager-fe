@@ -5,6 +5,7 @@ import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/ui/modal';
+import DashboardMock from '@/components/landing-page/dashboard-mock';
 import { Icons } from '@/components/icons';
 
 const Hero = () => {
@@ -27,7 +28,7 @@ const Hero = () => {
           </p>
           <div className='mt-12 flex flex-col sm:flex-row items-center gap-4 animate-fade-up-delay-2'>
             <Button size='lg' className='w-full sm:w-auto rounded-full text-base' asChild>
-              <Link href='/dashboard/overview'>
+              <Link href='/register-tenant'>
                 {t('getStarted')} <Icons.arrowUpRight className='h-5! w-5!' />
               </Link>
             </Button>
@@ -42,37 +43,27 @@ const Hero = () => {
           </div>
         </div>
         <div className='relative lg:max-w-lg xl:max-w-xl w-full animate-fade-up-delay-3'>
-          <div className='relative aspect-video bg-accent rounded-2xl ring-1 ring-border/50 overflow-hidden shadow-lg'>
-            <video
-              src='/Urator.mp4'
-              autoPlay
-              loop
-              muted
-              playsInline
-              aria-label='Demo Urator platform'
-              className='absolute inset-0 w-full h-full object-cover'
-            />
-          </div>
+          <DashboardMock />
         </div>
       </div>
 
       <Modal
-        title='Demo Produk'
-        description='Lihat video demo singkat untuk mengenal alur penggunaan aplikasi.'
+        title={t('demoTitle')}
+        description={t('demoDescription')}
         isOpen={isDemoOpen}
         onClose={() => setIsDemoOpen(false)}
       >
         <div className='overflow-hidden rounded-lg border border-border bg-background'>
           <video
             key={isDemoOpen ? 'open' : 'closed'}
-            src='/Uration.mp4'
+            src='/Urator.mp4'
             controls
             autoPlay
             muted
             playsInline
             className='aspect-video w-full max-h-[70vh] object-cover'
           >
-            Browser Anda tidak mendukung video.
+            {t('browserNotSupported')}
           </video>
         </div>
       </Modal>

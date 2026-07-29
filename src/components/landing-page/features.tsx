@@ -1,47 +1,52 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { Icons } from '@/components/icons';
+import FeatureMock, { type FeatureMockVariant } from './feature-mock';
 
 const Features = () => {
   const t = useTranslations('Features');
 
-  const features = [
+  const features: {
+    icon: React.FC<{ className?: string }>;
+    title: string;
+    description: string;
+    mock: FeatureMockVariant;
+  }[] = [
     {
       icon: Icons.creditCard,
       title: t('items.payment.title'),
       description: t('items.payment.description'),
-      image: '/E-Wallet-amico.svg'
+      mock: 'payment'
     },
     {
       icon: Icons.shieldCheck,
       title: t('items.gatekeeping.title'),
       description: t('items.gatekeeping.description'),
-      image: '/Privacy policy-bro.svg'
+      mock: 'gatekeeping'
     },
     {
       icon: Icons.coin,
       title: t('items.revenue.title'),
       description: t('items.revenue.description'),
-      image: '/Revenue-bro.svg'
+      mock: 'revenue'
     },
     {
       icon: Icons.bolt,
       title: t('items.kick.title'),
       description: t('items.kick.description'),
-      image: '/Inbox cleanup-cuate.svg'
+      mock: 'kick'
     },
     {
       icon: Icons.chartBar,
       title: t('items.analytics.title'),
       description: t('items.analytics.description'),
-      image: '/Spreadsheets-pana.svg'
+      mock: 'analytics'
     },
     {
       icon: Icons.bot,
       title: t('items.bot.title'),
       description: t('items.bot.description'),
-      image: '/Chat bot-bro.svg'
+      mock: 'bot'
     }
   ];
 
@@ -64,18 +69,9 @@ const Features = () => {
               </p>
             </CardHeader>
             <CardContent className='mt-auto px-0 pb-0'>
-              {feature.image ? (
-                <div className='relative h-52 overflow-hidden'>
-                  <Image
-                    src={feature.image}
-                    alt={feature.title}
-                    fill
-                    className='object-contain object-center p-6 transition-transform duration-300 group-hover:scale-105'
-                  />
-                </div>
-              ) : (
-                <div className='h-52' />
-              )}
+              <div className='h-52 overflow-hidden'>
+                <FeatureMock variant={feature.mock} />
+              </div>
             </CardContent>
           </Card>
         ))}

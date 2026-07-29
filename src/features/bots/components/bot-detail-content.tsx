@@ -124,6 +124,8 @@ export default function BotDetailContent({ botId }: { botId: string }) {
     return <BotDetailSkeleton />;
   }
 
+  if (!bot) return null;
+
   const totalMembers = connectedGroups.reduce((sum, g) => sum + g.member_count, 0);
   const avgMembers =
     connectedGroups.length > 0 ? Math.floor(totalMembers / connectedGroups.length) : 0;

@@ -21,7 +21,7 @@ const Navbar = () => {
             <Link href='/login'>{t('signIn')}</Link>
           </Button>
           <Button className='hidden xs:inline-flex' asChild>
-            <Link href='/dashboard/overview'>{t('getStarted')}</Link>
+            <Link href='/register-tenant'>{t('getStarted')}</Link>
           </Button>
 
           {/* Mobile Menu */}

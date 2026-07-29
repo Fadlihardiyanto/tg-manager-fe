@@ -6,13 +6,17 @@ import { VisuallyHidden as VisuallyHiddenPrimitive } from 'radix-ui';
 import { Logo } from './logo';
 import { NavMenu } from './nav-menu';
 import { Icons } from '@/components/icons';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 
 export const NavigationSheet = () => {
+  const t = useTranslations('NavigationSheet');
+  const navT = useTranslations('Navbar');
+
   return (
     <Sheet>
       <VisuallyHiddenPrimitive.Root>
-        <SheetTitle>Laci Navigasi</SheetTitle>
+        <SheetTitle>{t('title')}</SheetTitle>
       </VisuallyHiddenPrimitive.Root>
       <SheetTrigger asChild>
         <Button variant='outline' size='icon'>
@@ -25,10 +29,10 @@ export const NavigationSheet = () => {
 
         <div className='mt-8 space-y-4'>
           <Button variant='outline' className='w-full sm:hidden' asChild>
-            <Link href='/login'>Masuk</Link>
+            <Link href='/login'>{navT('signIn')}</Link>
           </Button>
           <Button className='w-full xs:hidden' asChild>
-            <Link href='/dashboard/overview'>Mulai Sekarang</Link>
+            <Link href='/register-tenant'>{navT('getStarted')}</Link>
           </Button>
         </div>
       </SheetContent>
