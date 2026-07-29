@@ -4,6 +4,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
@@ -41,18 +42,24 @@ const BOT_ROLE_STRIPE: Record<BotRole, string> = {
 
 interface BotCardGridProps {
   onEdit: (bot: TelegramBot) => void;
+  search?: string;
 }
 
-export function BotCardGrid({ onEdit }: BotCardGridProps) {
+export function BotCardGrid({ onEdit, search = '' }: BotCardGridProps) {
   const { data: botsData } = useSuspenseQuery(botsQueryOptions());
   const { data: groupsData } = useSuspenseQuery(groupsQueryOptions());
 
   const bots = botsData.data ?? [];
   const groups = groupsData.data ?? [];
 
+  // Filter by search
+  const query = search.toLowerCase().trim();
+  const filtered = query ? bots.filter((b) => b.username.toLowerCase().includes(query)) : bots;
+
   // Compute group counts per bot
   const groupCountByBotId = new Map<string, number>();
   for (const group of groups) {
+    if (!group.is_active) continue;
     groupCountByBotId.set(group.bot_id, (groupCountByBotId.get(group.bot_id) ?? 0) + 1);
   }
 
@@ -70,9 +77,23 @@ export function BotCardGrid({ onEdit }: BotCardGridProps) {
     );
   }
 
+  if (filtered.length === 0) {
+    return (
+      <div className='flex flex-col items-center justify-center rounded-xl border border-dashed border-border/70 bg-muted/20 p-10 text-center'>
+        <div className='flex size-12 items-center justify-center rounded-full bg-muted'>
+          <Icons.search className='size-6 text-muted-foreground' />
+        </div>
+        <p className='mt-3 font-medium text-foreground'>Bot tidak ditemukan</p>
+        <p className='mt-1 text-sm text-muted-foreground'>
+          Tidak ada bot dengan nama &quot;{search}&quot;.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className='grid gap-5 sm:grid-cols-2 xl:grid-cols-3'>
-      {bots.map((bot, i) => (
+      {filtered.map((bot, i) => (
         <BotCard
           key={bot.id}
           bot={bot}
@@ -96,6 +117,7 @@ function BotCard({ bot, groupCount, onEdit, index }: BotCardProps) {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [toggleOpen, setToggleOpen] = useState(false);
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const deleteMutation = useMutation({
     ...deleteBotMutation,
@@ -194,7 +216,15 @@ function BotCard({ bot, groupCount, onEdit, index }: BotCardProps) {
                 />
               </div>
               <div>
-                <h6 className='text-base font-semibold'>@{bot.username}</h6>
+                <h6 className='text-base font-semibold'>
+                  <button
+                    type='button'
+                    onClick={() => router.push(`/dashboard/bots/${bot.id}`)}
+                    className='hover:text-primary hover:underline transition-colors text-left'
+                  >
+                    @{bot.username}
+                  </button>
+                </h6>
                 <p className='text-xs text-muted-foreground'>ID: {bot.telegram_bot_id}</p>
               </div>
             </div>
@@ -217,6 +247,10 @@ function BotCard({ bot, groupCount, onEdit, index }: BotCardProps) {
                     <Icons.circleCheck className='mr-2 size-4' />
                   )}
                   {bot.is_active ? 'Nonaktifkan' : 'Aktifkan'}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push(`/dashboard/bots/${bot.id}`)}>
+                  <Icons.network className='mr-2 size-4' />
+                  Jaringan
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem

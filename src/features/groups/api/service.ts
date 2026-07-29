@@ -117,3 +117,18 @@ export async function generateConnectToken(botId: string): Promise<ConnectTokenR
     return { success: false, code: 400, message, data: undefined as any };
   }
 }
+
+// ─── Disconnect Group from Bot ──────────────────────────────────────
+export async function disconnectGroup(groupId: string): Promise<ApiResponse<null>> {
+  const authHeaders = await getAuthHeaders();
+
+  try {
+    return await apiClient<ApiResponse<null>>(`/api/v1/tenant/groups/${groupId}/disconnect`, {
+      method: 'POST',
+      headers: { ...authHeaders }
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Gagal memutuskan grup';
+    return { success: false, code: 400, message, data: null };
+  }
+}

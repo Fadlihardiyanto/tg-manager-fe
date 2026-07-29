@@ -331,7 +331,7 @@ function GroupsTab({ bot }: { bot: TelegramBot }) {
 
 // ─── Inline Connect Group Flow ─────────────────────────────────────────
 
-function ConnectGroupInline({ botId, botUsername }: { botId: string; botUsername: string }) {
+export function ConnectGroupInline({ botId, botUsername }: { botId: string; botUsername: string }) {
   const {
     loading,
     copied,
