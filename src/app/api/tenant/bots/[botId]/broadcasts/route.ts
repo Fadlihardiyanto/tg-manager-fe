@@ -1,41 +1,40 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { apiClient } from '@/lib/api-client';
+
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ botId: string }> }) {
   const { botId } = await params;
   const qs = req.nextUrl.searchParams.toString();
   const token = (await cookies()).get('access_token')?.value;
-  const opts = token ? { headers: { Authorization: `Bearer ${token}` } } : undefined;
-  try {
-    const data = await apiClient<any>(
-      `/api/v1/tenant/bots/${botId}/broadcasts${qs ? '?' + qs : ''}`,
-      opts
-    );
-    return NextResponse.json(data);
-  } catch (e) {
-    if (typeof e === 'object' && e && 'digest' in e) throw e;
+  if (!token) {
     return NextResponse.json({ success: false, code: 401, message: 'Sesi habis' }, { status: 401 });
   }
+  const res = await fetch(
+    `${BASE_URL}/api/v1/tenant/bots/${botId}/broadcasts${qs ? '?' + qs : ''}`,
+    {
+      headers: { Authorization: `Bearer ${token}` }
+    }
+  );
+  const data = await res.json();
+  return NextResponse.json(data, { status: res.status });
 }
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ botId: string }> }) {
   const { botId } = await params;
   const body = await req.json();
   const token = (await cookies()).get('access_token')?.value;
-  const opts: RequestInit = {
+  if (!token) {
+    return NextResponse.json({ success: false, code: 401, message: 'Sesi habis' }, { status: 401 });
+  }
+  const res = await fetch(`${BASE_URL}/api/v1/tenant/bots/${botId}/broadcasts`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {})
+      Authorization: `Bearer ${token}`
     },
     body: JSON.stringify(body)
-  };
-  try {
-    const data = await apiClient<any>(`/api/v1/tenant/bots/${botId}/broadcasts`, opts);
-    return NextResponse.json(data);
-  } catch (e) {
-    if (typeof e === 'object' && e && 'digest' in e) throw e;
-    return NextResponse.json({ success: false, code: 401, message: 'Sesi habis' }, { status: 401 });
-  }
+  });
+  const data = await res.json();
+  return NextResponse.json(data, { status: res.status });
 }

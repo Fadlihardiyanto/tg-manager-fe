@@ -33,6 +33,8 @@ import { useAuthStore } from '@/stores/auth-store';
 import * as React from 'react';
 import { Icons } from '../icons';
 
+import { useTenantPath } from '@/lib/tenant-path';
+
 function normalizePathname(pathname: string) {
   const normalized = pathname.replace(/\/$/, '');
 
@@ -67,6 +69,7 @@ function AvatarInitial() {
 export default function AppSidebar({ navGroups }: { navGroups: NavGroup[] }) {
   const pathname = usePathname();
   const router = useRouter();
+  const { getTenantHref } = useTenantPath();
 
   return (
     <Sidebar collapsible='icon'>
@@ -94,9 +97,10 @@ export default function AppSidebar({ navGroups }: { navGroups: NavGroup[] }) {
             <SidebarMenu>
               {group.items.map((item) => {
                 const Icon = item.icon ? Icons[item.icon] : Icons.logo;
-                const isItemActive = isActivePath(pathname, item.url);
+                const tenantUrl = getTenantHref(item.url);
+                const isItemActive = isActivePath(pathname, tenantUrl);
                 const hasActiveChild = item.items?.some((subItem) =>
-                  isActivePath(pathname, subItem.url)
+                  isActivePath(pathname, getTenantHref(subItem.url))
                 );
                 return item?.items && item?.items?.length > 0 ? (
                   <Collapsible
@@ -118,18 +122,21 @@ export default function AppSidebar({ navGroups }: { navGroups: NavGroup[] }) {
                       </CollapsibleTrigger>
                       <CollapsibleContent>
                         <SidebarMenuSub>
-                          {item.items?.map((subItem) => (
-                            <SidebarMenuSubItem key={subItem.title}>
-                              <SidebarMenuSubButton
-                                asChild
-                                isActive={isActivePath(pathname, subItem.url)}
-                              >
-                                <Link href={subItem.url}>
-                                  <span>{subItem.title}</span>
-                                </Link>
-                              </SidebarMenuSubButton>
-                            </SidebarMenuSubItem>
-                          ))}
+                          {item.items?.map((subItem) => {
+                            const subTenantUrl = getTenantHref(subItem.url);
+                            return (
+                              <SidebarMenuSubItem key={subItem.title}>
+                                <SidebarMenuSubButton
+                                  asChild
+                                  isActive={isActivePath(pathname, subTenantUrl)}
+                                >
+                                  <Link href={subTenantUrl}>
+                                    <span>{subItem.title}</span>
+                                  </Link>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+                            );
+                          })}
                         </SidebarMenuSub>
                       </CollapsibleContent>
                     </SidebarMenuItem>
@@ -142,7 +149,7 @@ export default function AppSidebar({ navGroups }: { navGroups: NavGroup[] }) {
                       isActive={isItemActive}
                       className='transition-all duration-150 data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=true]:font-semibold'
                     >
-                      <Link href={item.url}>
+                      <Link href={tenantUrl}>
                         <Icon className='size-4' />
                         <span className='group-data-[collapsible=icon]:hidden'>{item.title}</span>
                       </Link>

@@ -32,15 +32,10 @@ import type {
 export async function getPackages(): Promise<PackagesListResponse> {
   const authHeaders = await getAuthHeaders();
 
-  try {
-    return await apiClient<PackagesListResponse>('/api/v1/tenant/packages', {
-      method: 'GET',
-      headers: { ...authHeaders }
-    });
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Gagal mengambil paket';
-    return { success: false, code: 400, message, data: [] };
-  }
+  return apiClient<PackagesListResponse>('/api/v1/tenant/packages', {
+    method: 'GET',
+    headers: { ...authHeaders }
+  });
 }
 
 // ─── Get Package by ID ──────────────────────────────────────────────

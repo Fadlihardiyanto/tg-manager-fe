@@ -44,6 +44,7 @@ export function getColumns({
       }
     },
     {
+      id: 'expired_at',
       accessorKey: 'expired_at',
       header: ({ column }) => <DataTableColumnHeader column={column} title='Kedaluwarsa Pada' />,
       cell: ({ row }) =>
@@ -53,7 +54,8 @@ export function getColumns({
               day: 'numeric',
               year: 'numeric'
             })
-          : '-'
+          : '-',
+      meta: { label: 'Kedaluwarsa Pada' }
     },
     {
       id: 'migration_status',
@@ -79,6 +81,7 @@ export function getColumns({
       }
     },
     {
+      id: 'created_at',
       accessorKey: 'created_at',
       header: ({ column }) => <DataTableColumnHeader column={column} title='Dibuat Pada' />,
       cell: ({ row }) =>
@@ -88,7 +91,8 @@ export function getColumns({
               day: 'numeric',
               year: 'numeric'
             })
-          : '-'
+          : '-',
+      meta: { label: 'Dibuat Pada' }
     }
   ];
 }

@@ -15,6 +15,16 @@ import {
   DialogTitle
 } from '@/components/ui/dialog';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '@/components/ui/alert-dialog';
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -72,6 +82,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const [resendSubscriptionId, setResendSubscriptionId] = useState('');
   const [selectedSubscriptionId, setSelectedSubscriptionId] = useState('');
   const [additionalDays, setAdditionalDays] = useState('');
+  const [isSyncConfirmOpen, setIsSyncConfirmOpen] = useState(false);
 
   const kickMut = useMutation(kickMemberMutation);
   const extendMut = useMutation(extendAccessMutation);
@@ -128,7 +139,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         setKickSubscriptionId('');
         return;
       }
-      toast.error(res.message);
+      toast.error(res.errors?.[0] || res.message);
     } catch {
       toast.error('Gagal mengeluarkan member');
     }
@@ -149,7 +160,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         setResendSubscriptionId('');
         return;
       }
-      toast.error(res.message);
+      toast.error(res.errors?.[0] || res.message);
     } catch {
       toast.error('Gagal mengirim ulang tautan');
     }
@@ -467,6 +478,19 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
                 value={additionalDays}
                 onChange={(event) => setAdditionalDays(event.target.value)}
               />
+              <div className='flex gap-2 mt-2'>
+                {[7, 30, 90].map((d) => (
+                  <Button
+                    key={d}
+                    variant='outline'
+                    size='sm'
+                    className='h-7 px-2 text-xs'
+                    onClick={() => setAdditionalDays(String(d))}
+                  >
+                    +{d} hari
+                  </Button>
+                ))}
+              </div>
             </div>
 
             {selectedSubscription && (
@@ -504,6 +528,32 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         </DialogContent>
       </Dialog>
 
+      <AlertDialog open={isSyncConfirmOpen} onOpenChange={setIsSyncConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Sinkron Manual?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Sinkron manual akan memperbarui data langganan member ini dari Telegram. Gunakan jika
+              status langganan tidak sesuai.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                toast.promise(syncMut.mutateAsync(data.id), {
+                  loading: 'Sedang sinkron...',
+                  success: (res) => res.message,
+                  error: 'Gagal sinkron'
+                });
+              }}
+            >
+              Sinkronkan
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <Button variant='ghost' className='size-8 p-0'>
@@ -519,15 +569,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           <DropdownMenuItem onClick={() => setTimeout(() => setIsExtendOpen(true), 150)}>
             <Icons.calendar /> Perpanjang Akses
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => {
-              toast.promise(syncMut.mutateAsync(data.id), {
-                loading: 'Sedang sinkron...',
-                success: (res) => res.message,
-                error: 'Gagal sinkron'
-              });
-            }}
-          >
+          <DropdownMenuItem onClick={() => setIsSyncConfirmOpen(true)}>
             <Icons.settings /> Sinkron Manual
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setTimeout(() => setIsResendOpen(true), 150)}>

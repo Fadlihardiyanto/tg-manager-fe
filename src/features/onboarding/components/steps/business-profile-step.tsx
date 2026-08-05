@@ -15,7 +15,7 @@ export function BusinessProfileStep({ form }: StepProps) {
     <div className='flex flex-col gap-8'>
       <Heading
         title='Buat Ruang Kerja'
-        description='Konfigurasi profil bisnis Anda untuk memulai dengan TG-Manager.'
+        description='Konfigurasi profil bisnis Anda untuk memulai dengan Urator.'
       />
 
       <div className='flex flex-col gap-5'>

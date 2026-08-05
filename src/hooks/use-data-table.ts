@@ -208,9 +208,12 @@ export function useDataTable<TData>(props: UseDataTableProps<TData>) {
 
     return Object.entries(filterValues).reduce<ColumnFiltersState>((filters, [key, value]) => {
       if (value !== null) {
+        const column = columns.find((col) => col.id === key);
+        const variant = column?.meta?.variant;
+
         const processedValue = Array.isArray(value)
           ? value
-          : typeof value === 'string' && /[^a-zA-Z0-9]/.test(value)
+          : typeof value === 'string' && variant === 'text' && /[^a-zA-Z0-9]/.test(value)
             ? value.split(/[^a-zA-Z0-9]+/).filter(Boolean)
             : [value];
 
@@ -221,7 +224,7 @@ export function useDataTable<TData>(props: UseDataTableProps<TData>) {
       }
       return filters;
     }, []);
-  }, [filterValues, enableAdvancedFilter]);
+  }, [filterValues, columns, enableAdvancedFilter]);
 
   const [columnFilters, setColumnFilters] =
     React.useState<ColumnFiltersState>(initialColumnFilters);

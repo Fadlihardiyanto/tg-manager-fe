@@ -4,7 +4,7 @@ import CheckEmailClient from '@/features/auth/components/check-email-client';
 import { Icons } from '@/components/icons';
 
 export const metadata: Metadata = {
-  title: 'Periksa Email Anda - TG-Manager',
+  title: 'Periksa Email Anda - Urator',
   description: 'Verifikasi alamat email Anda untuk menyelesaikan pendaftaran.'
 };
 

@@ -258,7 +258,8 @@ export function getColumns(
         );
       },
       enableSorting: false,
-      enableColumnFilter: false
+      enableColumnFilter: false,
+      meta: { label: 'Balasan / Media' }
     },
     {
       id: 'is_active',
@@ -273,7 +274,7 @@ export function getColumns(
       enableSorting: false,
       enableColumnFilter: true,
       meta: {
-        label: 'status',
+        label: 'Status',
         variant: 'multiSelect' as const,
         options: [
           { label: 'Aktif', value: 'true' },
@@ -298,7 +299,8 @@ export function getColumns(
         );
       },
       enableSorting: true,
-      enableColumnFilter: false
+      enableColumnFilter: false,
+      meta: { label: 'Dibuat' }
     },
     {
       id: 'actions',

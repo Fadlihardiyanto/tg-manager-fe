@@ -5,6 +5,7 @@ import { searchParamsCache } from '@/lib/searchparams';
 import { membersQueryOptions } from '../api/queries';
 import { MembersListingContent } from './members-listing-content';
 import { MemberDetailDrawer } from './member-detail-drawer';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default async function MemberListing() {
   const page = searchParamsCache.get('page');
@@ -29,7 +30,7 @@ export default async function MemberListing() {
       <HydrationBoundary state={dehydrate(queryClient)}>
         <MembersListingContent />
       </HydrationBoundary>
-      <Suspense fallback={null}>
+      <Suspense fallback={<Skeleton className='h-64 w-full' />}>
         <MemberDetailDrawer />
       </Suspense>
     </>

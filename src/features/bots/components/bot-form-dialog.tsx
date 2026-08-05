@@ -133,7 +133,13 @@ export function BotFormDialog({ bot, open, onOpenChange }: BotFormDialogProps) {
         </DialogHeader>
 
         {isEdit && bot ? (
-          <BotEditTabs bot={bot} form={form} isPending={isPending} canCreateBot={canCreateBot} />
+          <BotEditTabs
+            bot={bot}
+            form={form}
+            isPending={isPending}
+            canCreateBot={canCreateBot}
+            onClose={() => onOpenChange(false)}
+          />
         ) : (
           <>
             <form.AppForm>
@@ -194,13 +200,15 @@ function BotEditTabs({
   bot,
   form,
   isPending,
-  canCreateBot
+  canCreateBot,
+  onClose
 }: {
   bot: TelegramBot;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- form API type is invariant in its type parameter
   form: any;
   isPending: boolean;
   canCreateBot: boolean;
+  onClose: () => void;
 }) {
   return (
     <Tabs defaultValue='settings' className='gap-0'>
@@ -218,7 +226,14 @@ function BotEditTabs({
       <TabsContent value='settings' forceMount className='mt-4 data-[state=inactive]:hidden'>
         <SettingsTab bot={bot} form={form} />
         <div className='mt-6 flex items-center justify-end gap-2'>
-          <Button type='button' variant='outline' onClick={() => form.reset()}>
+          <Button
+            type='button'
+            variant='outline'
+            onClick={() => {
+              form.reset();
+              onClose();
+            }}
+          >
             Batal
           </Button>
           <Button

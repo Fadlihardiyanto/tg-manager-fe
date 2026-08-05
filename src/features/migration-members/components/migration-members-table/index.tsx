@@ -111,7 +111,7 @@ export function MigrationMembersTable({
 
       <DataTable
         table={table}
-        title='Migration & Import'
+        title='Migrasi Member'
         description='Kelola migrasi member dari sistem lama ke sistem baru. Anda dapat menambahkan member secara manual atau mengimpor dari file CSV.'
         notice={
           isFirstLoad ? (

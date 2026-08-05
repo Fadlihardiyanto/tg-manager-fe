@@ -5,7 +5,7 @@ import { parseAsString, useQueryState } from 'nuqs';
 
 const tabs = [
   { value: 'active', label: 'Member Aktif' },
-  { value: 'migration', label: 'Migration & Import' }
+  { value: 'migration', label: 'Migrasi Member' }
 ];
 
 export function MembersPageTabs() {

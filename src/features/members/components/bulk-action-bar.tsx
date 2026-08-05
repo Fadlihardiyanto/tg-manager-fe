@@ -11,9 +11,10 @@ import {
   DialogTitle
 } from '@/components/ui/dialog';
 import { Icons } from '@/components/icons';
-import { bulkKickMembersMutation } from '../api/mutations';
+import { bulkKickMembersMutation, bulkExtendMembersMutation } from '../api/mutations';
 import type { Member } from '../api/types';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
   Select,
@@ -40,10 +41,13 @@ export function BulkActionBar({
   onClearSelection
 }: BulkActionBarProps) {
   const [isKickModalOpen, setIsKickModalOpen] = useState(false);
+  const [isExtendModalOpen, setIsExtendModalOpen] = useState(false);
   const [kickMode, setKickMode] = useState<'all' | 'single'>('all');
   const [selectedPackageId, setSelectedPackageId] = useState('');
+  const [extendDays, setExtendDays] = useState('');
 
   const bulkKickMut = useMutation(bulkKickMembersMutation);
+  const bulkExtendMut = useMutation(bulkExtendMembersMutation);
 
   const packageOptions = useMemo(() => {
     const packages = new Map<string, { id: string; name: string; memberCount: number }>();
@@ -66,8 +70,6 @@ export function BulkActionBar({
 
     return Array.from(packages.values()).toSorted((a, b) => a.name.localeCompare(b.name));
   }, [selectedMembers]);
-
-  if (selectedIds.length === 0) return null;
 
   const handleBulkKick = async () => {
     const targets =
@@ -108,16 +110,68 @@ export function BulkActionBar({
     }
   };
 
+  const handleBulkExtend = async () => {
+    const days = Number(extendDays);
+    if (!days || days <= 0) return;
+
+    const targets = selectedMembers.flatMap((member) =>
+      getActiveSubscriptions(member).map((subscription) => ({
+        id: member.id,
+        subscriptionId: subscription.id,
+        additionalDays: days
+      }))
+    );
+
+    if (targets.length === 0) {
+      toast.error('Tidak ada langganan aktif dari member yang dipilih.');
+      return;
+    }
+
+    try {
+      const res = await bulkExtendMut.mutateAsync(targets);
+      if (res.success) {
+        toast.success(res.message);
+        onClearSelection();
+        setIsExtendModalOpen(false);
+        setExtendDays('');
+      } else {
+        toast.error(res.message || 'Gagal memperpanjang langganan');
+      }
+    } catch {
+      toast.error('Gagal memperpanjang langganan');
+    }
+  };
+
+  if (selectedIds.length === 0) return null;
+
   return (
     <div className='fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 rounded-full border border-border bg-background px-4 py-3 shadow-lg animate-in slide-in-from-bottom-10 fade-in duration-300'>
       <div className='flex items-center gap-2 pr-4 border-r border-border'>
-        <div className='flex size-6 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary'>
+        <div
+          className='flex size-6 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary'
+          title={
+            selectedMembers
+              .map((m) => `@${m.username || m.first_name}`)
+              .slice(0, 5)
+              .join(', ') +
+            (selectedMembers.length > 5 ? ` +${selectedMembers.length - 5} lainnya` : '')
+          }
+        >
           {selectedIds.length}
         </div>
         <span className='text-sm font-medium'>terpilih</span>
       </div>
 
       <div className='flex items-center gap-2'>
+        <Button
+          variant='outline'
+          size='sm'
+          className='h-8 hover:bg-primary hover:text-primary-foreground'
+          onClick={() => setIsExtendModalOpen(true)}
+        >
+          <Icons.calendar /> Perpanjang
+        </Button>
+
         <Button
           variant='outline'
           size='sm'
@@ -242,6 +296,53 @@ export function BulkActionBar({
               onClick={handleBulkKick}
             >
               Keluarkan Member
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={isExtendModalOpen}
+        onOpenChange={(open) => {
+          setIsExtendModalOpen(open);
+          if (!open) setExtendDays('');
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Perpanjang Langganan</DialogTitle>
+            <DialogDescription>
+              Perpanjang semua langganan aktif dari {selectedIds.length} member terpilih. Total{' '}
+              {selectedMembers.reduce((sum, m) => sum + getActiveSubscriptions(m).length, 0)}{' '}
+              langganan akan diperpanjang.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className='space-y-2 py-4'>
+            <Label htmlFor='bulk-extend-days'>Tambahan Hari</Label>
+            <Input
+              id='bulk-extend-days'
+              type='number'
+              min='1'
+              placeholder='30'
+              value={extendDays}
+              onChange={(e) => setExtendDays(e.target.value)}
+            />
+            <p className='text-xs text-muted-foreground'>
+              Jumlah hari yang akan ditambahkan ke setiap langganan aktif.
+            </p>
+          </div>
+
+          <DialogFooter>
+            <Button variant='outline' onClick={() => setIsExtendModalOpen(false)}>
+              Batal
+            </Button>
+            <Button
+              isLoading={bulkExtendMut.isPending}
+              disabled={!extendDays || Number(extendDays) <= 0}
+              onClick={handleBulkExtend}
+            >
+              Perpanjang
             </Button>
           </DialogFooter>
         </DialogContent>

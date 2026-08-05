@@ -3,9 +3,11 @@
 import { useRouter } from 'next/navigation';
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
+import { useAuthStore } from '@/stores/auth-store';
 
 export function SuccessStep() {
   const router = useRouter();
+  const slug = useAuthStore((s) => s.client?.slug);
 
   return (
     <div className='flex flex-col items-center justify-center gap-6 py-12 text-center'>
@@ -22,12 +24,16 @@ export function SuccessStep() {
         <h3 className='text-2xl font-bold tracking-tight'>Semua Sudah Siap!</h3>
         <p className='mx-auto max-w-sm text-muted-foreground'>
           Workspace Anda telah berhasil dikonfigurasi. Mulai kelola komunitas Telegram Anda dengan
-          TG-Manager sekarang.
+          Urator sekarang.
         </p>
       </div>
 
       <div className='flex w-full max-w-xs flex-col gap-3 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 delay-500'>
-        <Button size='lg' className='w-full' onClick={() => router.push('/dashboard/overview')}>
+        <Button
+          size='lg'
+          className='w-full'
+          onClick={() => router.push(slug ? `/${slug}/dashboard/overview` : '/dashboard/overview')}
+        >
           <Icons.dashboard />
           Ke Dashboard
         </Button>

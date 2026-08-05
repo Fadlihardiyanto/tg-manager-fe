@@ -1,7 +1,8 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { parseAsString, useQueryState } from 'nuqs';
+import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import { DataTable } from '@/components/ui/table/data-table';
 import { DataTableToolbar } from '@/components/ui/table/data-table-toolbar';
@@ -26,7 +27,7 @@ export function MembersTable({ filters }: { filters: MemberFilters }) {
     parseAsString.withOptions({ shallow: true, history: 'replace' })
   );
 
-  const { data, isError, isLoading } = useQuery({
+  const { data, isError, isLoading, refetch } = useQuery({
     ...membersQueryOptions(filters),
     placeholderData: (previous) => previous
   });
@@ -45,8 +46,7 @@ export function MembersTable({ filters }: { filters: MemberFilters }) {
     debounceMs: 500,
     enableRowSelection: true,
     initialState: {
-      columnPinning: { right: ['actions'] },
-      columnVisibility: { status: false }
+      columnPinning: { right: ['actions'] }
     }
   });
 
@@ -62,9 +62,17 @@ export function MembersTable({ filters }: { filters: MemberFilters }) {
         description='Kelola member aktif, pantau paket langganan, dan lihat status keanggotaan.'
         notice={
           isError ? (
-            <div className='flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700'>
+            <div className='flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700'>
               <Icons.warning className='h-4 w-4 shrink-0' />
-              Gagal memuat data member
+              <span className='flex-1'>Gagal memuat data member</span>
+              <Button
+                variant='ghost'
+                size='sm'
+                className='h-7 px-2 text-xs text-red-700 hover:bg-red-100'
+                onClick={() => refetch()}
+              >
+                Coba Lagi
+              </Button>
             </div>
           ) : isFirstLoad ? (
             <div className='flex items-center justify-center py-6'>

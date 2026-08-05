@@ -55,6 +55,7 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
   const activeSubs = member.subscriptions?.filter((s: Subscription) => s.status === 'active') || [];
   const historySubs = member.subscriptions || [];
   const groups = member.subscriptions || [];
+  const memberTelegramUrl = member.username ? `https://t.me/${member.username}` : undefined;
 
   return (
     <Tabs value={tab} onValueChange={setTab} className='flex flex-col h-full bg-background'>
@@ -85,7 +86,7 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
           <TabsTrigger
             value='overview'
             className={cn(
-              'rounded-none border-b-2 border-transparent px-0 pb-3 text-[13px] font-medium data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:font-bold data-[state=active]:shadow-none',
+              'rounded-none border-b border-transparent px-0 pb-3 text-[13px] font-medium data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:font-bold data-[state=active]:shadow-none',
               'text-muted-foreground hover:text-foreground'
             )}
           >
@@ -94,16 +95,16 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
           <TabsTrigger
             value='groups'
             className={cn(
-              'rounded-none border-b-2 border-transparent px-0 pb-3 text-[13px] font-medium data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:font-bold data-[state=active]:shadow-none ml-6',
+              'rounded-none border-b border-transparent px-0 pb-3 text-[13px] font-medium data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:font-bold data-[state=active]:shadow-none ml-6',
               'text-muted-foreground hover:text-foreground'
             )}
           >
-            Grup Aktif
+            Langganan per Grup
           </TabsTrigger>
           <TabsTrigger
             value='history'
             className={cn(
-              'rounded-none border-b-2 border-transparent px-0 pb-3 text-[13px] font-medium data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:font-bold data-[state=active]:shadow-none ml-6',
+              'rounded-none border-b border-transparent px-0 pb-3 text-[13px] font-medium data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:font-bold data-[state=active]:shadow-none ml-6',
               'text-muted-foreground hover:text-foreground'
             )}
           >
@@ -205,7 +206,7 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
         <TabsContent value='groups' className='mt-0'>
           <div className='flex flex-col gap-4'>
             <h3 className='text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-4'>
-              Grup Aktif
+              Langganan per Grup
             </h3>
             <div className='flex flex-col gap-2'>
               {groups.length > 0 ? (
@@ -286,8 +287,12 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
         <Button
           className='flex-1 rounded-xl text-[13px] font-bold'
           aria-label='Kirim pesan ke member'
+          disabled={!memberTelegramUrl}
+          asChild
         >
-          Kirim Pesan
+          <a href={memberTelegramUrl ?? '#'} target='_blank' rel='noopener noreferrer'>
+            Kirim Pesan
+          </a>
         </Button>
         <Button
           variant='outline'

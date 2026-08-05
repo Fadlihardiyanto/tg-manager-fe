@@ -65,11 +65,11 @@ export type BotResponse = ApiResponse<TelegramBot>;
 export const BOT_ROLE_LABELS: Record<BotRole, string> = {
   sales_only: 'Penjualan',
   gatekeeper_only: 'Gatekeeper',
-  all_in_one: 'Semua Fungsi'
+  all_in_one: 'Multi-fungsi'
 };
 
 export const BOT_ROLE_OPTIONS = [
   { value: 'sales_only', label: 'Penjualan' },
   { value: 'gatekeeper_only', label: 'Gatekeeper' },
-  { value: 'all_in_one', label: 'Semua Fungsi' }
+  { value: 'all_in_one', label: 'Multi-fungsi' }
 ];

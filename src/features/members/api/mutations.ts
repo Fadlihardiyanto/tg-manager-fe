@@ -1,6 +1,13 @@
 import { mutationOptions } from '@tanstack/react-query';
 import { getQueryClient } from '@/lib/query-client';
-import { extendAccess, kickMember, manualSync, resendLink, bulkKickMembers } from './service';
+import {
+  extendAccess,
+  kickMember,
+  manualSync,
+  resendLink,
+  bulkKickMembers,
+  bulkExtendMembers
+} from './service';
 import { membersKeys } from './queries';
 import type { ExtendAccessPayload } from './types';
 
@@ -37,6 +44,20 @@ export const resendLinkMutation = mutationOptions({
 
 export const bulkKickMembersMutation = mutationOptions({
   mutationFn: (targets: { id: string; subscriptionId?: string }[]) => bulkKickMembers(targets),
+  onSuccess: () => {
+    getQueryClient().invalidateQueries({ queryKey: membersKeys.all });
+  }
+});
+
+export const bulkExtendMembersMutation = mutationOptions({
+  mutationFn: (targets: { id: string; subscriptionId: string; additionalDays: number }[]) =>
+    bulkExtendMembers(
+      targets.map((t) => ({
+        id: t.id,
+        subscriptionId: t.subscriptionId,
+        additionalDays: t.additionalDays
+      }))
+    ),
   onSuccess: () => {
     getQueryClient().invalidateQueries({ queryKey: membersKeys.all });
   }

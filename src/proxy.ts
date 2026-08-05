@@ -5,15 +5,6 @@ import { routing } from './i18n/routing';
 
 const intlMiddleware = createMiddleware(routing);
 
-const protectedRoutes = ['/dashboard'];
-const authRoutes = [
-  '/login',
-  '/register-tenant',
-  '/forgot-password',
-  '/verify-email',
-  '/check-email'
-];
-
 export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
@@ -34,10 +25,9 @@ export function proxy(req: NextRequest) {
   const refreshToken = req.cookies.get('refresh_token')?.value;
   const hasToken = !!accessToken || !!refreshToken;
 
-  const isProtectedRoute = protectedRoutes.some((route) => pathnameWithoutLocale.startsWith(route));
-  const isAuthRoute = authRoutes.some(
-    (route) => pathnameWithoutLocale === route || pathnameWithoutLocale === '/'
-  );
+  const isProtectedRoute =
+    pathnameWithoutLocale.startsWith('/dashboard') ||
+    /^\/[^/]+\/dashboard/.test(pathnameWithoutLocale);
 
   if (isProtectedRoute && !hasToken && process.env.NODE_ENV === 'production') {
     const loginUrl = new URL(
@@ -46,17 +36,6 @@ export function proxy(req: NextRequest) {
     );
     loginUrl.searchParams.set('callbackUrl', pathname);
     return NextResponse.redirect(loginUrl);
-  }
-
-  if (isAuthRoute && hasToken) {
-    return NextResponse.redirect(
-      new URL(
-        currentLocale === routing.defaultLocale
-          ? '/dashboard/overview'
-          : `/${currentLocale}/dashboard/overview`,
-        req.url
-      )
-    );
   }
 
   return intlMiddleware(req);

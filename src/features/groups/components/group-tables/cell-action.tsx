@@ -46,6 +46,8 @@ export function CellAction({ data, onEdit }: CellActionProps) {
         onClose={() => setDeleteOpen(false)}
         onConfirm={() => deleteMutation.mutate(data.id)}
         loading={deleteMutation.isPending}
+        title='Hapus grup?'
+        description={`Grup "${data.name}" akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.`}
       />
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>

@@ -16,7 +16,7 @@ export function BotSetupStep({ form }: StepProps) {
     <div className='flex flex-col gap-8'>
       <Heading
         title='Hubungkan Bot Anda'
-        description='Untuk mengintegrasikan workspace secara aman, masukkan token bot Telegram Anda. Langkah ini memberi izin TG-Manager untuk menangani pesan masuk dan mengotomatisasi respons atas nama Anda.'
+        description='Untuk mengintegrasikan workspace secara aman, masukkan token bot Telegram Anda. Langkah ini memberi izin Urator untuk menangani pesan masuk dan mengotomatisasi respons atas nama Anda.'
       />
 
       <Alert className='bg-muted/40 [&>svg]:mt-0.5'>

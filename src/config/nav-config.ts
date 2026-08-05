@@ -52,6 +52,13 @@ export const navGroups: NavGroup[] = [
         isActive: false,
         items: []
       },
+      {
+        title: 'Transaksi',
+        url: '/dashboard/transactions',
+        icon: 'coin',
+        isActive: false,
+        items: []
+      },
 
       {
         title: 'Bots',

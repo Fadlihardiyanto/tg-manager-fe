@@ -19,6 +19,7 @@ interface DataTableProps<TData> extends React.ComponentProps<'div'> {
   notice?: React.ReactNode;
   title?: string;
   description?: string;
+  emptyState?: React.ReactNode;
 }
 
 export function DataTable<TData>({
@@ -27,7 +28,8 @@ export function DataTable<TData>({
   notice,
   children,
   title,
-  description
+  description,
+  emptyState
 }: DataTableProps<TData>) {
   const hasTitle = title || description;
 
@@ -108,7 +110,7 @@ export function DataTable<TData>({
                     colSpan={table.getAllColumns().length}
                     className='text-muted-foreground h-32 text-center'
                   >
-                    Tidak ada hasil.
+                    {emptyState ?? 'Tidak ada hasil.'}
                   </TableCell>
                 </TableRow>
               )}

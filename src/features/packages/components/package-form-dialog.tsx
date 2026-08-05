@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/dialog';
 import { FieldGroup, FieldLabel, FieldDescription } from '@/components/ui/field';
 import { Icons } from '@/components/icons';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useSuspenseQuery, useQueryClient } from '@tanstack/react-query';
 import {
   createPackageMutation,
   updatePackageMutation,
@@ -25,7 +25,7 @@ import { groupsQueryOptions } from '@/features/groups/api/queries';
 import { useActivePlan } from '@/features/billing/components/active-plan-provider';
 import type { Package, PackagesListResponse } from '../api/types';
 import { toast } from 'sonner';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import * as z from 'zod';
 
 type PackageFormValues = {
@@ -66,8 +66,17 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
   const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
   const canCreatePackage = isEdit || hasQuota('packages');
 
+  // Seed group associations when editing an existing package
+  useEffect(() => {
+    if (open && package_?.groups) {
+      setSelectedGroupIds(package_.groups.map((g) => g.id));
+    } else if (open && !package_) {
+      setSelectedGroupIds([]);
+    }
+  }, [open, package_]);
+
   // Fetch groups for multi-select (active groups only)
-  const { data: groupsData } = useQuery(groupsQueryOptions());
+  const { data: groupsData } = useSuspenseQuery(groupsQueryOptions());
   const activeGroups = (groupsData?.data ?? []).filter((g) => g.is_active);
 
   const form = useAppForm({
@@ -104,6 +113,20 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
   const { FormTextField, FormTextareaField, FormSwitchField } = useFormFields<PackageFormValues>();
 
   const isAllAccess = useStore(form.store, (state) => state.values.is_all_access);
+  const isDirty = useStore(form.store, (state) => state.isDirty);
+  const submissionAttempts = useStore(form.store, (state) => state.submissionAttempts);
+
+  // Auto-scroll to first validation error on submit
+  useEffect(() => {
+    if (submissionAttempts === 0) return;
+    setTimeout(() => {
+      const scrollEl = document.getElementById('package-form-scroll');
+      const firstError = scrollEl?.querySelector('.text-destructive');
+      if (firstError) {
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 50);
+  }, [submissionAttempts]);
 
   const syncPackageList = (item: Package) => {
     queryClient.setQueryData<PackagesListResponse | undefined>(packageKeys.list(), (old) => {
@@ -137,7 +160,7 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
         }
 
         // Associate groups if any selected (create mode only)
-        if (!isAllAccess && selectedGroupIds.length > 0 && res.data?.id) {
+        if (!isAllAccess && res.data?.id) {
           await associateMutation.mutateAsync({
             packageId: res.data.id,
             data: { group_ids: selectedGroupIds }
@@ -164,7 +187,7 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
         }
 
         // Associate groups if any selected
-        if (!isAllAccess && selectedGroupIds.length > 0 && res.data?.id) {
+        if (!isAllAccess && res.data?.id) {
           await associateMutation.mutateAsync({
             packageId: res.data.id,
             data: { group_ids: selectedGroupIds }
@@ -184,6 +207,9 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
 
   const associateMutation = useMutation({
     ...associateGroupsMutation,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: packageKeys.all });
+    },
     onError: () => toast.error('Gagal menghubungkan grup ke paket')
   });
 
@@ -207,7 +233,15 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
         onOpenChange(v);
       }}
     >
-      <DialogContent className='sm:max-w-[520px] max-h-[85vh] flex flex-col overflow-hidden p-0 gap-0'>
+      <DialogContent
+        className='sm:max-w-[520px] max-h-[85vh] flex flex-col overflow-hidden p-0 gap-0'
+        onPointerDownOutside={(e) => {
+          if (isDirty) e.preventDefault();
+        }}
+        onEscapeKeyDown={(e) => {
+          if (isDirty) e.preventDefault();
+        }}
+      >
         <div className='shrink-0 px-6 pt-6'>
           <DialogHeader>
             <DialogTitle>{isEdit ? 'Ubah Paket' : 'Tambah Paket Baru'}</DialogTitle>
@@ -217,7 +251,7 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
           </DialogHeader>
         </div>
 
-        <div className='flex-1 min-h-0 overflow-y-auto px-6 py-4'>
+        <div id='package-form-scroll' className='flex-1 min-h-0 overflow-y-auto px-6 py-4'>
           <form.AppForm>
             <form.Form id='package-form-dialog' className='space-y-4'>
               <FormTextField
@@ -289,10 +323,15 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
                   <FieldDescription>
                     Pilih grup Telegram mana yang bisa diakses oleh paket ini.
                   </FieldDescription>
-                  <div className='flex flex-col gap-2 rounded-xl border bg-muted/30 p-4 max-h-[160px] overflow-y-auto'>
+                  <div className='flex flex-col gap-2 rounded-md border bg-muted/20 p-4'>
                     {activeGroups.map((group) => (
-                      <label key={group.id} className='flex items-center gap-2 cursor-pointer'>
+                      <label
+                        key={group.id}
+                        htmlFor={`group-${group.id}`}
+                        className='flex items-center gap-2 cursor-pointer'
+                      >
                         <Checkbox
+                          id={`group-${group.id}`}
                           className='border'
                           checked={selectedGroupIds.includes(group.id)}
                           onCheckedChange={() => toggleGroup(group.id)}
@@ -316,9 +355,19 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
               type='button'
               variant='outline'
               onClick={() => {
-                form.reset();
-                setSelectedGroupIds([]);
-                onOpenChange(false);
+                if (isDirty) {
+                  if (
+                    confirm('Anda memiliki perubahan yang belum disimpan. Yakin ingin membatalkan?')
+                  ) {
+                    form.reset();
+                    setSelectedGroupIds([]);
+                    onOpenChange(false);
+                  }
+                } else {
+                  form.reset();
+                  setSelectedGroupIds([]);
+                  onOpenChange(false);
+                }
               }}
             >
               Batal

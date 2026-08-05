@@ -3,11 +3,23 @@
     "title": "Automate Your <br></br> <highlight>Telegram</highlight> Group Memberships",
     "description": "Automate gatekeeping, secure invite-only access, and accept instant payments via VA & QRIS for your Telegram membership groups.",
     "getStarted": "Get Started",
-    "watchDemo": "Watch Demo"
+    "watchDemo": "Watch Demo",
+    "demoTitle": "Product Demo",
+    "demoDescription": "Watch a quick demo to understand the platform workflow.",
+    "browserNotSupported": "Your browser does not support video."
+  },
+  "NavMenu": {
+    "home": "Home",
+    "features": "Features",
+    "faq": "FAQ",
+    "pricing": "Pricing"
   },
   "Navbar": {
     "signIn": "Sign In",
     "getStarted": "Get Started"
+  },
+  "NavigationSheet": {
+    "title": "Navigation"
   },
   "Features": {
     "header": "Powerful Features, Built for Autopilot.",
@@ -74,7 +86,12 @@
     "mostPopular": "Most Popular",
     "perMonth": "per month",
     "getStarted": "Get Started",
-    "free": "Rp 0"
+    "free": "Rp 0",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "perYear": "per year",
+    "error": "Failed to load pricing. Please try again.",
+    "retry": "Retry"
   },
   "Footer": {
     "brandDescription": "Automated Telegram gatekeeper & monetization platform. Focus on building your community, let us handle the payments and access.",

@@ -2,9 +2,11 @@
 
 import { useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useVerifyEmailQuery } from '../api/queries';
 import { useAuthStore } from '@/stores/auth-store';
 import { Icons } from '@/components/icons';
+import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
 export default function VerifyEmailClient() {
@@ -13,7 +15,6 @@ export default function VerifyEmailClient() {
   const token = searchParams.get('token');
   const setAuth = useAuthStore((s) => s.setAuth);
 
-  // If token is missing, redirect to login
   useEffect(() => {
     if (!token) {
       toast.error('Tautan verifikasi tidak valid', {
@@ -46,30 +47,12 @@ export default function VerifyEmailClient() {
         if (res.data?.needs_onboarding) {
           router.push('/onboarding');
         } else {
-          router.push('/dashboard/overview');
+          const slug = res.data?.client?.slug;
+          router.push(slug ? `/${slug}/dashboard/overview` : '/dashboard/overview');
         }
-      } else {
-        toast.error('Verifikasi gagal', {
-          description: res?.message || 'Token tidak valid atau sudah kedaluwarsa.'
-        });
-        setTimeout(() => router.push('/login'), 3000);
       }
-    } else if (verifyQuery.isError) {
-      toast.error('Terjadi kesalahan verifikasi', {
-        description:
-          verifyQuery.error?.message || 'Terjadi kesalahan yang tidak terduga saat verifikasi.'
-      });
-      setTimeout(() => router.push('/login'), 3000);
     }
-  }, [
-    verifyQuery.isSuccess,
-    verifyQuery.isError,
-    verifyQuery.data,
-    verifyQuery.error,
-    router,
-    token,
-    setAuth
-  ]);
+  }, [verifyQuery.isSuccess, verifyQuery.data, router, token, setAuth]);
 
   if (!token) return null;
 
@@ -81,8 +64,7 @@ export default function VerifyEmailClient() {
           <div className='space-y-2'>
             <h1 className='text-xl font-semibold tracking-tight'>Memverifikasi email Anda</h1>
             <p className='text-sm text-muted-foreground'>
-              Mohon tunggu sementara kami memverifikasi alamat email Anda. Anda akan segera
-              diarahkan.
+              Mohon tunggu sementara kami memverifikasi alamat email Anda.
             </p>
           </div>
         </>
@@ -91,13 +73,16 @@ export default function VerifyEmailClient() {
           <div className='h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center'>
             <Icons.close className='h-6 w-6 text-destructive' />
           </div>
-          <div className='space-y-2'>
+          <div className='space-y-4'>
             <h1 className='text-xl font-semibold tracking-tight'>Verifikasi Gagal</h1>
             <p className='text-sm text-muted-foreground'>
               {verifyQuery.data?.message ||
                 verifyQuery.error?.message ||
-                'Tautan mungkin tidak valid atau sudah kedaluwarsa. Mengarahkan ke halaman masuk...'}
+                'Tautan mungkin tidak valid atau sudah kedaluwarsa.'}
             </p>
+            <Button asChild>
+              <Link href='/login'>Kembali ke Masuk</Link>
+            </Button>
           </div>
         </>
       ) : verifyQuery.isSuccess && verifyQuery.data?.success ? (

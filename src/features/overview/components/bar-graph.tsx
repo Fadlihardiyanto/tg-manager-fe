@@ -13,14 +13,16 @@ import type { RevenueChartItem } from '../api/types';
 
 const chartConfig = {
   revenue: {
-    label: 'Revenue',
+    label: 'Pendapatan',
     color: 'var(--chart-1)'
   }
 } satisfies ChartConfig;
 
 function formatDate(dateStr: string) {
-  const d = new Date(dateStr + 'T00:00:00');
-  return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+  const d = new Date(dateStr);
+  return Number.isNaN(d.getTime())
+    ? dateStr
+    : d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
 }
 
 function formatCompact(value: number) {
@@ -35,8 +37,8 @@ export function BarGraph({ data }: { data: RevenueChartItem[] }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Grafik Pendapatan 30 Hari</CardTitle>
-        <CardDescription>Revenue harian 30 hari terakhir</CardDescription>
+        <CardTitle>Tren Pendapatan</CardTitle>
+        <CardDescription>Pendapatan periode terakhir</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>

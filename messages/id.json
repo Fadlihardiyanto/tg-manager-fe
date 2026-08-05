@@ -3,11 +3,23 @@
     "title": "Otomatisasi Keanggotaan Grup <br></br> <highlight>Telegram</highlight> Anda",
     "description": "Otomatisasi pengelolaan anggota, amankan akses khusus undangan, dan terima pembayaran instan via VA & QRIS untuk grup Telegram Anda.",
     "getStarted": "Mulai Sekarang",
-    "watchDemo": "Lihat Demo"
+    "watchDemo": "Lihat Demo",
+    "demoTitle": "Demo Produk",
+    "demoDescription": "Lihat video demo singkat untuk mengenal alur penggunaan aplikasi.",
+    "browserNotSupported": "Browser Anda tidak mendukung video."
+  },
+  "NavMenu": {
+    "home": "Beranda",
+    "features": "Fitur",
+    "faq": "FAQ",
+    "pricing": "Harga"
   },
   "Navbar": {
     "signIn": "Masuk",
     "getStarted": "Mulai Sekarang"
+  },
+  "NavigationSheet": {
+    "title": "Navigasi"
   },
   "Features": {
     "header": "Fitur Canggih, Bekerja Secara Otomatis.",
@@ -74,7 +86,12 @@
     "mostPopular": "Paling Populer",
     "perMonth": "per bulan",
     "getStarted": "Mulai Sekarang",
-    "free": "Rp 0"
+    "free": "Rp 0",
+    "monthly": "Bulanan",
+    "yearly": "Tahunan",
+    "perYear": "per tahun",
+    "error": "Gagal memuat harga. Silakan coba lagi.",
+    "retry": "Coba Lagi"
   },
   "Footer": {
     "brandDescription": "Platform penjaga & monetisasi Telegram otomatis. Fokus pada membangun komunitas, biar kami yang menangani pembayaran dan akses.",

@@ -12,6 +12,8 @@ import {
 } from '@/components/ui/dialog';
 import { Icons } from '@/components/icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useStore } from '@tanstack/react-form';
+import { useEffect } from 'react';
 import { createDiscountMutation, updateDiscountMutation } from '../api/mutations';
 import { discountKeys } from '../api/queries';
 import type { MemberDiscount, DiscountType } from '../api/types';
@@ -146,6 +148,19 @@ export function DiscountFormDialog({ discount, open, onOpenChange }: DiscountFor
   const { FormTextField, FormSelectField } = useFormFields<DiscountFormValues>();
 
   const isPending = createMutation.isPending || updateMutation.isPending;
+  const submissionAttempts = useStore(form.store, (s) => s.submissionAttempts);
+
+  // Auto-scroll to first validation error on submit
+  useEffect(() => {
+    if (submissionAttempts === 0) return;
+    setTimeout(() => {
+      const scrollEl = document.getElementById('discount-form-scroll');
+      const firstError = scrollEl?.querySelector('.text-destructive');
+      if (firstError) {
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 50);
+  }, [submissionAttempts]);
 
   return (
     <Dialog
@@ -167,7 +182,7 @@ export function DiscountFormDialog({ discount, open, onOpenChange }: DiscountFor
           </DialogHeader>
         </div>
 
-        <div className='flex-1 min-h-0 overflow-y-auto px-6 py-4'>
+        <div id='discount-form-scroll' className='flex-1 min-h-0 overflow-y-auto px-6 py-4'>
           <form.AppForm>
             <form.Form id='discount-form-dialog' className='space-y-4'>
               <div className='grid grid-cols-2 gap-4'>

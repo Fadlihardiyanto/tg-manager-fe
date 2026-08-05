@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { useTenantPath } from '@/lib/tenant-path';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -41,6 +42,7 @@ const BOT_ROLE_STYLES: Record<BotRole, string> = {
 export default function BotDetailContent({ botId }: { botId: string }) {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { getTenantHref } = useTenantPath();
 
   const { data: botData, isLoading: botLoading } = useQuery(botByIdQueryOptions(botId));
   const { data: groupsData, isLoading: groupsLoading } = useQuery(groupsQueryOptions());
@@ -63,7 +65,7 @@ export default function BotDetailContent({ botId }: { botId: string }) {
     onSuccess: () => {
       toast.success('Bot berhasil dihapus');
       void queryClient.invalidateQueries({ queryKey: botKeys.all });
-      router.push('/dashboard/bots');
+      router.push(getTenantHref('/dashboard/bots'));
       router.refresh();
     },
     onError: () => toast.error('Gagal menghapus bot')

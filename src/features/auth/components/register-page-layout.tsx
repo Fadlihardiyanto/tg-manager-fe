@@ -20,11 +20,9 @@ export default function RegisterPageLayout() {
             </Link>
           </Button>
         </div>
-        <div className='rounded-2xl bg-gradient-to-br from-border/80 via-border/40 to-transparent p-[1px] shadow-xl shadow-black/5'>
-          <Card className='rounded-[15px] w-full p-6 md:p-8 bg-background/80 backdrop-blur-sm'>
-            <RegisterForm />
-          </Card>
-        </div>
+        <Card className='rounded-xl w-full p-6 md:p-8'>
+          <RegisterForm />
+        </Card>
       </div>
     </div>
   );

@@ -12,10 +12,13 @@ import { Icons } from '@/components/icons';
 import { useActivePlan } from '@/features/billing/components/active-plan-provider';
 import type { MemberDiscount } from '../api/types';
 
+import { useTenantPath } from '@/lib/tenant-path';
+
 export function DiscountListingContent() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingDiscount, setEditingDiscount] = useState<MemberDiscount | null>(null);
   const { canUseFeature } = useActivePlan();
+  const { getTenantHref } = useTenantPath();
   const allowDiscountSystem = canUseFeature('allow_discount_system');
 
   const handleEdit = useCallback((discount: MemberDiscount) => {
@@ -76,7 +79,7 @@ export function DiscountListingContent() {
                 Upgrade plan Anda untuk membuat, mengelola, dan melacak performa diskon.
               </p>
               <Button asChild className='mt-5 rounded-full'>
-                <Link href='/dashboard/billing?tab=upgrade'>Upgrade Plan</Link>
+                <Link href={getTenantHref('/dashboard/billing?tab=upgrade')}>Upgrade Plan</Link>
               </Button>
             </div>
           </div>

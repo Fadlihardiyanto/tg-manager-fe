@@ -12,13 +12,16 @@ import { Icons } from '@/components/icons';
 import { QuotaCard } from '@/features/billing/components/quota-card';
 import { useActivePlan } from '@/features/billing/components/active-plan-provider';
 import { groupsQueryOptions } from '@/features/groups/api/queries';
+import { useTenantPath } from '@/lib/tenant-path';
 import Link from 'next/link';
 import type { Package } from '../api/types';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 export function PackageListingContent() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPackage, setEditingPackage] = useState<Package | null>(null);
   const { hasQuota } = useActivePlan();
+  const { getTenantHref } = useTenantPath();
 
   const { data: groupsData } = useSuspenseQuery(groupsQueryOptions());
   const hasActiveGroups = (groupsData?.data ?? []).some((g) => g.is_active);
@@ -49,8 +52,8 @@ export function PackageListingContent() {
           <p className='mt-1 text-amber-700'>
             Silakan hubungkan grup Telegram Anda terlebih dahulu sebelum membuat paket jualan.
           </p>
-          <Button asChild size='sm' className='mt-3 rounded-full'>
-            <Link href='/dashboard/groups'>Hubungkan Grup</Link>
+          <Button asChild size='sm' className='mt-3'>
+            <Link href={getTenantHref('/dashboard/groups')}>Hubungkan Grup</Link>
           </Button>
         </div>
       )}
@@ -59,19 +62,35 @@ export function PackageListingContent() {
         onEdit={handleEdit}
         notice={<QuotaCard resource='packages' title='Kuota paket' />}
         toolbarActions={
-          <Button
-            onClick={handleAdd}
-            size='sm'
-            disabled={!hasActiveGroups || !canCreatePackage}
-            className='rounded-full'
-          >
+          <>
             {canCreatePackage ? (
-              <Icons.add className='mr-2 h-4 w-4' />
+              hasActiveGroups ? (
+                <Button onClick={handleAdd} size='sm' className='rounded-full'>
+                  <Icons.add className='mr-2 h-4 w-4' />
+                  Tambah Paket
+                </Button>
+              ) : (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span>
+                      <Button onClick={handleAdd} size='sm' disabled className='rounded-full'>
+                        <Icons.add className='mr-2 h-4 w-4' />
+                        Tambah Paket
+                      </Button>
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>Hubungkan grup terlebih dahulu</TooltipContent>
+                </Tooltip>
+              )
             ) : (
-              <Icons.lock className='mr-2 h-4 w-4' />
+              <Button asChild size='sm' className='rounded-full'>
+                <Link href={getTenantHref('/dashboard/billing')}>
+                  <Icons.lock className='mr-2 h-4 w-4' />
+                  Upgrade Paket
+                </Link>
+              </Button>
             )}
-            {canCreatePackage ? 'Tambah Paket' : 'Limit Tercapai'}
-          </Button>
+          </>
         }
       />
 

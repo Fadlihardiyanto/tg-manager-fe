@@ -36,37 +36,40 @@ export function ForgotPasswordForm({ ...props }: React.ComponentProps<'form'>) {
     }
   });
 
+  const handleRetry = () => {
+    form.reset();
+    setError(null);
+    setIsSubmitted(false);
+  };
+
   if (isSubmitted) {
     return (
       <div className='flex flex-col w-full text-center'>
-        {/* Success Icon */}
         <div className='flex justify-center mb-6'>
           <div className='flex h-16 w-16 items-center justify-center rounded-full bg-primary/10'>
             <Icons.check className='h-8 w-8 text-primary' />
           </div>
         </div>
 
-        {/* Success Message */}
         <h1 className='text-2xl font-bold text-foreground mb-2'>Periksa Email Anda</h1>
-        <p className='text-sm text-muted-foreground mb-8'>
+        <p className='text-sm text-muted-foreground mb-4'>
           Kami telah mengirim tautan reset kata sandi ke{' '}
           <span className='font-semibold text-foreground'>{form.state.values.email}</span>. Silakan
           periksa kotak masuk Anda dan ikuti petunjuknya.
         </p>
+        <p className='text-xs text-muted-foreground mb-8'>
+          Tidak menemukan email? Coba periksa folder spam atau promosi.
+        </p>
 
-        {/* Actions */}
         <div className='flex flex-col gap-4'>
-          <Button
-            asChild
-            className='w-full h-12 rounded-xl bg-gradient-to-r from-primary to-primary/80 text-base font-semibold text-primary-foreground transition-opacity hover:from-primary/90 hover:to-primary/70'
-          >
+          <Button asChild className='w-full h-11 rounded-xl font-semibold text-sm'>
             <Link href='/login'>Kembali ke Masuk</Link>
           </Button>
           <p className='text-center text-sm text-muted-foreground'>
             Belum menerima email?{' '}
             <button
               type='button'
-              onClick={() => setIsSubmitted(false)}
+              onClick={handleRetry}
               className='cursor-pointer font-bold text-foreground transition-colors hover:underline'
             >
               Coba lagi
@@ -79,7 +82,6 @@ export function ForgotPasswordForm({ ...props }: React.ComponentProps<'form'>) {
 
   return (
     <div className='flex flex-col w-full'>
-      {/* BEGIN: Header Section */}
       <header className='flex flex-col items-center text-center mb-6'>
         <div className='relative flex items-center justify-center mb-4 h-16 w-full max-w-[250px]'>
           <Image
@@ -92,33 +94,36 @@ export function ForgotPasswordForm({ ...props }: React.ComponentProps<'form'>) {
         </div>
         <h1 className='text-2xl font-bold text-foreground mb-2'>Lupa kata sandi?</h1>
         <p className='text-muted-foreground text-sm'>
-          Tidak masalah, kami akan mengirim petunjuk reset.
+          Masukkan email Anda, kami akan mengirim tautan reset.
         </p>
       </header>
 
       <form.AppForm>
         <form.Form className='space-y-5 w-full' {...props}>
-          {/* Email */}
           <form.AppField
             name='email'
             children={(_field) => (
               <TextField
-                label=''
+                label='Alamat email'
                 type='email'
                 placeholder='Alamat email'
+                autoComplete='email'
+                name='email'
                 leftIcon={<Icons.mail className='h-5 w-5' />}
-                className='pl-10 h-12 border border-border rounded-xl focus-visible:ring-2 focus-visible:ring-ring/40 text-base placeholder:text-muted-foreground bg-background'
+                className='pl-10 h-11 border border-border rounded-xl focus-visible:ring-2 focus-visible:ring-ring/40 text-sm placeholder:text-muted-foreground bg-background'
               />
             )}
           />
 
-          {/* Error Message */}
-          {error && <p className='text-sm text-destructive'>{error}</p>}
+          {error && (
+            <p className='text-sm text-destructive' role='alert'>
+              {error}
+            </p>
+          )}
 
-          {/* Submit Button */}
           <form.SubmitButton
             disabled={isSubmitting}
-            className='w-full bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-semibold h-12 rounded-xl hover:from-primary/90 hover:to-primary/70 active:scale-[0.98] transition-all mt-4 text-base'
+            className='w-full h-11 rounded-xl font-semibold text-sm'
           >
             {isSubmitting ? (
               <span className='flex items-center gap-2'>
@@ -132,7 +137,6 @@ export function ForgotPasswordForm({ ...props }: React.ComponentProps<'form'>) {
         </form.Form>
       </form.AppForm>
 
-      {/* BEGIN: Footer */}
       <footer className='mt-6 text-center'>
         <Link
           href='/login'

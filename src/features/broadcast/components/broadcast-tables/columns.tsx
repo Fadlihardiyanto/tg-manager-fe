@@ -2,6 +2,7 @@
 
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-header';
 import type { Broadcast } from '../../api/types';
 import type { ColumnDef } from '@tanstack/react-table';
@@ -53,7 +54,8 @@ export const columns: ColumnDef<Broadcast>[] = [
       </Badge>
     ),
     enableSorting: false,
-    enableColumnFilter: false
+    enableColumnFilter: false,
+    meta: { label: 'Tujuan' }
   },
   {
     id: 'message_type',
@@ -65,7 +67,8 @@ export const columns: ColumnDef<Broadcast>[] = [
       </span>
     ),
     enableSorting: false,
-    enableColumnFilter: false
+    enableColumnFilter: false,
+    meta: { label: 'Tipe' }
   },
   {
     id: 'message_text',
@@ -80,7 +83,8 @@ export const columns: ColumnDef<Broadcast>[] = [
       );
     },
     enableSorting: false,
-    enableColumnFilter: false
+    enableColumnFilter: false,
+    meta: { label: 'Pesan' }
   },
   {
     id: 'status',
@@ -100,7 +104,8 @@ export const columns: ColumnDef<Broadcast>[] = [
       );
     },
     enableSorting: false,
-    enableColumnFilter: false
+    enableColumnFilter: false,
+    meta: { label: 'Status' }
   },
   {
     id: 'progress',
@@ -120,13 +125,47 @@ export const columns: ColumnDef<Broadcast>[] = [
           </div>
           <Progress value={progressValue} />
           {failed_count > 0 && (
-            <span className='text-xs text-destructive'>({failed_count} gagal)</span>
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  type='button'
+                  className='text-xs text-destructive hover:underline cursor-pointer'
+                >
+                  ({failed_count} gagal)
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className='w-80 p-0' align='start'>
+                <div className='px-4 py-3 border-b border-border'>
+                  <p className='text-sm font-semibold'>Gagal: {failed_count} penerima</p>
+                </div>
+                <div className='max-h-[240px] overflow-y-auto'>
+                  {row.original.failed_details?.map((d, i) => (
+                    <div
+                      key={i}
+                      className='flex items-start gap-2 px-4 py-2 text-sm border-b border-border last:border-0'
+                    >
+                      <Icons.circleX className='mt-0.5 size-3.5 shrink-0 text-destructive' />
+                      <div className='min-w-0'>
+                        <p className='font-mono text-xs text-muted-foreground truncate'>
+                          {d.chat_id}
+                        </p>
+                        <p className='text-xs'>{d.error}</p>
+                      </div>
+                    </div>
+                  ))}
+                  {!row.original.failed_details?.length && (
+                    <p className='px-4 py-2 text-xs text-muted-foreground'>Detail tidak tersedia</p>
+                  )}
+                </div>
+              </PopoverContent>
+            </Popover>
           )}
         </div>
       );
     },
     enableSorting: false,
-    enableColumnFilter: false
+    enableColumnFilter: false,
+    meta: { label: 'Progres' }
   },
   {
     id: 'scheduled_at',
@@ -148,7 +187,8 @@ export const columns: ColumnDef<Broadcast>[] = [
       );
     },
     enableSorting: true,
-    enableColumnFilter: false
+    enableColumnFilter: false,
+    meta: { label: 'Jadwal' }
   },
   {
     id: 'created_at',
@@ -169,6 +209,7 @@ export const columns: ColumnDef<Broadcast>[] = [
       );
     },
     enableSorting: true,
-    enableColumnFilter: false
+    enableColumnFilter: false,
+    meta: { label: 'Dibuat' }
   }
 ];

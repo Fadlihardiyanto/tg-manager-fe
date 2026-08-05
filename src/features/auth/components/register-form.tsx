@@ -6,13 +6,12 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useStore } from '@tanstack/react-form';
 import { Icons } from '@/components/icons';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useAppForm } from '@/components/ui/tanstack-form';
 import { TextField } from '@/components/forms/fields';
 import { tenantRegisterSchema, type TenantRegisterInput } from '../schemas/auth-schema';
 import { useRegisterMutation } from '../api/queries';
-import { toast } from 'sonner';
 
-/** Password strength checks */
 function getPasswordChecks(password: string) {
   return {
     length: password.length >= 8,
@@ -25,6 +24,7 @@ const RegisterForm = () => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [registerError, setRegisterError] = useState<string | null>(null);
   const registerMutation = useRegisterMutation();
 
   const form = useAppForm({
@@ -39,6 +39,7 @@ const RegisterForm = () => {
     },
     onSubmit: async ({ value }) => {
       try {
+        setRegisterError(null);
         const res = await registerMutation.mutateAsync({
           name: value.name,
           email: value.email,
@@ -47,27 +48,18 @@ const RegisterForm = () => {
         });
 
         if (res.success) {
-          toast.success('Pendaftaran berhasil', {
-            description: res.message || 'Silakan periksa email Anda untuk memverifikasi akun.'
-          });
-          // BE guide: redirect to check-email page with email param
           router.push(`/check-email?email=${encodeURIComponent(value.email)}`);
         } else {
-          toast.error('Pendaftaran gagal', {
-            description: res.message || 'Terjadi kesalahan'
-          });
+          setRegisterError(res.message || 'Terjadi kesalahan');
         }
       } catch (error: unknown) {
-        const message = error instanceof Error ? error.message : 'Please try again later';
-        toast.error('Pendaftaran gagal', { description: message });
+        setRegisterError(error instanceof Error ? error.message : 'Silakan coba lagi nanti');
       }
     }
   });
 
-  /** Live form values (reactive via useStore) */
   const formValues = useStore(form.store, (s) => s.values);
 
-  /** Live password checks */
   const passwordChecks = useMemo(
     () => getPasswordChecks(formValues.password),
     [formValues.password]
@@ -75,7 +67,6 @@ const RegisterForm = () => {
 
   return (
     <div className='flex flex-col w-full'>
-      {/* BEGIN: Header Section */}
       <header className='flex flex-col items-center text-center mb-6'>
         <div className='relative flex items-center justify-center mb-4 h-16 w-full max-w-[250px]'>
           <Image
@@ -87,53 +78,64 @@ const RegisterForm = () => {
           />
         </div>
         <h1 className='text-2xl font-bold text-foreground mb-2'>Buat akun</h1>
-        <p className='text-muted-foreground text-sm'>Bergabunglah dengan otomatisasi Telegram.</p>
+        <p className='text-muted-foreground text-sm'>Isi data Anda untuk membuat akun.</p>
       </header>
 
       <form.AppForm>
         <form.Form className='space-y-5 w-full'>
-          {/* Name */}
+          {registerError && (
+            <Alert variant='destructive' className='mb-2'>
+              <AlertTitle className='text-sm font-semibold'>Pendaftaran gagal</AlertTitle>
+              <AlertDescription className='text-sm'>{registerError}</AlertDescription>
+            </Alert>
+          )}
+
           <form.AppField
             name='name'
             children={(field) => (
               <TextField
-                label=''
+                label='Nama lengkap'
                 type='text'
                 placeholder='Nama lengkap'
+                autoComplete='name'
+                name='name'
                 leftIcon={<Icons.user className='h-5 w-5' />}
-                className='pl-10 h-12 border border-border rounded-xl focus-visible:ring-2 focus-visible:ring-ring/40 text-base placeholder:text-muted-foreground bg-background'
+                className='pl-10 h-11 border border-border rounded-xl focus-visible:ring-2 focus-visible:ring-ring/40 text-sm placeholder:text-muted-foreground bg-background'
               />
             )}
           />
 
-          {/* Email */}
           <form.AppField
             name='email'
             children={(field) => (
               <TextField
-                label=''
+                label='Alamat email'
                 type='email'
                 placeholder='Alamat email'
+                autoComplete='email'
+                name='email'
                 leftIcon={<Icons.mail className='h-5 w-5' />}
-                className='pl-10 h-12 border border-border rounded-xl focus-visible:ring-2 focus-visible:ring-ring/40 text-base placeholder:text-muted-foreground bg-background'
+                className='pl-10 h-11 border border-border rounded-xl focus-visible:ring-2 focus-visible:ring-ring/40 text-sm placeholder:text-muted-foreground bg-background'
               />
             )}
           />
 
-          {/* Password */}
           <form.AppField
             name='password'
             children={(field) => (
               <TextField
-                label=''
+                label='Kata sandi'
                 type={showPassword ? 'text' : 'password'}
                 placeholder='Kata sandi'
+                autoComplete='new-password'
+                name='password'
                 hideError
                 leftIcon={<Icons.lock className='h-5 w-5' />}
                 rightElement={
                   <button
                     type='button'
                     tabIndex={-1}
+                    aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
                     onClick={() => setShowPassword(!showPassword)}
                     className='cursor-pointer text-muted-foreground hover:text-foreground transition-colors'
                   >
@@ -144,12 +146,11 @@ const RegisterForm = () => {
                     )}
                   </button>
                 }
-                className='pl-10 h-12 border border-border rounded-xl focus-visible:ring-2 focus-visible:ring-ring/40 font-mono tracking-widest text-base placeholder:text-muted-foreground bg-background'
+                className='pl-10 h-11 border border-border rounded-xl focus-visible:ring-2 focus-visible:ring-ring/40 text-sm placeholder:text-muted-foreground bg-background'
               />
             )}
           />
 
-          {/* Password Validation Checklist */}
           <div className='-mt-1 mb-1 flex flex-col gap-1.5'>
             <ValidationItem label='Minimal 8 karakter' valid={passwordChecks.length} />
             <ValidationItem
@@ -162,19 +163,23 @@ const RegisterForm = () => {
             />
           </div>
 
-          {/* Confirm Password */}
           <form.AppField
             name='confirmPassword'
             children={(field) => (
               <TextField
-                label=''
+                label='Ulangi kata sandi'
                 type={showConfirmPassword ? 'text' : 'password'}
                 placeholder='Ulangi kata sandi'
+                autoComplete='new-password'
+                name='confirmPassword'
                 leftIcon={<Icons.lock className='h-5 w-5' />}
                 rightElement={
                   <button
                     type='button'
                     tabIndex={-1}
+                    aria-label={
+                      showConfirmPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'
+                    }
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className='cursor-pointer text-muted-foreground hover:text-foreground transition-colors'
                   >
@@ -185,13 +190,13 @@ const RegisterForm = () => {
                     )}
                   </button>
                 }
-                className='pl-10 h-12 border border-border rounded-xl focus-visible:ring-2 focus-visible:ring-ring/40 font-mono tracking-widest text-base placeholder:text-muted-foreground bg-background'
+                className='pl-10 h-11 border border-border rounded-xl focus-visible:ring-2 focus-visible:ring-ring/40 text-sm placeholder:text-muted-foreground bg-background'
               />
             )}
           />
 
           <form.SubmitButton
-            className='w-full bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-semibold h-12 rounded-xl hover:from-primary/90 hover:to-primary/70 active:scale-[0.98] transition-all mt-4 text-base'
+            className='w-full h-11 rounded-xl font-semibold text-sm'
             disabled={registerMutation.isPending}
           >
             {registerMutation.isPending ? (
@@ -206,7 +211,6 @@ const RegisterForm = () => {
         </form.Form>
       </form.AppForm>
 
-      {/* BEGIN: Footer */}
       <footer className='mt-6 text-center'>
         <p className='text-sm text-muted-foreground'>
           Sudah punya akun?{' '}
@@ -219,7 +223,6 @@ const RegisterForm = () => {
   );
 };
 
-/** Inline validation check item */
 function ValidationItem({ label, valid }: { label: string; valid: boolean }) {
   return (
     <div

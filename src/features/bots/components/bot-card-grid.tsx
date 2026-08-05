@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useTenantPath } from '@/lib/tenant-path';
 
 import { AlertModal } from '@/components/modal/alert-modal';
 import { Badge } from '@/components/ui/badge';
@@ -118,6 +119,7 @@ function BotCard({ bot, groupCount, onEdit, index }: BotCardProps) {
   const [toggleOpen, setToggleOpen] = useState(false);
   const queryClient = useQueryClient();
   const router = useRouter();
+  const { getTenantHref } = useTenantPath();
 
   const deleteMutation = useMutation({
     ...deleteBotMutation,
@@ -219,7 +221,7 @@ function BotCard({ bot, groupCount, onEdit, index }: BotCardProps) {
                 <h6 className='text-base font-semibold'>
                   <button
                     type='button'
-                    onClick={() => router.push(`/dashboard/bots/${bot.id}`)}
+                    onClick={() => router.push(getTenantHref(`/dashboard/bots/${bot.id}`))}
                     className='hover:text-primary hover:underline transition-colors text-left'
                   >
                     @{bot.username}
@@ -248,7 +250,9 @@ function BotCard({ bot, groupCount, onEdit, index }: BotCardProps) {
                   )}
                   {bot.is_active ? 'Nonaktifkan' : 'Aktifkan'}
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => router.push(`/dashboard/bots/${bot.id}`)}>
+                <DropdownMenuItem
+                  onClick={() => router.push(getTenantHref(`/dashboard/bots/${bot.id}`))}
+                >
                   <Icons.network className='mr-2 size-4' />
                   Jaringan
                 </DropdownMenuItem>

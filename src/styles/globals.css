@@ -14,6 +14,20 @@
   body {
     @apply bg-background text-foreground;
   }
+  button,
+  [role='button'],
+  [role='tab'],
+  a,
+  label,
+  input[type='checkbox'],
+  input[type='radio'] {
+    cursor: pointer;
+  }
+  button:disabled,
+  [disabled],
+  [aria-disabled='true'] {
+    cursor: not-allowed !important;
+  }
 
   /* Global scrollbar styling to match ScrollArea */
   * {

@@ -3,13 +3,17 @@ import type {
   BroadcastsListResponse,
   BroadcastResponse,
   PresignedUrlRequest,
-  PresignedUrlResponse
+  PresignedUrlResponse,
+  BroadcastReachResponse
 } from './types';
 
 const LOGIN_URL = '/login';
 
 async function apiFetch(url: string, options?: RequestInit) {
-  const res = await fetch(url, options);
+  const res = await fetch(url, {
+    ...options,
+    credentials: 'include'
+  });
   if (res.status === 401 && typeof window !== 'undefined') {
     window.location.href = LOGIN_URL;
     throw new Error('Sesi habis');
@@ -59,6 +63,15 @@ export async function createBroadcast(
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Gagal membuat broadcast';
+    return { success: false, code: 400, message, data: undefined as any };
+  }
+}
+
+export async function getBroadcastReach(botId: string): Promise<BroadcastReachResponse> {
+  try {
+    return await apiFetch(`/api/tenant/bots/${botId}/broadcast-reach`);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Gagal mengambil data jangkauan';
     return { success: false, code: 400, message, data: undefined as any };
   }
 }

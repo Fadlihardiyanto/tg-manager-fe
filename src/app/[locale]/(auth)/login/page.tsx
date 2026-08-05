@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import LoginPageLayout from '@/features/auth/components/login-page-layout';
 
 export const metadata: Metadata = {
-  title: 'Masuk - TG-Manager',
+  title: 'Masuk - Urator',
   description: 'Masuk ke dashboard tenant Anda'
 };
 

@@ -22,8 +22,7 @@ export async function getAuthHeaders(): Promise<HeadersInit> {
   if (!token) {
     cookieStore.delete('access_token');
     cookieStore.delete('refresh_token');
-    const { redirect } = await import('next/navigation');
-    redirect('/login');
+    throw new Error('Unauthorized');
   }
 
   return { Authorization: `Bearer ${token}` };

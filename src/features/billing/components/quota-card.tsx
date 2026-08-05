@@ -6,6 +6,7 @@ import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useActivePlan } from './active-plan-provider';
+import { useTenantPath } from '@/lib/tenant-path';
 
 interface QuotaCardProps {
   resource: 'bots' | 'packages' | 'custom_commands' | 'broadcasts';
@@ -15,6 +16,7 @@ interface QuotaCardProps {
 
 export function QuotaCard({ resource, title, className }: QuotaCardProps) {
   const { getQuota, isLoading } = useActivePlan();
+  const { getTenantHref } = useTenantPath();
 
   if (isLoading) return null;
 
@@ -44,7 +46,7 @@ export function QuotaCard({ resource, title, className }: QuotaCardProps) {
         size='sm'
         className='self-start rounded-full text-xs font-bold tracking-wider uppercase sm:self-center'
       >
-        <Link href='/dashboard/billing?tab=upgrade'>Upgrade Plan</Link>
+        <Link href={getTenantHref('/dashboard/billing?tab=upgrade')}>Upgrade Plan</Link>
       </Button>
     </div>
   );

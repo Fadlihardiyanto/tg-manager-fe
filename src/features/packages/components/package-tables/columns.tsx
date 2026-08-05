@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
@@ -17,26 +17,49 @@ import {
 } from '@/components/ui/alert-dialog';
 import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-header';
 import { togglePackageStatusMutation } from '../../api/mutations';
-import type { Package } from '../../api/types';
+import { packageKeys } from '../../api/queries';
+import type { Package, PackagesListResponse } from '../../api/types';
 import type { ColumnDef } from '@tanstack/react-table';
 import { Icons } from '@/components/icons';
 import { CellAction } from './cell-action';
 import { cn } from '@/lib/utils';
 import { formatDate, formatRupiah } from '@/lib/format';
 
-// ponytail: inline status cell — one place, one purpose
-function StatusCell({ pkg }: { pkg: Package }) {
+export function StatusCell({ pkg }: { pkg: Package }) {
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const queryClient = useQueryClient();
 
   const activateMutation = useMutation({
     ...togglePackageStatusMutation(true),
-    onSuccess: () => toast.success('Paket diaktifkan'),
+    onSuccess: (res) => {
+      if (res.success && res.data) {
+        queryClient.setQueryData<PackagesListResponse | undefined>(packageKeys.list(), (old) => {
+          if (!old) return old;
+          return {
+            ...old,
+            data: old.data.map((p) => (p.id === res.data!.id ? res.data! : p))
+          };
+        });
+      }
+      toast.success('Paket diaktifkan');
+    },
     onError: () => toast.error('Gagal mengaktifkan paket')
   });
 
   const deactivateMutation = useMutation({
     ...togglePackageStatusMutation(false),
-    onSuccess: () => toast.success('Paket dinonaktifkan'),
+    onSuccess: (res) => {
+      if (res.success && res.data) {
+        queryClient.setQueryData<PackagesListResponse | undefined>(packageKeys.list(), (old) => {
+          if (!old) return old;
+          return {
+            ...old,
+            data: old.data.map((p) => (p.id === res.data!.id ? res.data! : p))
+          };
+        });
+      }
+      toast.success('Paket dinonaktifkan');
+    },
     onError: () => toast.error('Gagal menonaktifkan paket')
   });
 
@@ -116,7 +139,8 @@ export function getColumns(onEdit?: (pkg: Package) => void): ColumnDef<Package>[
         );
       },
       enableSorting: true,
-      enableColumnFilter: false
+      enableColumnFilter: false,
+      meta: { label: 'Harga' }
     },
     {
       id: 'description',
@@ -131,7 +155,8 @@ export function getColumns(onEdit?: (pkg: Package) => void): ColumnDef<Package>[
         );
       },
       enableSorting: false,
-      enableColumnFilter: false
+      enableColumnFilter: false,
+      meta: { label: 'Deskripsi' }
     },
     {
       id: 'duration_days',
@@ -142,7 +167,8 @@ export function getColumns(onEdit?: (pkg: Package) => void): ColumnDef<Package>[
         return <span className='text-sm'>{days} hari</span>;
       },
       enableSorting: true,
-      enableColumnFilter: false
+      enableColumnFilter: false,
+      meta: { label: 'Durasi' }
     },
     {
       id: 'groups',
@@ -165,7 +191,8 @@ export function getColumns(onEdit?: (pkg: Package) => void): ColumnDef<Package>[
         );
       },
       enableSorting: false,
-      enableColumnFilter: false
+      enableColumnFilter: false,
+      meta: { label: 'Grup' }
     },
     {
       id: 'is_all_access',
@@ -196,7 +223,7 @@ export function getColumns(onEdit?: (pkg: Package) => void): ColumnDef<Package>[
       enableSorting: false,
       enableColumnFilter: true,
       meta: {
-        label: 'akses penuh',
+        label: 'Akses Penuh',
         variant: 'multiSelect' as const,
         options: [
           { label: 'Ya', value: 'true' },
@@ -217,7 +244,7 @@ export function getColumns(onEdit?: (pkg: Package) => void): ColumnDef<Package>[
       enableSorting: false,
       enableColumnFilter: true,
       meta: {
-        label: 'status',
+        label: 'Status',
         variant: 'multiSelect' as const,
         options: [
           { label: 'Aktif', value: 'true' },
@@ -242,7 +269,8 @@ export function getColumns(onEdit?: (pkg: Package) => void): ColumnDef<Package>[
         );
       },
       enableSorting: true,
-      enableColumnFilter: false
+      enableColumnFilter: false,
+      meta: { label: 'Dibuat' }
     },
     {
       id: 'actions',

@@ -13,7 +13,17 @@ export default function SuperadminAuthProvider({ children }: { children: React.R
   const hydrated = useRef(false);
   const lastPath = useRef(pathname);
 
+  // Only hydrate admin session when on a superadmin route to avoid
+  // noisy 401 errors in the browser console when logged in as a tenant.
+  const isSuperadminRoute = pathname.includes('/superadmin');
+
   const hydrate = useCallback(async () => {
+    if (!isSuperadminRoute) {
+      // Not on a superadmin route — clear stale admin auth if any
+      if (!accessToken) clearAuth();
+      return;
+    }
+
     try {
       const res = await fetch('/api/auth/admin-session');
       if (res.ok) {
@@ -34,7 +44,7 @@ export default function SuperadminAuthProvider({ children }: { children: React.R
     if (!accessToken) {
       clearAuth();
     }
-  }, [accessToken, setAuth, clearAuth]);
+  }, [accessToken, setAuth, clearAuth, isSuperadminRoute]);
 
   useEffect(() => {
     if (hydrated.current && lastPath.current === pathname) return;

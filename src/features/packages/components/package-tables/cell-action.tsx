@@ -49,7 +49,7 @@ export function CellAction({ data, onEdit }: CellActionProps) {
       />
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
-          <Button variant='ghost' className='h-8 w-8 p-0'>
+          <Button variant='ghost' className='h-11 w-11 p-0'>
             <span className='sr-only'>Buka menu</span>
             <Icons.ellipsis className='h-4 w-4' />
           </Button>

@@ -1,11 +1,12 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-
 import { Button } from '@/components/ui/button';
+import { useTenantPath } from '@/lib/tenant-path';
 
 export default function NotFound() {
   const router = useRouter();
+  const { getTenantHref } = useTenantPath();
 
   return (
     <div className='absolute top-1/2 left-1/2 mb-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center text-center'>
@@ -18,7 +19,11 @@ export default function NotFound() {
         <Button onClick={() => router.back()} variant='default' size='lg'>
           Kembali
         </Button>
-        <Button onClick={() => router.push('/dashboard')} variant='ghost' size='lg'>
+        <Button
+          onClick={() => router.push(getTenantHref('/dashboard/overview'))}
+          variant='ghost'
+          size='lg'
+        >
           Kembali ke Beranda
         </Button>
       </div>

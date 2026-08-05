@@ -61,7 +61,8 @@ export function getColumns(
         );
       },
       enableSorting: false,
-      enableColumnFilter: false
+      enableColumnFilter: false,
+      meta: { label: 'Tipe & Nilai' }
     },
     {
       id: 'usage',
@@ -77,7 +78,8 @@ export function getColumns(
         );
       },
       enableSorting: false,
-      enableColumnFilter: false
+      enableColumnFilter: false,
+      meta: { label: 'Pemakaian' }
     },
     {
       id: 'valid_until',
@@ -107,7 +109,8 @@ export function getColumns(
         );
       },
       enableSorting: true,
-      enableColumnFilter: false
+      enableColumnFilter: false,
+      meta: { label: 'Berlaku Sampai' }
     },
     {
       id: 'is_active',
@@ -129,7 +132,8 @@ export function getColumns(
         );
       },
       enableSorting: false,
-      enableColumnFilter: false
+      enableColumnFilter: false,
+      meta: { label: 'Status' }
     },
     {
       id: 'created_at',
@@ -148,7 +152,8 @@ export function getColumns(
         );
       },
       enableSorting: true,
-      enableColumnFilter: false
+      enableColumnFilter: false,
+      meta: { label: 'Dibuat' }
     },
     {
       id: 'actions',

@@ -1,6 +1,12 @@
 import { Suspense } from 'react';
+import type { Metadata } from 'next';
 import VerifyEmailClient from '@/features/auth/components/verify-email-client';
 import { Icons } from '@/components/icons';
+
+export const metadata: Metadata = {
+  title: 'Verifikasi Email - Urator',
+  description: 'Verifikasi alamat email Anda untuk mengaktifkan akun.'
+};
 
 export default function VerifyEmailPage() {
   return (

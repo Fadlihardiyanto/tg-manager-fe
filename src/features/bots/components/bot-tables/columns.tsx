@@ -95,6 +95,7 @@ export function getColumns(onEdit: (bot: TelegramBot) => void): ColumnDef<Telegr
       id: 'is_active',
       accessorKey: 'is_active',
       enableSorting: false,
+      meta: { label: 'Status' },
       header: ({ column }: { column: Column<TelegramBot, unknown> }) => (
         <DataTableColumnHeader column={column} title='Status' />
       ),
@@ -132,7 +133,8 @@ export function getColumns(onEdit: (bot: TelegramBot) => void): ColumnDef<Telegr
             year: 'numeric'
           })}
         </span>
-      )
+      ),
+      meta: { label: 'Dibuat' }
     },
     {
       id: 'actions',

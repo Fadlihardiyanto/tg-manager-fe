@@ -16,6 +16,12 @@ interface BulkKickTarget {
   subscriptionId?: string;
 }
 
+interface BulkExtendTarget {
+  id: string;
+  subscriptionId: string;
+  additionalDays: number;
+}
+
 export async function getMembers(filters: MemberFilters): Promise<MembersResponse> {
   const authHeaders = await getAuthHeaders();
 
@@ -29,37 +35,17 @@ export async function getMembers(filters: MemberFilters): Promise<MembersRespons
 
   const queryString = params.toString() ? `?${params.toString()}` : '';
 
-  try {
-    return await apiClient<MembersResponse>(`/api/v1/tenant/members${queryString}`, {
-      headers: { ...authHeaders }
-    });
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Server Error';
-    return {
-      success: false,
-      code: 500, // ponytail: static, not used by UI
-      message,
-      meta: { page: 1, limit: 10, total: 0, total_pages: 0 },
-      data: []
-    };
-  }
+  return apiClient<MembersResponse>(`/api/v1/tenant/members${queryString}`, {
+    headers: { ...authHeaders }
+  });
 }
 
 export async function getMember(id: string): Promise<MemberDetailResponse> {
   const authHeaders = await getAuthHeaders();
 
-  try {
-    return await apiClient<MemberDetailResponse>(`/api/v1/tenant/members/${id}`, {
-      headers: { ...authHeaders }
-    });
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Server Error';
-    return {
-      success: false,
-      message,
-      data: {} as MemberDetail
-    };
-  }
+  return apiClient<MemberDetailResponse>(`/api/v1/tenant/members/${id}`, {
+    headers: { ...authHeaders }
+  });
 }
 
 export async function extendAccess(
@@ -154,6 +140,27 @@ export async function bulkKickMembers(targets: BulkKickTarget[]): Promise<Action
     };
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Gagal mengeluarkan member';
+    return { success: false, message };
+  }
+}
+
+export async function bulkExtendMembers(targets: BulkExtendTarget[]): Promise<ActionResponse> {
+  try {
+    const results = await Promise.all(
+      targets.map((t) =>
+        extendAccess(t.id, { subscription_id: t.subscriptionId, additional_days: t.additionalDays })
+      )
+    );
+    const allSucceeded = results.every((r) => r.success);
+
+    return {
+      success: allSucceeded,
+      message: allSucceeded
+        ? `${targets.length} langganan berhasil diperpanjang`
+        : 'Gagal memperpanjang sebagian langganan'
+    };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Gagal memperpanjang langganan';
     return { success: false, message };
   }
 }

@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import { useAppForm } from '@/components/ui/tanstack-form';
+import { useStore } from '@tanstack/react-form';
 import { useSuperadminAuthStore } from '@/stores/superadmin-auth-store';
 import { loginAdmin, verifyAdminOtp, resendAdminOtp } from '../api/service';
 import { toast } from 'sonner';
@@ -137,6 +138,8 @@ export function AdminLoginForm() {
     }
   });
 
+  const isSubmitting = useStore(form.store, (s) => s.isSubmitting);
+
   if (step === 'otp') {
     return (
       <div className='flex flex-col w-full'>
@@ -250,7 +253,7 @@ export function AdminLoginForm() {
             required
           />
 
-          <Button type='submit' size='lg' className='w-full'>
+          <Button type='submit' size='lg' className='w-full' isLoading={isSubmitting}>
             Masuk
           </Button>
         </form.Form>

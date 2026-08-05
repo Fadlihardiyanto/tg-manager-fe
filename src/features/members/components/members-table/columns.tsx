@@ -86,12 +86,15 @@ export const columns: ColumnDef<Member>[] = [
             <div className='flex size-10 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/5 ring-2 ring-primary/10 text-primary font-bold text-sm'>
               {initials}
             </div>
-            {/* Online indicator */}
+            {/* Active membership indicator */}
             <span
               className={cn(
                 'absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-background',
                 row.original.global_status ? 'bg-emerald-500' : 'bg-muted-foreground/40'
               )}
+              title={
+                row.original.global_status ? 'Punya langganan aktif' : 'Tidak ada langganan aktif'
+              }
             />
           </div>
           <div className='max-w-56 truncate'>
@@ -116,17 +119,29 @@ export const columns: ColumnDef<Member>[] = [
     enableColumnFilter: true
   },
   {
+    id: 'phone',
     accessorKey: 'phone',
     header: 'Telepon',
-    cell: ({ row }) => row.original.phone || '-'
+    cell: ({ row }) => row.original.phone || '-',
+    meta: { label: 'Telepon' }
   },
   {
     id: 'subscription',
     accessorFn: (row) =>
       row.subscriptions?.map((subscription) => subscription.package_name).join(', ') ??
       row.active_packages.join(', '),
-    enableSorting: false,
-    header: 'Langganan',
+    enableSorting: true,
+    meta: { label: 'Langganan' },
+    sortingFn: (rowA, rowB) => {
+      const a = rowA.original.nearest_expiry
+        ? new Date(rowA.original.nearest_expiry).getTime()
+        : Number.MAX_SAFE_INTEGER;
+      const b = rowB.original.nearest_expiry
+        ? new Date(rowB.original.nearest_expiry).getTime()
+        : Number.MAX_SAFE_INTEGER;
+      return a - b;
+    },
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Langganan' />,
     cell: ({ row }) => {
       const subscriptions = row.original.subscriptions;
 
@@ -208,19 +223,7 @@ export const columns: ColumnDef<Member>[] = [
       variant: 'dateRange' as const
     }
   },
-  {
-    id: 'status',
-    accessorFn: (row) => (row.global_status ? 'active' : 'expired'),
-    enableSorting: false,
-    header: 'Status',
-    cell: () => null,
-    enableColumnFilter: true,
-    meta: {
-      label: 'status',
-      variant: 'multiSelect' as const,
-      options: STATUS_OPTIONS
-    }
-  },
+
   {
     id: 'actions',
     size: 50,

@@ -13,7 +13,7 @@ const localePattern = new RegExp(`^/(${routing.locales.join('|')})(/|$)`);
 
 // This allows to add custom title as well
 const routeMapping: Record<string, BreadcrumbItem[]> = {
-  '/dashboard': [{ title: 'Dashboard', link: '/dashboard' }],
+  '/dashboard': [{ title: 'Dashboard', link: '/dashboard/overview' }],
   '/dashboard/bots': [
     { title: 'Dashboard', link: '/dashboard/overview' },
     { title: 'Bots', link: '/dashboard/bots' }
@@ -52,12 +52,62 @@ const routeMapping: Record<string, BreadcrumbItem[]> = {
   ]
 };
 
+const labelMapping: Record<string, string> = {
+  Dashboard: 'Dashboard',
+  Bots: 'Bot',
+  Members: 'Member',
+  Groups: 'Grup',
+  Packages: 'Paket',
+  Commands: 'Command',
+  Broadcast: 'Siaran',
+  Midtrans: 'Midtrans',
+  Billing: 'Billing',
+  Discounts: 'Diskon'
+};
+
 export function useBreadcrumbs() {
   const pathname = usePathname();
 
   const breadcrumbs = useMemo(() => {
     const routePath = pathname.replace(localePattern, '/') || '/';
 
+    // Check if it's a tenant path: /:tenant/dashboard/...
+    const tenantMatch = routePath.match(/^\/([^/]+)\/dashboard(\/.*)?$/);
+
+    if (tenantMatch) {
+      const tenant = tenantMatch[1];
+      const subPath = '/dashboard' + (tenantMatch[2] || '');
+
+      let items: BreadcrumbItem[] = [];
+
+      if (routeMapping[subPath]) {
+        items = [...routeMapping[subPath]];
+      } else {
+        const segments = subPath.split('/').filter(Boolean); // ['dashboard', ...]
+        items = segments.map((segment, index) => {
+          const path = `/${segments.slice(0, index + 1).join('/')}`;
+          return {
+            title: segment.charAt(0).toUpperCase() + segment.slice(1),
+            link: path
+          };
+        });
+      }
+
+      // Prepends tenant slug to all links in items and maps titles
+      return items.map((item) => {
+        const link =
+          item.link === '/dashboard'
+            ? `/${tenant}/dashboard/overview`
+            : item.link.replace('/dashboard', `/${tenant}/dashboard`);
+
+        return {
+          title: labelMapping[item.title] || item.title,
+          link
+        };
+      });
+    }
+
+    // Default fallback (e.g. for superadmin or non-tenant pages)
     if (routeMapping[routePath]) {
       return routeMapping[routePath];
     }

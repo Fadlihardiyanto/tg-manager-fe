@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTenantPath } from '@/lib/tenant-path';
 import {
   Dialog,
   DialogContent,
@@ -34,6 +36,7 @@ interface ConnectGroupModalProps {
 export function ConnectGroupModal({ open, onOpenChange }: ConnectGroupModalProps) {
   const queryClient = useQueryClient();
   const { data: botsData } = useQuery(botsQueryOptions());
+  const { getTenantHref } = useTenantPath();
   const activeBots = (botsData?.data ?? []).filter((b) => b.is_active);
   const botOptions = activeBots.map((b) => ({
     value: b.id,
@@ -47,12 +50,16 @@ export function ConnectGroupModal({ open, onOpenChange }: ConnectGroupModalProps
   const [copied, setCopied] = useState(false);
   const [connectStatus, setConnectStatus] = useState<ConnectStatus | null>(null);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(true);
+  const [pollCount, setPollCount] = useState(0);
+  const [consecutiveErrors, setConsecutiveErrors] = useState(0);
+  const startedAtRef = useRef<number>(0);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const selectedBot = activeBots.find((b) => b.id === selectedBotId);
   const botUsername = selectedBot?.username;
   const command = `/connect@${botUsername} ${token}`;
-  const inviteLink = `https://t.me/${botUsername}?startgroup=${token}`;
+  const inviteLink = `https://t.me/${botUsername}?startgroup=connect_${token}`;
 
   // Timer countdown
   useEffect(() => {
@@ -74,6 +81,8 @@ export function ConnectGroupModal({ open, onOpenChange }: ConnectGroupModalProps
     if (!token || !selectedBotId || !secondsLeft) return;
 
     let cancelled = false;
+    let localPollCount = 0;
+
     const poll = async () => {
       try {
         const res = await fetch(`/api/tenant/bots/${selectedBotId}/groups/connect-status/${token}`);
@@ -83,6 +92,8 @@ export function ConnectGroupModal({ open, onOpenChange }: ConnectGroupModalProps
 
         const status = json.data.status as ConnectStatus;
         setConnectStatus(status);
+        setPollCount((c) => c + 1);
+        setConsecutiveErrors(0);
 
         if (status === 'success') {
           toast.success('Grup berhasil dihubungkan!');
@@ -90,9 +101,17 @@ export function ConnectGroupModal({ open, onOpenChange }: ConnectGroupModalProps
           setTimeout(() => onOpenChange(false), 800);
         } else if (status === 'expired') {
           setToken('');
+          setPollCount(0);
         }
       } catch {
-        // network error, retry on next interval
+        if (cancelled) return;
+        localPollCount++;
+        setPollCount((c) => c + 1);
+        setConsecutiveErrors((c) => {
+          const next = c + 1;
+          if (next >= 2) toast.warning('Gagal mengecek status. Mencoba lagi...');
+          return next;
+        });
       }
     };
 
@@ -105,6 +124,9 @@ export function ConnectGroupModal({ open, onOpenChange }: ConnectGroupModalProps
   }, [token, selectedBotId, secondsLeft, queryClient, onOpenChange]);
 
   const timeString = `${String(Math.floor(secondsLeft / 60)).padStart(2, '0')}:${String(secondsLeft % 60).padStart(2, '0')}`;
+  const elapsedSeconds = startedAtRef.current
+    ? Math.floor((Date.now() - startedAtRef.current) / 1000)
+    : 0;
 
   // Reset state on close
   useEffect(() => {
@@ -114,8 +136,20 @@ export function ConnectGroupModal({ open, onOpenChange }: ConnectGroupModalProps
       setSecondsLeft(0);
       setCopied(false);
       setConnectStatus(null);
+      setPollCount(0);
+      setConsecutiveErrors(0);
+      startedAtRef.current = 0;
     }
   }, [open]);
+
+  const handleCancel = () => {
+    setToken('');
+    setSecondsLeft(0);
+    setConnectStatus(null);
+    setPollCount(0);
+    setConsecutiveErrors(0);
+    startedAtRef.current = 0;
+  };
 
   const handleGenerate = async () => {
     if (!selectedBotId) return;
@@ -126,6 +160,7 @@ export function ConnectGroupModal({ open, onOpenChange }: ConnectGroupModalProps
       setToken(res.data.token);
       setSecondsLeft(res.data.expires_in);
       setConnectStatus('pending');
+      startedAtRef.current = Date.now();
     } else {
       toast.error(res.message || 'Gagal generate kode');
     }
@@ -148,16 +183,19 @@ export function ConnectGroupModal({ open, onOpenChange }: ConnectGroupModalProps
         </DialogHeader>
 
         <div className='space-y-5'>
-          <button
-            type='button'
-            onClick={() => setShowTutorial(!showTutorial)}
-            className='flex items-center gap-2 text-sm text-primary hover:underline'
-          >
-            <Icons.video className='h-4 w-4' />
-            {showTutorial ? 'Sembunyikan Tutorial' : 'Tonton Tutorial'}
-          </button>
+          {!token && (
+            <button
+              type='button'
+              onClick={() => setShowTutorial(!showTutorial)}
+              className='flex items-center gap-2 text-sm text-primary hover:underline'
+            >
+              <Icons.video className='h-4 w-4' />
+              Butuh bantuan?{' '}
+              {showTutorial ? 'Sembunyikan tutorial' : 'Tonton tutorial menghubungkan grup'}
+            </button>
+          )}
 
-          {showTutorial && (
+          {showTutorial && !token && (
             <div className='rounded-lg overflow-hidden border bg-black'>
               <video
                 ref={videoRef}
@@ -172,30 +210,42 @@ export function ConnectGroupModal({ open, onOpenChange }: ConnectGroupModalProps
             </div>
           )}
 
-          <div className='space-y-2'>
-            <label htmlFor='connect-select-bot' className='text-sm font-medium'>
-              Pilih Bot
-            </label>
-            <Select
-              value={selectedBotId}
-              onValueChange={(v) => {
-                setSelectedBotId(v);
-                setToken('');
-              }}
-              disabled={!!token}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder='Pilih bot...' />
-              </SelectTrigger>
-              <SelectContent>
-                {botOptions.map((opt) => (
-                  <SelectItem key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {!token && (
+            <div className='space-y-2'>
+              <label className='text-sm font-medium'>Pilih Bot</label>
+              {activeBots.length === 0 ? (
+                <div className='rounded-lg border border-amber-500/20 bg-amber-500/5 p-4 text-sm text-amber-800'>
+                  <p className='font-medium'>Belum ada bot aktif.</p>
+                  <p className='mt-1 text-amber-700'>
+                    Aktifkan bot Telegram Anda terlebih dahulu sebelum menghubungkan grup.
+                  </p>
+                  <Button asChild size='sm' className='mt-3 rounded-full'>
+                    <Link href={getTenantHref('/dashboard/bots')}>Kelola Bot</Link>
+                  </Button>
+                </div>
+              ) : (
+                <Select
+                  value={selectedBotId}
+                  onValueChange={(v) => {
+                    setSelectedBotId(v);
+                    setToken('');
+                  }}
+                  disabled={!!token}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder='Pilih bot...' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {botOptions.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+          )}
 
           {!token && selectedBotId && (
             <Button onClick={handleGenerate} isLoading={loading} className='w-full'>
@@ -205,31 +255,49 @@ export function ConnectGroupModal({ open, onOpenChange }: ConnectGroupModalProps
 
           {token && connectStatus === 'pending' && (
             <>
-              <div className='space-y-2 text-sm text-muted-foreground'>
-                <p className='font-medium text-foreground'>Instruksi:</p>
-                <ol className='list-decimal list-inside space-y-1'>
-                  <li>
-                    Masukkan bot ke grup Telegram Anda{' '}
-                    <a
-                      href={inviteLink}
-                      target='_blank'
-                      rel='noopener noreferrer'
-                      className='text-primary hover:underline'
-                    >
-                      (klik di sini)
-                    </a>
-                    .
-                  </li>
-                  <li>Jadikan bot sebagai Administrator grup.</li>
-                  <li>Kirim kode berikut di dalam grup:</li>
-                </ol>
-              </div>
+              <button
+                type='button'
+                onClick={() => setShowInstructions(!showInstructions)}
+                className='flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors'
+              >
+                <Icons.chevronsDown
+                  className={cn('size-4 transition-transform', !showInstructions && '-rotate-90')}
+                />
+                {showInstructions ? 'Sembunyikan Instruksi' : 'Lihat Instruksi'}
+              </button>
 
-              <div className='flex items-center gap-2 p-3 bg-muted rounded-lg border'>
+              {showInstructions && (
+                <div className='space-y-2 text-sm text-muted-foreground'>
+                  <ol className='list-decimal list-inside space-y-1'>
+                    <li>
+                      Masukkan bot ke grup Telegram Anda{' '}
+                      <a
+                        href={inviteLink}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className='text-primary hover:underline'
+                      >
+                        (klik di sini)
+                      </a>
+                      .
+                    </li>
+                    <li>Jadikan bot sebagai Administrator grup.</li>
+                    <li>Kirim kode berikut di dalam grup:</li>
+                  </ol>
+                </div>
+              )}
+
+              <div className='flex items-center gap-2 rounded-lg border bg-muted p-3'>
                 <code className='flex-1 font-mono text-sm font-bold text-primary'>{command}</code>
-                <Button size='sm' variant='outline' onClick={handleCopy}>
+                <Button
+                  size='sm'
+                  variant='outline'
+                  onClick={handleCopy}
+                  aria-label='Salin kode koneksi ke clipboard'
+                >
                   <Icons.clipboardCopy className={cn('h-4 w-4', copied && 'text-green-500')} />
                   {copied ? 'Tersalin' : 'Salin'}
+                  {copied && <span className='sr-only'>Kode berhasil disalin</span>}
                 </Button>
               </div>
 
@@ -245,15 +313,42 @@ export function ConnectGroupModal({ open, onOpenChange }: ConnectGroupModalProps
                 </a>
               </p>
 
-              <div className='flex items-center gap-2 text-sm text-muted-foreground'>
-                <Icons.clock className='h-4 w-4' />
-                Kode akan kadaluarsa dalam:{' '}
-                <span className='font-mono font-bold text-foreground'>{timeString}</span>
-              </div>
-
-              <div className='flex items-center justify-center gap-2 text-sm text-muted-foreground'>
-                <Icons.spinner className='h-4 w-4 animate-spin' />
-                Menunggu konfirmasi di Telegram...
+              <div className='space-y-2 rounded-lg border bg-muted/50 p-3' aria-live='polite'>
+                <div className='flex items-center gap-2 text-sm text-muted-foreground'>
+                  <Icons.clock className='h-4 w-4' />
+                  Kode kadaluarsa dalam{' '}
+                  <span className='font-mono font-bold text-foreground'>{timeString}</span>
+                </div>
+                <div className='flex items-center gap-2 text-sm text-muted-foreground'>
+                  <Icons.spinner className='h-4 w-4 animate-spin' />
+                  Menunggu konfirmasi di Telegram
+                  {elapsedSeconds > 0 && ` (${elapsedSeconds} detik)`}
+                  ...
+                </div>
+                {consecutiveErrors >= 2 && (
+                  <p className='text-xs text-amber-600'>
+                    Gangguan jaringan terdeteksi. Polling tetap berjalan otomatis.
+                    {consecutiveErrors >= 3 && (
+                      <button
+                        type='button'
+                        onClick={() => {
+                          setConsecutiveErrors(0);
+                          setPollCount(0);
+                        }}
+                        className='ml-2 text-primary hover:underline'
+                      >
+                        Coba lagi manual
+                      </button>
+                    )}
+                  </p>
+                )}
+                <button
+                  type='button'
+                  onClick={handleCancel}
+                  className='text-xs text-muted-foreground hover:text-foreground transition-colors'
+                >
+                  Batalkan koneksi
+                </button>
               </div>
             </>
           )}

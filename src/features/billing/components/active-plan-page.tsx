@@ -36,6 +36,7 @@ import type { ActivePlan, BillingCycle, CheckoutBillingData } from '../api/types
 import { useActivePlan } from './active-plan-provider';
 import { BillingHistoryTab } from './billing-history-tab';
 import { CancelPendingBillingButton } from './cancel-pending-billing-button';
+import { useTenantPath } from '@/lib/tenant-path';
 
 const quotaItems = [
   { key: 'bots', label: 'Bot', description: 'Jumlah bot Telegram yang masih bisa dikelola.' },
@@ -93,6 +94,7 @@ const billingTabs = [
 
 export function ActivePlanPage() {
   const [billingCycle, setBillingCycle] = useState<BillingCycle>('monthly');
+  const { getTenantHref } = useTenantPath();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
   const [checkoutPayment, setCheckoutPayment] = useState<CheckoutBillingData | null>(null);
@@ -249,15 +251,15 @@ export function ActivePlanPage() {
                           paymentUrl={billing.payment_url}
                           clientKey={billing.client_key}
                           orderId={billing.order_id || billing.id}
-                          successRedirectUrl='/dashboard/billing/checkout-result'
-                          pendingRedirectUrl='/dashboard/billing/checkout-result'
+                          successRedirectUrl={getTenantHref('/dashboard/billing/checkout-result')}
+                          pendingRedirectUrl={getTenantHref('/dashboard/billing/checkout-result')}
                           fallbackLabel='Lanjutkan Pembayaran'
                         >
                           Lanjutkan Pembayaran
                         </MidtransSnapCheckout>
                       ) : null}
                       <Button asChild variant='outline'>
-                        <Link href='/dashboard/billing?tab=upgrade'>
+                        <Link href={getTenantHref('/dashboard/billing?tab=upgrade')}>
                           <Icons.rocket className='h-4 w-4' />
                           Upgrade Plan
                         </Link>
@@ -436,6 +438,20 @@ export function ActivePlanPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className='space-y-4'>
+              {billing?.status === 'active' &&
+                plan &&
+                !publicPlans.some(
+                  (p) => p.id !== plan.id && (p.max_members ?? 0) > (plan.max_members ?? 0)
+                ) && (
+                  <Alert>
+                    <Icons.circleCheck />
+                    <AlertTitle>Paket tertinggi sudah aktif</AlertTitle>
+                    <AlertDescription>
+                      Anda sudah menggunakan paket <strong>{plan.display_name}</strong> — paket
+                      tertinggi yang tersedia saat ini.
+                    </AlertDescription>
+                  </Alert>
+                )}
               <div className='flex flex-wrap items-center gap-2'>
                 <Button
                   type='button'

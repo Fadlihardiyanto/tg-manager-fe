@@ -345,7 +345,7 @@ export default function OnboardingFlow() {
             <Icons.robot className='size-5 text-primary-foreground' />
           </div>
           <div>
-            <h1 className='text-base font-bold text-primary'>TG-Manager</h1>
+            <h1 className='text-base font-bold text-primary'>Urator</h1>
             <p className='mt-[2px] text-xs text-muted-foreground'>Progres Onboarding</p>
           </div>
         </div>

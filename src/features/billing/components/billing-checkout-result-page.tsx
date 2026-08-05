@@ -20,6 +20,7 @@ import { formatDate, formatRupiah } from '@/lib/format';
 import { activeBillingQueryOptions, billingHistoryQueryOptions } from '../api/queries';
 import type { ActiveBilling, BillingCycle } from '../api/types';
 import { CancelPendingBillingButton } from './cancel-pending-billing-button';
+import { useTenantPath } from '@/lib/tenant-path';
 
 const MAX_AUTO_REFETCH = 4;
 
@@ -53,6 +54,7 @@ function getCheckoutResultState(
 
 export function BillingCheckoutResultPage() {
   const [pollCount, setPollCount] = useState(0);
+  const { getTenantHref } = useTenantPath();
   const query = useQuery({
     ...activeBillingQueryOptions(),
     staleTime: 0,
@@ -282,10 +284,12 @@ export function BillingCheckoutResultPage() {
 
         <div className='flex flex-col gap-3 sm:flex-row'>
           <Button asChild variant='outline'>
-            <Link href='/dashboard/billing?tab=upgrade'>Kembali ke Upgrade Plan</Link>
+            <Link href={getTenantHref('/dashboard/billing?tab=upgrade')}>
+              Kembali ke Upgrade Plan
+            </Link>
           </Button>
           <Button asChild>
-            <Link href='/dashboard/billing?tab=billing'>Lihat Billing Aktif</Link>
+            <Link href={getTenantHref('/dashboard/billing?tab=billing')}>Lihat Billing Aktif</Link>
           </Button>
         </div>
       </CardFooter>

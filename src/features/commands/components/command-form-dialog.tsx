@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { FormTelegramEditor } from '@/features/broadcast/components/telegram-editor';
 import {
   Dialog,
   DialogContent,
@@ -34,7 +34,7 @@ import type {
 } from '../api/types';
 import { toast } from 'sonner';
 import * as z from 'zod';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const BLACKLIST = ['/start', '/packages', '/mysub', '/status', '/myorders', '/connect'];
 
@@ -76,10 +76,7 @@ interface CommandFormDialogProps {
 export function CommandFormDialog({ command, open, onOpenChange }: CommandFormDialogProps) {
   const isEdit = !!command;
   const queryClient = useQueryClient();
-  const { hasQuota } = useActivePlan();
-  const [isLinkPopoverOpen, setIsLinkPopoverOpen] = useState(false);
-  const [linkUrl, setLinkUrl] = useState('');
-  const [linkSelection, setLinkSelection] = useState<{ start: number; end: number } | null>(null);
+  const { hasQuota, isLoading: isBillingLoading } = useActivePlan();
 
   const { data: botsData } = useSuspenseQuery(botsQueryOptions());
   const { data: packagesData, isLoading: isPackagesLoading } = useQuery(packagesQueryOptions());
@@ -235,7 +232,7 @@ export function CommandFormDialog({ command, open, onOpenChange }: CommandFormDi
     }
   });
 
-  const { FormTextField, FormTextareaField, FormSelectField, FormFileUploadField } =
+  const { FormTextField, FormSelectField, FormFileUploadField } =
     useFormFields<CommandFormValues>();
 
   const responseType = useStore(form.store, (state) => state.values.response_type);
@@ -244,57 +241,38 @@ export function CommandFormDialog({ command, open, onOpenChange }: CommandFormDi
   const selectedPackageIds = useStore(form.store, (state) => state.values.package_ids);
   const selectedGroupIds = useStore(form.store, (state) => state.values.group_ids);
   const isPending = createMutation.isPending || updateMutation.isPending;
-  const canCreateCommand = isEdit || hasQuota('custom_commands');
+  const canCreateCommand = isEdit || isBillingLoading || hasQuota('custom_commands');
   const maxChars = responseType === 'text' ? 4096 : 1024;
   const responseText = useStore(form.store, (state) => state.values.response_text);
   const remaining = maxChars - Array.from(responseText).length;
+  const commandTrigger = useStore(form.store, (state) => state.values.command_trigger);
+  const submissionAttempts = useStore(form.store, (state) => state.submissionAttempts);
 
+  // Reset package_ids when access scope is no longer 'member'
   useEffect(() => {
     if (accessScope !== 'member' && selectedPackageIds.length > 0) {
       form.setFieldValue('package_ids', []);
     }
   }, [accessScope, form, selectedPackageIds]);
 
+  // Reset group_ids when chat type is 'dm_only'
   useEffect(() => {
     if (chatTypeScope === 'dm_only' && selectedGroupIds.length > 0) {
       form.setFieldValue('group_ids', []);
     }
   }, [chatTypeScope, form, selectedGroupIds]);
 
-  const handleFormat = (tag: string, href?: string, selection = linkSelection) => {
-    const el = document.getElementById('response_text') as HTMLTextAreaElement;
-    if (!el) return;
-
-    const start = selection?.start ?? el.selectionStart;
-    const end = selection?.end ?? el.selectionEnd;
-    const text = el.value;
-    const selected = text.substring(start, end);
-
-    let wrapped: string;
-    if (tag === 'a' && href) {
-      wrapped = selected ? `<a href="${href}">${selected}</a>` : `<a href="${href}">link</a>`;
-    } else {
-      wrapped = selected ? `<${tag}>${selected}</${tag}>` : `<${tag}></${tag}>`;
-    }
-
-    const newValue = text.substring(0, start) + wrapped + text.substring(end);
-    form.setFieldValue('response_text', newValue);
-
+  // Auto-scroll to first validation error whenever user attempts a submit
+  useEffect(() => {
+    if (submissionAttempts === 0) return;
     setTimeout(() => {
-      el.focus();
-      el.setSelectionRange(start + wrapped.length, start + wrapped.length);
-    }, 0);
-  };
-
-  const handleLinkApply = () => {
-    const trimmedUrl = linkUrl.trim();
-    if (!trimmedUrl) return;
-
-    handleFormat('a', trimmedUrl);
-    setLinkUrl('');
-    setLinkSelection(null);
-    setIsLinkPopoverOpen(false);
-  };
+      const scrollEl = document.getElementById('command-form-scroll');
+      const firstError = scrollEl?.querySelector('.text-destructive');
+      if (firstError) {
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 50);
+  }, [submissionAttempts]);
 
   return (
     <Dialog
@@ -316,7 +294,7 @@ export function CommandFormDialog({ command, open, onOpenChange }: CommandFormDi
           </DialogHeader>
         </div>
 
-        <div className='flex-1 min-h-0 overflow-y-auto px-6 py-4'>
+        <div id='command-form-scroll' className='flex-1 min-h-0 overflow-y-auto px-6 py-4'>
           <form.AppForm>
             <form.Form id='command-form-dialog' className='space-y-4'>
               {isEdit ? (
@@ -504,121 +482,15 @@ export function CommandFormDialog({ command, open, onOpenChange }: CommandFormDi
                 </form.AppField>
               )}
 
-              <div className='space-y-1'>
-                <div className='flex items-center gap-1'>
-                  {responseType !== 'text' && (
-                    <p className='text-xs text-muted-foreground'>
-                      Teks ini akan menjadi caption untuk{' '}
-                      {responseType === 'photo' ? 'gambar' : 'dokumen'}.
-                    </p>
-                  )}
-                </div>
+              <div className='space-y-4'>
+                {responseType !== 'text' && (
+                  <p className='text-xs text-muted-foreground'>
+                    Teks ini akan menjadi caption untuk{' '}
+                    {responseType === 'photo' ? 'gambar' : 'dokumen'}.
+                  </p>
+                )}
 
-                <div className='flex items-center gap-1 rounded-xl border bg-muted/30 p-1.5'>
-                  <button
-                    type='button'
-                    className='hover:bg-muted rounded px-2 py-1 text-sm font-bold'
-                    onClick={() => handleFormat('b')}
-                    title='Bold'
-                  >
-                    <Icons.bold className='size-4' />
-                  </button>
-                  <button
-                    type='button'
-                    className='hover:bg-muted rounded px-2 py-1 text-sm italic'
-                    onClick={() => handleFormat('i')}
-                    title='Italic'
-                  >
-                    <Icons.italic className='size-4' />
-                  </button>
-                  <button
-                    type='button'
-                    className='hover:bg-muted rounded px-2 py-1 text-sm underline'
-                    onClick={() => handleFormat('u')}
-                    title='Underline'
-                  >
-                    <Icons.underline className='size-4' />
-                  </button>
-                  <span className='text-muted-foreground mx-1'>|</span>
-                  <Popover open={isLinkPopoverOpen} onOpenChange={setIsLinkPopoverOpen}>
-                    <PopoverTrigger asChild>
-                      <button
-                        type='button'
-                        className='hover:bg-muted rounded px-2 py-1 text-sm'
-                        onClick={() => {
-                          const el = document.getElementById(
-                            'response_text'
-                          ) as HTMLTextAreaElement;
-                          if (!el) return;
-                          setLinkSelection({
-                            start: el.selectionStart,
-                            end: el.selectionEnd
-                          });
-                        }}
-                        title='Link'
-                      >
-                        <Icons.link className='size-4' />
-                      </button>
-                    </PopoverTrigger>
-                    <PopoverContent className='w-80 space-y-3' align='start'>
-                      <div className='space-y-1'>
-                        <p className='text-sm font-medium'>Masukkan URL</p>
-                        <Input
-                          type='url'
-                          placeholder='https://example.com'
-                          value={linkUrl}
-                          onChange={(event) => setLinkUrl(event.target.value)}
-                          onKeyDown={(event) => {
-                            if (event.key === 'Enter') {
-                              event.preventDefault();
-                              handleLinkApply();
-                            }
-                          }}
-                        />
-                      </div>
-                      <div className='flex justify-end gap-2'>
-                        <Button
-                          type='button'
-                          variant='outline'
-                          size='sm'
-                          onClick={() => {
-                            setIsLinkPopoverOpen(false);
-                            setLinkUrl('');
-                            setLinkSelection(null);
-                          }}
-                        >
-                          Batal
-                        </Button>
-                        <Button
-                          type='button'
-                          size='sm'
-                          disabled={!linkUrl.trim()}
-                          onClick={handleLinkApply}
-                        >
-                          Sisipkan
-                        </Button>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                  <button
-                    type='button'
-                    className='hover:bg-muted rounded px-2 py-1 text-sm'
-                    onClick={() => handleFormat('code')}
-                    title='Code'
-                  >
-                    <Icons.code className='size-4' />
-                  </button>
-                  <button
-                    type='button'
-                    className='hover:bg-muted rounded px-2 py-1 text-sm'
-                    onClick={() => handleFormat('s')}
-                    title='Strikethrough'
-                  >
-                    <Icons.slash className='size-4' />
-                  </button>
-                </div>
-
-                <FormTextareaField
+                <FormTelegramEditor
                   name='response_text'
                   label={
                     responseType === 'photo'
@@ -627,7 +499,6 @@ export function CommandFormDialog({ command, open, onOpenChange }: CommandFormDi
                         ? 'Keterangan Dokumen (Caption)'
                         : 'Isi Pesan Balasan'
                   }
-                  required
                   placeholder={
                     responseType === 'photo'
                       ? 'Tulis caption untuk gambar...'
@@ -635,23 +506,12 @@ export function CommandFormDialog({ command, open, onOpenChange }: CommandFormDi
                         ? 'Tulis caption untuk dokumen...'
                         : 'Tulis pesan balasan...'
                   }
-                  className='min-h-[120px]'
+                  maxChars={maxChars}
+                  commandTrigger={commandTrigger}
                   validators={{
                     onBlur: z.string().min(1, 'Isi pesan wajib diisi')
                   }}
                 />
-
-                <div
-                  className={`text-right text-xs ${
-                    remaining < 0
-                      ? 'text-destructive font-medium'
-                      : remaining < 50
-                        ? 'text-yellow-600'
-                        : 'text-muted-foreground'
-                  }`}
-                >
-                  {remaining} karakter tersisa
-                </div>
               </div>
 
               {!canCreateCommand && (

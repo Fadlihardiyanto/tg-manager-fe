@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import AdminLoginPageLayout from '@/features/superadmin/components/admin-login-page-layout';
 
 export const metadata: Metadata = {
-  title: 'Panel Admin - TG-Manager',
+  title: 'Panel Admin - Urator',
   description: 'Masuk ke dashboard operator platform'
 };
 

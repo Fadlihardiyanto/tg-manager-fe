@@ -17,7 +17,7 @@ export function useConnectFlow(botId: string, botUsername: string) {
   const [connectStatus, setConnectStatus] = useState<ConnectStatus | null>(null);
 
   const command = `/connect@${botUsername} ${token}`;
-  const inviteLink = `https://t.me/${botUsername}?startgroup=${token}`;
+  const inviteLink = `https://t.me/${botUsername}?startgroup=connect_${token}`;
   const timeString = `${String(Math.floor(secondsLeft / 60)).padStart(2, '0')}:${String(secondsLeft % 60).padStart(2, '0')}`;
 
   // Timer countdown
