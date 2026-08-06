@@ -46,8 +46,8 @@ export function GroupTable({ onEdit, onBulkDelete, toolbarActions, emptyState }:
 
   const selectionBar =
     selectedCount > 0 && onBulkDelete ? (
-      <div className='flex items-center gap-3'>
-        <span className='text-sm font-medium'>{selectedCount} grup dipilih</span>
+      <div className='flex items-center gap-3 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5'>
+        <span className='text-sm font-medium text-primary'>{selectedCount} grup dipilih</span>
         <div className='flex gap-2'>
           <Button
             variant='outline'
