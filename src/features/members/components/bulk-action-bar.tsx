@@ -149,7 +149,7 @@ export function BulkActionBar({
       <span className='text-sm font-medium text-primary'>{selectedIds.length} member dipilih</span>
       <div className='flex gap-2'>
         <Button
-          variant='outline'
+          variant='default'
           size='sm'
           className='rounded-full'
           onClick={() => setIsExtendModalOpen(true)}
@@ -158,9 +158,9 @@ export function BulkActionBar({
         </Button>
 
         <Button
-          variant='outline'
+          variant='destructive'
           size='sm'
-          className='rounded-full hover:bg-destructive hover:text-destructive-foreground'
+          className='rounded-full'
           onClick={() => setIsKickModalOpen(true)}
         >
           <Icons.trash /> Keluarkan Member
