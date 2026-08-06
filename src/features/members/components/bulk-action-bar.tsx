@@ -43,6 +43,8 @@ export function BulkActionBar({
   const [isExtendModalOpen, setIsExtendModalOpen] = useState(false);
   const [selectedPackageIds, setSelectedPackageIds] = useState<string[]>([]);
   const [extendDays, setExtendDays] = useState('');
+  const [packageError, setPackageError] = useState<string | null>(null);
+  const [daysError, setDaysError] = useState<string | null>(null);
 
   const bulkKickMut = useMutation(bulkKickMembersMutation);
   const bulkExtendMut = useMutation(bulkExtendMembersMutation);
@@ -80,12 +82,14 @@ export function BulkActionBar({
   const isSelectAll = selectedPackageIds.length === packageScopes.length;
 
   const togglePackage = (packageId: string) => {
+    setPackageError(null);
     setSelectedPackageIds((prev) =>
       prev.includes(packageId) ? prev.filter((id) => id !== packageId) : [...prev, packageId]
     );
   };
 
   const toggleAllPackages = () => {
+    setPackageError(null);
     if (isSelectAll) {
       setSelectedPackageIds([]);
     } else {
@@ -94,11 +98,14 @@ export function BulkActionBar({
   };
 
   const openKickModal = () => {
+    setPackageError(null);
     setSelectedPackageIds(packageScopes.map((scope) => scope.packageId));
     setIsKickModalOpen(true);
   };
 
   const openExtendModal = () => {
+    setPackageError(null);
+    setDaysError(null);
     setSelectedPackageIds(packageScopes.map((scope) => scope.packageId));
     setIsExtendModalOpen(true);
   };
@@ -106,12 +113,15 @@ export function BulkActionBar({
   const closeKickModal = () => {
     setIsKickModalOpen(false);
     setSelectedPackageIds([]);
+    setPackageError(null);
   };
 
   const closeExtendModal = () => {
     setIsExtendModalOpen(false);
     setSelectedPackageIds([]);
     setExtendDays('');
+    setPackageError(null);
+    setDaysError(null);
   };
 
   const buildTargets = () =>
@@ -126,9 +136,10 @@ export function BulkActionBar({
     }));
 
     if (targets.length === 0) {
-      toast.error('Pilih minimal satu paket terlebih dahulu.');
+      setPackageError('Pilih minimal satu paket terlebih dahulu.');
       return;
     }
+    setPackageError(null);
 
     try {
       const res = await bulkKickMut.mutateAsync(targets);
@@ -150,7 +161,11 @@ export function BulkActionBar({
 
   const handleBulkExtend = async () => {
     const days = Number(extendDays);
-    if (!days || days <= 0) return;
+    if (!days || days <= 0) {
+      setDaysError('Masukkan jumlah hari yang valid.');
+      return;
+    }
+    setDaysError(null);
 
     const targets = buildTargets().map((t) => ({
       id: t.memberId,
@@ -159,9 +174,10 @@ export function BulkActionBar({
     }));
 
     if (targets.length === 0) {
-      toast.error('Pilih minimal satu paket terlebih dahulu.');
+      setPackageError('Pilih minimal satu paket terlebih dahulu.');
       return;
     }
+    setPackageError(null);
 
     try {
       const res = await bulkExtendMut.mutateAsync(targets);
@@ -273,6 +289,7 @@ export function BulkActionBar({
                 </button>
               </div>
               {packageList}
+              {packageError && <p className='text-sm text-destructive'>{packageError}</p>}
               {memberWithNoActivePackage > 0 && (
                 <p className='text-xs text-muted-foreground'>
                   {memberWithNoActivePackage} member tanpa paket aktif akan dilewati.
@@ -288,7 +305,6 @@ export function BulkActionBar({
             <Button
               variant='destructive'
               isLoading={bulkKickMut.isPending}
-              disabled={selectedPackageIds.length === 0}
               onClick={handleBulkKick}
             >
               Keluarkan Member
@@ -325,6 +341,7 @@ export function BulkActionBar({
                 </button>
               </div>
               {packageList}
+              {packageError && <p className='text-sm text-destructive'>{packageError}</p>}
               {memberWithNoActivePackage > 0 && (
                 <p className='text-xs text-muted-foreground'>
                   {memberWithNoActivePackage} member tanpa paket aktif akan dilewati.
@@ -340,8 +357,12 @@ export function BulkActionBar({
                 min='1'
                 placeholder='30'
                 value={extendDays}
-                onChange={(e) => setExtendDays(e.target.value)}
+                onChange={(e) => {
+                  setExtendDays(e.target.value);
+                  setDaysError(null);
+                }}
               />
+              {daysError && <p className='text-sm text-destructive'>{daysError}</p>}
             </div>
           </div>
 
@@ -349,11 +370,7 @@ export function BulkActionBar({
             <Button variant='outline' onClick={closeExtendModal}>
               Batal
             </Button>
-            <Button
-              isLoading={bulkExtendMut.isPending}
-              disabled={selectedPackageIds.length === 0 || !extendDays || Number(extendDays) <= 0}
-              onClick={handleBulkExtend}
-            >
+            <Button isLoading={bulkExtendMut.isPending} onClick={handleBulkExtend}>
               Perpanjang
             </Button>
           </DialogFooter>
