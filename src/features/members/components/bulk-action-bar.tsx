@@ -145,28 +145,13 @@ export function BulkActionBar({
   if (selectedIds.length === 0) return null;
 
   return (
-    <div className='flex items-center gap-4 rounded-full border border-border bg-background px-4 py-2 shadow-sm'>
-      <div className='flex items-center gap-2 pr-4 border-r border-border'>
-        <div
-          className='flex size-6 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary'
-          title={
-            selectedMembers
-              .map((m) => `@${m.username || m.first_name}`)
-              .slice(0, 5)
-              .join(', ') +
-            (selectedMembers.length > 5 ? ` +${selectedMembers.length - 5} lainnya` : '')
-          }
-        >
-          {selectedIds.length}
-        </div>
-        <span className='text-sm font-medium'>terpilih</span>
-      </div>
-
-      <div className='flex items-center gap-2'>
+    <div className='flex items-center gap-3'>
+      <span className='text-sm font-medium'>{selectedIds.length} member dipilih</span>
+      <div className='flex gap-2'>
         <Button
           variant='outline'
           size='sm'
-          className='h-8 rounded-full hover:bg-primary hover:text-primary-foreground'
+          className='rounded-full'
           onClick={() => setIsExtendModalOpen(true)}
         >
           <Icons.calendar /> Perpanjang
@@ -175,20 +160,14 @@ export function BulkActionBar({
         <Button
           variant='outline'
           size='sm'
-          className='h-8 rounded-full hover:bg-destructive hover:text-destructive-foreground'
+          className='rounded-full hover:bg-destructive hover:text-destructive-foreground'
           onClick={() => setIsKickModalOpen(true)}
         >
           <Icons.trash /> Keluarkan Member
         </Button>
 
-        <Button
-          variant='ghost'
-          size='sm'
-          aria-label='Hapus pilihan'
-          className='size-8 p-0 ml-1 rounded-full text-muted-foreground hover:text-foreground'
-          onClick={onClearSelection}
-        >
-          <Icons.close />
+        <Button variant='outline' size='sm' className='rounded-full' onClick={onClearSelection}>
+          Batal Pilih
         </Button>
       </div>
 
