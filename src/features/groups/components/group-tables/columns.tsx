@@ -42,8 +42,8 @@ export function getColumns(onEdit?: (group: TelegramGroup) => void): ColumnDef<T
       ),
       enableSorting: false,
       enableColumnFilter: false,
-      size: 36,
-      meta: { label: 'Pilih' }
+      enableHiding: false,
+      size: 40
     },
     {
       id: 'name',
