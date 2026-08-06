@@ -49,12 +49,18 @@ export function GroupTable({ onEdit, onBulkDelete, toolbarActions, emptyState }:
       <div className='flex items-center gap-3'>
         <span className='text-sm font-medium'>{selectedCount} grup dipilih</span>
         <div className='flex gap-2'>
-          <Button variant='outline' size='sm' onClick={() => table.toggleAllRowsSelected(false)}>
+          <Button
+            variant='outline'
+            size='sm'
+            className='rounded-full'
+            onClick={() => table.toggleAllRowsSelected(false)}
+          >
             Batal Pilih
           </Button>
           <Button
             variant='destructive'
             size='sm'
+            className='rounded-full'
             onClick={() => {
               const ids = table.getFilteredSelectedRowModel().rows.map((r) => r.original.id);
               onBulkDelete(ids);
