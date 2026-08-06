@@ -95,30 +95,33 @@ export function MembersTable({ filters }: { filters: MemberFilters }) {
           ) : undefined
         }
       >
-        <DataTableToolbar table={table}>
-          <Select
-            value={packageId ?? 'all'}
-            onValueChange={(v) => setPackageId(v === 'all' ? null : v)}
-          >
-            <SelectTrigger className='h-10 w-44 rounded-full border-border font-semibold'>
-              <SelectValue placeholder='Semua paket' />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value='all'>Semua paket</SelectItem>
-              {packages.map((pkg) => (
-                <SelectItem key={pkg.id} value={pkg.id}>
-                  {pkg.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <DataTableToolbar table={table} hideViewOptions={selectedIds.length > 0}>
+          {selectedIds.length > 0 ? (
+            <BulkActionBar
+              selectedIds={selectedIds}
+              selectedMembers={selectedMembers}
+              onClearSelection={() => table.toggleAllRowsSelected(false)}
+            />
+          ) : (
+            <Select
+              value={packageId ?? 'all'}
+              onValueChange={(v) => setPackageId(v === 'all' ? null : v)}
+            >
+              <SelectTrigger className='h-10 w-44 rounded-full border-border font-semibold'>
+                <SelectValue placeholder='Semua paket' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='all'>Semua paket</SelectItem>
+                {packages.map((pkg) => (
+                  <SelectItem key={pkg.id} value={pkg.id}>
+                    {pkg.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         </DataTableToolbar>
       </DataTable>
-      <BulkActionBar
-        selectedIds={selectedIds}
-        selectedMembers={selectedMembers}
-        onClearSelection={() => table.toggleAllRowsSelected(false)}
-      />
     </>
   );
 }

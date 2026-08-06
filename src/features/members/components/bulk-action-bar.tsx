@@ -145,7 +145,7 @@ export function BulkActionBar({
   if (selectedIds.length === 0) return null;
 
   return (
-    <div className='fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 rounded-full border border-border bg-background px-4 py-3 shadow-lg animate-in slide-in-from-bottom-10 fade-in duration-300'>
+    <div className='flex items-center gap-4 rounded-full border border-border bg-background px-4 py-2 shadow-sm'>
       <div className='flex items-center gap-2 pr-4 border-r border-border'>
         <div
           className='flex size-6 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary'
@@ -166,7 +166,7 @@ export function BulkActionBar({
         <Button
           variant='outline'
           size='sm'
-          className='h-8 hover:bg-primary hover:text-primary-foreground'
+          className='h-8 rounded-full hover:bg-primary hover:text-primary-foreground'
           onClick={() => setIsExtendModalOpen(true)}
         >
           <Icons.calendar /> Perpanjang
@@ -175,7 +175,7 @@ export function BulkActionBar({
         <Button
           variant='outline'
           size='sm'
-          className='h-8 hover:bg-destructive hover:text-destructive-foreground'
+          className='h-8 rounded-full hover:bg-destructive hover:text-destructive-foreground'
           onClick={() => setIsKickModalOpen(true)}
         >
           <Icons.trash /> Keluarkan Member
