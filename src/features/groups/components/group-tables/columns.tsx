@@ -1,6 +1,7 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-header';
 import type { TelegramGroup } from '../../api/types';
 import { ColumnDef } from '@tanstack/react-table';
@@ -112,7 +113,7 @@ export function getColumns(onEdit?: (group: TelegramGroup) => void): ColumnDef<T
         const Icon = isActive ? Icons.circleCheck : Icons.xCircle;
         const reason = !isActive ? row.original.inactive_reason : null;
         return (
-          <div className='flex flex-col items-start gap-0.5'>
+          <div className='flex items-center gap-1.5'>
             <Badge
               variant={isActive ? 'default' : 'outline'}
               className={cn(
@@ -126,7 +127,17 @@ export function getColumns(onEdit?: (group: TelegramGroup) => void): ColumnDef<T
               {isActive ? 'Aktif' : 'Nonaktif'}
             </Badge>
             {reason && (
-              <span className='text-[11px] text-destructive truncate max-w-[140px]'>{reason}</span>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button type='button' className='text-muted-foreground hover:text-foreground'>
+                    <Icons.help className='size-4' />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side='right' className='max-w-[280px]'>
+                  <span className='font-medium'>Alasan nonaktif</span>
+                  <p className='font-normal'>{reason}</p>
+                </TooltipContent>
+              </Tooltip>
             )}
           </div>
         );
