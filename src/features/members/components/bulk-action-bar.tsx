@@ -10,25 +10,24 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Icons } from '@/components/icons';
 import { bulkKickMembersMutation, bulkExtendMembersMutation } from '../api/mutations';
 import type { Member } from '../api/types';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 
 interface BulkActionBarProps {
   selectedIds: string[];
   selectedMembers: Member[];
   onClearSelection: () => void;
+}
+
+interface PackageScope {
+  packageId: string;
+  packageName: string;
+  targets: { memberId: string; subscriptionId: string }[];
 }
 
 function getActiveSubscriptions(member: Member) {
@@ -40,68 +39,96 @@ export function BulkActionBar({
   selectedMembers,
   onClearSelection
 }: BulkActionBarProps) {
-  const [isKickModalOpen, setIsKickModalOpen] = useState(false);
-  const [isExtendModalOpen, setIsExtendModalOpen] = useState(false);
-  const [kickMode, setKickMode] = useState<'all' | 'single'>('all');
-  const [selectedPackageId, setSelectedPackageId] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPackageIds, setSelectedPackageIds] = useState<string[]>([]);
   const [extendDays, setExtendDays] = useState('');
 
   const bulkKickMut = useMutation(bulkKickMembersMutation);
   const bulkExtendMut = useMutation(bulkExtendMembersMutation);
 
-  const packageOptions = useMemo(() => {
-    const packages = new Map<string, { id: string; name: string; memberCount: number }>();
+  const packageScopes = useMemo<PackageScope[]>(() => {
+    const scopes = new Map<string, PackageScope>();
 
     for (const member of selectedMembers) {
-      const seenPackageIds = new Set<string>();
-
       for (const subscription of getActiveSubscriptions(member)) {
-        if (seenPackageIds.has(subscription.package_id)) continue;
+        const scope =
+          scopes.get(subscription.package_id) ??
+          ({
+            packageId: subscription.package_id,
+            packageName: subscription.package_name,
+            targets: []
+          } satisfies PackageScope);
 
-        const current = packages.get(subscription.package_id);
-        packages.set(subscription.package_id, {
-          id: subscription.package_id,
-          name: subscription.package_name,
-          memberCount: (current?.memberCount ?? 0) + 1
+        scope.targets.push({
+          memberId: member.id,
+          subscriptionId: subscription.id
         });
-        seenPackageIds.add(subscription.package_id);
+        scopes.set(subscription.package_id, scope);
       }
     }
 
-    return Array.from(packages.values()).toSorted((a, b) => a.name.localeCompare(b.name));
+    return Array.from(scopes.values()).toSorted((a, b) =>
+      a.packageName.localeCompare(b.packageName)
+    );
   }, [selectedMembers]);
 
+  const totalSubscriptions = packageScopes.reduce((sum, scope) => sum + scope.targets.length, 0);
+  const memberWithNoActivePackage = selectedMembers.filter(
+    (m) => getActiveSubscriptions(m).length === 0
+  ).length;
+  const isSelectAll = selectedPackageIds.length === packageScopes.length;
+
+  const togglePackage = (packageId: string) => {
+    setSelectedPackageIds((prev) =>
+      prev.includes(packageId) ? prev.filter((id) => id !== packageId) : [...prev, packageId]
+    );
+  };
+
+  const toggleAllPackages = () => {
+    if (isSelectAll) {
+      setSelectedPackageIds([]);
+    } else {
+      setSelectedPackageIds(packageScopes.map((scope) => scope.packageId));
+    }
+  };
+
+  const openModal = () => {
+    setSelectedPackageIds(packageScopes.map((scope) => scope.packageId));
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedPackageIds([]);
+    setExtendDays('');
+  };
+
+  const buildTargets = () =>
+    packageScopes
+      .filter((scope) => selectedPackageIds.includes(scope.packageId))
+      .flatMap((scope) => scope.targets);
+
   const handleBulkKick = async () => {
-    const targets =
-      kickMode === 'all'
-        ? selectedMembers.map((member) => ({ id: member.id }))
-        : selectedMembers.flatMap((member) => {
-            const subscription = getActiveSubscriptions(member).find(
-              (item) => item.package_id === selectedPackageId
-            );
+    const targets = buildTargets().map((t) => ({
+      id: t.memberId,
+      subscriptionId: t.subscriptionId
+    }));
 
-            return subscription ? [{ id: member.id, subscriptionId: subscription.id }] : [];
-          });
-
-    const skippedCount = kickMode === 'all' ? 0 : selectedMembers.length - targets.length;
-
-    if (kickMode === 'single' && !selectedPackageId) return;
     if (targets.length === 0) {
-      toast.error('Tidak ada member yang punya package aktif tersebut.');
+      toast.error('Pilih minimal satu paket terlebih dahulu.');
       return;
     }
 
     try {
       const res = await bulkKickMut.mutateAsync(targets);
       if (res.success) {
-        const summary =
-          skippedCount > 0 ? `${res.message}. ${skippedCount} member dilewati.` : res.message;
-
-        toast.success(summary);
+        toast.success(
+          memberWithNoActivePackage > 0
+            ? `${targets.length} langganan dikeluarkan. ${memberWithNoActivePackage} member tanpa paket aktif dilewati.`
+            : res.message || `${targets.length} langganan dikeluarkan`
+        );
         onClearSelection();
-        setIsKickModalOpen(false);
-        setKickMode('all');
-        setSelectedPackageId('');
+        closeModal();
       } else {
         toast.error(res.message || 'Gagal mengeluarkan member');
       }
@@ -114,26 +141,27 @@ export function BulkActionBar({
     const days = Number(extendDays);
     if (!days || days <= 0) return;
 
-    const targets = selectedMembers.flatMap((member) =>
-      getActiveSubscriptions(member).map((subscription) => ({
-        id: member.id,
-        subscriptionId: subscription.id,
-        additionalDays: days
-      }))
-    );
+    const targets = buildTargets().map((t) => ({
+      id: t.memberId,
+      subscriptionId: t.subscriptionId,
+      additionalDays: days
+    }));
 
     if (targets.length === 0) {
-      toast.error('Tidak ada langganan aktif dari member yang dipilih.');
+      toast.error('Pilih minimal satu paket terlebih dahulu.');
       return;
     }
 
     try {
       const res = await bulkExtendMut.mutateAsync(targets);
       if (res.success) {
-        toast.success(res.message);
+        toast.success(
+          memberWithNoActivePackage > 0
+            ? `${targets.length} langganan diperpanjang. ${memberWithNoActivePackage} member tanpa paket aktif dilewati.`
+            : res.message || `${targets.length} langganan diperpanjang`
+        );
         onClearSelection();
-        setIsExtendModalOpen(false);
-        setExtendDays('');
+        closeModal();
       } else {
         toast.error(res.message || 'Gagal memperpanjang langganan');
       }
@@ -152,173 +180,123 @@ export function BulkActionBar({
           Batal Pilih
         </Button>
 
-        <Button
-          variant='default'
-          size='sm'
-          className='rounded-full'
-          onClick={() => setIsExtendModalOpen(true)}
-        >
+        <Button variant='default' size='sm' className='rounded-full' onClick={openModal}>
           <Icons.calendar /> Perpanjang
         </Button>
 
-        <Button
-          variant='destructive'
-          size='sm'
-          className='rounded-full'
-          onClick={() => setIsKickModalOpen(true)}
-        >
+        <Button variant='destructive' size='sm' className='rounded-full' onClick={openModal}>
           <Icons.trash /> Keluarkan Member
         </Button>
       </div>
 
       <Dialog
-        open={isKickModalOpen}
+        open={isModalOpen}
         onOpenChange={(open) => {
-          setIsKickModalOpen(open);
-          if (!open) {
-            setKickMode('all');
-            setSelectedPackageId('');
-          }
+          if (!open) closeModal();
         }}
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Keluarkan Member Terpilih</DialogTitle>
+            <DialogTitle>Keluarkan / Perpanjang Member</DialogTitle>
             <DialogDescription>
-              Pilih apakah {selectedIds.length} member terpilih akan dikeluarkan dari semua package
-              atau hanya dari satu package tertentu.
+              {selectedIds.length} member terpilih · {totalSubscriptions} langganan aktif. Pilih
+              paket yang ingin diproses.
             </DialogDescription>
           </DialogHeader>
 
           <div className='space-y-4 py-4'>
             <div className='space-y-3'>
-              <Label>Mode Pengeluaran</Label>
-              <RadioGroup
-                value={kickMode}
-                onValueChange={(value) => setKickMode(value as 'all' | 'single')}
-                className='gap-3'
-              >
-                <Label
-                  htmlFor='bulk-kick-all'
-                  className={cn(
-                    'border-border flex cursor-pointer items-start gap-3 rounded-lg border p-3',
-                    kickMode === 'all' && 'border-primary bg-primary/5'
-                  )}
+              <div className='flex items-center justify-between'>
+                <Label>Paket yang dimiliki member terpilih</Label>
+                <button
+                  type='button'
+                  className='text-sm font-medium text-primary hover:underline'
+                  onClick={toggleAllPackages}
                 >
-                  <RadioGroupItem value='all' id='bulk-kick-all' className='mt-0.5' />
-                  <div className='space-y-1'>
-                    <p className='text-sm font-medium'>Keluarkan dari semua paket</p>
-                    <p className='text-xs text-muted-foreground'>
-                      Semua member terpilih akan di-kick dari seluruh akses aktifnya.
-                    </p>
-                  </div>
-                </Label>
-                <Label
-                  htmlFor='bulk-kick-single'
-                  className={cn(
-                    'border-border flex cursor-pointer items-start gap-3 rounded-lg border p-3',
-                    kickMode === 'single' && 'border-primary bg-primary/5'
-                  )}
-                >
-                  <RadioGroupItem value='single' id='bulk-kick-single' className='mt-0.5' />
-                  <div className='space-y-1'>
-                    <p className='text-sm font-medium'>Keluarkan dari paket tertentu</p>
-                    <p className='text-xs text-muted-foreground'>
-                      Hanya member yang punya package aktif ini yang akan diproses.
-                    </p>
-                  </div>
-                </Label>
-              </RadioGroup>
+                  {isSelectAll ? 'Kosongkan' : 'Pilih semua'}
+                </button>
+              </div>
+
+              {packageScopes.length === 0 ? (
+                <p className='text-sm text-muted-foreground'>
+                  Tidak ada paket aktif dari member yang sedang dipilih.
+                </p>
+              ) : (
+                <div className='space-y-2'>
+                  {packageScopes.map((scope) => {
+                    const isChecked = selectedPackageIds.includes(scope.packageId);
+                    return (
+                      <div
+                        key={scope.packageId}
+                        role='checkbox'
+                        aria-checked={isChecked}
+                        aria-label={scope.packageName}
+                        tabIndex={0}
+                        className={cn(
+                          'flex cursor-pointer items-center gap-3 rounded-lg border p-3',
+                          isChecked && 'border-primary bg-primary/5'
+                        )}
+                        onClick={() => togglePackage(scope.packageId)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            togglePackage(scope.packageId);
+                          }
+                        }}
+                      >
+                        <Checkbox
+                          checked={isChecked}
+                          tabIndex={-1}
+                          aria-hidden
+                          className='pointer-events-none'
+                        />
+                        <div className='flex-1'>
+                          <p className='text-sm font-medium'>{scope.packageName}</p>
+                          <p className='text-xs text-muted-foreground'>
+                            {scope.targets.length} langganan
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {memberWithNoActivePackage > 0 && (
+                <p className='text-xs text-muted-foreground'>
+                  {memberWithNoActivePackage} member tanpa paket aktif akan dilewati.
+                </p>
+              )}
             </div>
 
-            {kickMode === 'single' && (
-              <div className='space-y-2'>
-                <Label htmlFor='bulk-kick-package'>Paket</Label>
-                <Select
-                  value={selectedPackageId}
-                  onValueChange={setSelectedPackageId}
-                  disabled={packageOptions.length === 0}
-                >
-                  <SelectTrigger id='bulk-kick-package' className='w-full'>
-                    <SelectValue placeholder='Pilih paket aktif' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {packageOptions.map((pkg) => (
-                      <SelectItem key={pkg.id} value={pkg.id}>
-                        {pkg.name} ({pkg.memberCount} member)
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {selectedPackageId && (
-                  <p className='text-sm text-muted-foreground'>
-                    Member yang tidak punya paket ini akan otomatis dilewati.
-                  </p>
-                )}
-                {packageOptions.length === 0 && (
-                  <p className='text-sm text-muted-foreground'>
-                    Tidak ada paket aktif dari member yang sedang dipilih.
-                  </p>
-                )}
-              </div>
-            )}
+            <div className='space-y-2'>
+              <Label htmlFor='bulk-extend-days'>Tambahan Hari (untuk Perpanjang)</Label>
+              <Input
+                id='bulk-extend-days'
+                type='number'
+                min='1'
+                placeholder='30'
+                value={extendDays}
+                onChange={(e) => setExtendDays(e.target.value)}
+              />
+            </div>
           </div>
 
           <DialogFooter>
-            <Button variant='outline' onClick={() => setIsKickModalOpen(false)}>
+            <Button variant='outline' onClick={closeModal}>
               Batal
             </Button>
             <Button
               variant='destructive'
               isLoading={bulkKickMut.isPending}
-              disabled={kickMode === 'single' && !selectedPackageId}
+              disabled={selectedPackageIds.length === 0}
               onClick={handleBulkKick}
             >
-              Keluarkan Member
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog
-        open={isExtendModalOpen}
-        onOpenChange={(open) => {
-          setIsExtendModalOpen(open);
-          if (!open) setExtendDays('');
-        }}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Perpanjang Langganan</DialogTitle>
-            <DialogDescription>
-              Perpanjang semua langganan aktif dari {selectedIds.length} member terpilih. Total{' '}
-              {selectedMembers.reduce((sum, m) => sum + getActiveSubscriptions(m).length, 0)}{' '}
-              langganan akan diperpanjang.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className='space-y-2 py-4'>
-            <Label htmlFor='bulk-extend-days'>Tambahan Hari</Label>
-            <Input
-              id='bulk-extend-days'
-              type='number'
-              min='1'
-              placeholder='30'
-              value={extendDays}
-              onChange={(e) => setExtendDays(e.target.value)}
-            />
-            <p className='text-xs text-muted-foreground'>
-              Jumlah hari yang akan ditambahkan ke setiap langganan aktif.
-            </p>
-          </div>
-
-          <DialogFooter>
-            <Button variant='outline' onClick={() => setIsExtendModalOpen(false)}>
-              Batal
+              Keluarkan
             </Button>
             <Button
               isLoading={bulkExtendMut.isPending}
-              disabled={!extendDays || Number(extendDays) <= 0}
+              disabled={selectedPackageIds.length === 0 || !extendDays || Number(extendDays) <= 0}
               onClick={handleBulkExtend}
             >
               Perpanjang
