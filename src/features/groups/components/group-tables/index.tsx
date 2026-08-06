@@ -44,41 +44,39 @@ export function GroupTable({ onEdit, onBulkDelete, toolbarActions, emptyState }:
 
   const selectedCount = table.getFilteredSelectedRowModel().rows.length;
 
+  const selectionBar =
+    selectedCount > 0 && onBulkDelete ? (
+      <div className='flex items-center gap-3'>
+        <span className='text-sm font-medium'>{selectedCount} grup dipilih</span>
+        <div className='flex gap-2'>
+          <Button variant='outline' size='sm' onClick={() => table.toggleAllRowsSelected(false)}>
+            Batal Pilih
+          </Button>
+          <Button
+            variant='destructive'
+            size='sm'
+            onClick={() => {
+              const ids = table.getFilteredSelectedRowModel().rows.map((r) => r.original.id);
+              onBulkDelete(ids);
+            }}
+          >
+            <Icons.trash className='mr-2 h-4 w-4' />
+            Hapus {selectedCount} Grup
+          </Button>
+        </div>
+      </div>
+    ) : undefined;
+
   return (
     <DataTable
       table={table}
       title='Daftar Grup'
       description='Kelola grup Telegram, penugasan bot, dan status akses member.'
       emptyState={emptyState}
-      actionBar={
-        selectedCount > 0 && onBulkDelete ? (
-          <div className='flex items-center gap-3'>
-            <span className='text-sm font-medium'>{selectedCount} grup dipilih</span>
-            <div className='ml-auto flex gap-2'>
-              <Button
-                variant='outline'
-                size='sm'
-                onClick={() => table.toggleAllRowsSelected(false)}
-              >
-                Batal Pilih
-              </Button>
-              <Button
-                variant='destructive'
-                size='sm'
-                onClick={() => {
-                  const ids = table.getFilteredSelectedRowModel().rows.map((r) => r.original.id);
-                  onBulkDelete(ids);
-                }}
-              >
-                <Icons.trash className='mr-2 h-4 w-4' />
-                Hapus {selectedCount} Grup
-              </Button>
-            </div>
-          </div>
-        ) : undefined
-      }
     >
-      <DataTableToolbar table={table}>{toolbarActions}</DataTableToolbar>
+      <DataTableToolbar table={table} hideViewOptions={selectedCount > 0}>
+        {selectionBar ?? toolbarActions}
+      </DataTableToolbar>
     </DataTable>
   );
 }
