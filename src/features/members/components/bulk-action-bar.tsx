@@ -39,7 +39,8 @@ export function BulkActionBar({
   selectedMembers,
   onClearSelection
 }: BulkActionBarProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isKickModalOpen, setIsKickModalOpen] = useState(false);
+  const [isExtendModalOpen, setIsExtendModalOpen] = useState(false);
   const [selectedPackageIds, setSelectedPackageIds] = useState<string[]>([]);
   const [extendDays, setExtendDays] = useState('');
 
@@ -92,13 +93,23 @@ export function BulkActionBar({
     }
   };
 
-  const openModal = () => {
+  const openKickModal = () => {
     setSelectedPackageIds(packageScopes.map((scope) => scope.packageId));
-    setIsModalOpen(true);
+    setIsKickModalOpen(true);
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
+  const openExtendModal = () => {
+    setSelectedPackageIds(packageScopes.map((scope) => scope.packageId));
+    setIsExtendModalOpen(true);
+  };
+
+  const closeKickModal = () => {
+    setIsKickModalOpen(false);
+    setSelectedPackageIds([]);
+  };
+
+  const closeExtendModal = () => {
+    setIsExtendModalOpen(false);
     setSelectedPackageIds([]);
     setExtendDays('');
   };
@@ -128,7 +139,7 @@ export function BulkActionBar({
             : res.message || `${targets.length} langganan dikeluarkan`
         );
         onClearSelection();
-        closeModal();
+        closeKickModal();
       } else {
         toast.error(res.message || 'Gagal mengeluarkan member');
       }
@@ -161,7 +172,7 @@ export function BulkActionBar({
             : res.message || `${targets.length} langganan diperpanjang`
         );
         onClearSelection();
-        closeModal();
+        closeExtendModal();
       } else {
         toast.error(res.message || 'Gagal memperpanjang langganan');
       }
@@ -172,6 +183,51 @@ export function BulkActionBar({
 
   if (selectedIds.length === 0) return null;
 
+  const packageList = (
+    <div className='space-y-2'>
+      {packageScopes.length === 0 ? (
+        <p className='text-sm text-muted-foreground'>
+          Tidak ada paket aktif dari member yang sedang dipilih.
+        </p>
+      ) : (
+        packageScopes.map((scope) => {
+          const isChecked = selectedPackageIds.includes(scope.packageId);
+          return (
+            <div
+              key={scope.packageId}
+              role='checkbox'
+              aria-checked={isChecked}
+              aria-label={scope.packageName}
+              tabIndex={0}
+              className={cn(
+                'flex cursor-pointer items-center gap-3 rounded-lg border p-3',
+                isChecked && 'border-primary bg-primary/5'
+              )}
+              onClick={() => togglePackage(scope.packageId)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  togglePackage(scope.packageId);
+                }
+              }}
+            >
+              <Checkbox
+                checked={isChecked}
+                tabIndex={-1}
+                aria-hidden
+                className='pointer-events-none'
+              />
+              <div className='flex-1'>
+                <p className='text-sm font-medium'>{scope.packageName}</p>
+                <p className='text-xs text-muted-foreground'>{scope.targets.length} langganan</p>
+              </div>
+            </div>
+          );
+        })
+      )}
+    </div>
+  );
+
   return (
     <div className='flex items-center gap-3'>
       <span className='text-sm font-medium text-primary'>{selectedIds.length} member dipilih</span>
@@ -180,27 +236,27 @@ export function BulkActionBar({
           Batal Pilih
         </Button>
 
-        <Button variant='default' size='sm' className='rounded-full' onClick={openModal}>
+        <Button variant='default' size='sm' className='rounded-full' onClick={openExtendModal}>
           <Icons.calendar /> Perpanjang
         </Button>
 
-        <Button variant='destructive' size='sm' className='rounded-full' onClick={openModal}>
+        <Button variant='destructive' size='sm' className='rounded-full' onClick={openKickModal}>
           <Icons.trash /> Keluarkan Member
         </Button>
       </div>
 
       <Dialog
-        open={isModalOpen}
+        open={isKickModalOpen}
         onOpenChange={(open) => {
-          if (!open) closeModal();
+          if (!open) closeKickModal();
         }}
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Keluarkan / Perpanjang Member</DialogTitle>
+            <DialogTitle>Keluarkan Member</DialogTitle>
             <DialogDescription>
               {selectedIds.length} member terpilih · {totalSubscriptions} langganan aktif. Pilih
-              paket yang ingin diproses.
+              paket yang akan dikeluarkan.
             </DialogDescription>
           </DialogHeader>
 
@@ -216,52 +272,59 @@ export function BulkActionBar({
                   {isSelectAll ? 'Kosongkan' : 'Pilih semua'}
                 </button>
               </div>
-
-              {packageScopes.length === 0 ? (
-                <p className='text-sm text-muted-foreground'>
-                  Tidak ada paket aktif dari member yang sedang dipilih.
+              {packageList}
+              {memberWithNoActivePackage > 0 && (
+                <p className='text-xs text-muted-foreground'>
+                  {memberWithNoActivePackage} member tanpa paket aktif akan dilewati.
                 </p>
-              ) : (
-                <div className='space-y-2'>
-                  {packageScopes.map((scope) => {
-                    const isChecked = selectedPackageIds.includes(scope.packageId);
-                    return (
-                      <div
-                        key={scope.packageId}
-                        role='checkbox'
-                        aria-checked={isChecked}
-                        aria-label={scope.packageName}
-                        tabIndex={0}
-                        className={cn(
-                          'flex cursor-pointer items-center gap-3 rounded-lg border p-3',
-                          isChecked && 'border-primary bg-primary/5'
-                        )}
-                        onClick={() => togglePackage(scope.packageId)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            togglePackage(scope.packageId);
-                          }
-                        }}
-                      >
-                        <Checkbox
-                          checked={isChecked}
-                          tabIndex={-1}
-                          aria-hidden
-                          className='pointer-events-none'
-                        />
-                        <div className='flex-1'>
-                          <p className='text-sm font-medium'>{scope.packageName}</p>
-                          <p className='text-xs text-muted-foreground'>
-                            {scope.targets.length} langganan
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
               )}
+            </div>
+          </div>
 
+          <DialogFooter>
+            <Button variant='outline' onClick={closeKickModal}>
+              Batal
+            </Button>
+            <Button
+              variant='destructive'
+              isLoading={bulkKickMut.isPending}
+              disabled={selectedPackageIds.length === 0}
+              onClick={handleBulkKick}
+            >
+              Keluarkan Member
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={isExtendModalOpen}
+        onOpenChange={(open) => {
+          if (!open) closeExtendModal();
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Perpanjang Langganan</DialogTitle>
+            <DialogDescription>
+              {selectedIds.length} member terpilih · {totalSubscriptions} langganan aktif. Pilih
+              paket yang akan diperpanjang.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className='space-y-4 py-4'>
+            <div className='space-y-3'>
+              <div className='flex items-center justify-between'>
+                <Label>Paket yang dimiliki member terpilih</Label>
+                <button
+                  type='button'
+                  className='text-sm font-medium text-primary hover:underline'
+                  onClick={toggleAllPackages}
+                >
+                  {isSelectAll ? 'Kosongkan' : 'Pilih semua'}
+                </button>
+              </div>
+              {packageList}
               {memberWithNoActivePackage > 0 && (
                 <p className='text-xs text-muted-foreground'>
                   {memberWithNoActivePackage} member tanpa paket aktif akan dilewati.
@@ -270,7 +333,7 @@ export function BulkActionBar({
             </div>
 
             <div className='space-y-2'>
-              <Label htmlFor='bulk-extend-days'>Tambahan Hari (untuk Perpanjang)</Label>
+              <Label htmlFor='bulk-extend-days'>Tambahan Hari</Label>
               <Input
                 id='bulk-extend-days'
                 type='number'
@@ -283,16 +346,8 @@ export function BulkActionBar({
           </div>
 
           <DialogFooter>
-            <Button variant='outline' onClick={closeModal}>
+            <Button variant='outline' onClick={closeExtendModal}>
               Batal
-            </Button>
-            <Button
-              variant='destructive'
-              isLoading={bulkKickMut.isPending}
-              disabled={selectedPackageIds.length === 0}
-              onClick={handleBulkKick}
-            >
-              Keluarkan
             </Button>
             <Button
               isLoading={bulkExtendMut.isPending}
