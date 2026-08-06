@@ -148,6 +148,10 @@ export function BulkActionBar({
     <div className='flex items-center gap-3'>
       <span className='text-sm font-medium text-primary'>{selectedIds.length} member dipilih</span>
       <div className='flex gap-2'>
+        <Button variant='outline' size='sm' className='rounded-full' onClick={onClearSelection}>
+          Batal Pilih
+        </Button>
+
         <Button
           variant='default'
           size='sm'
@@ -164,10 +168,6 @@ export function BulkActionBar({
           onClick={() => setIsKickModalOpen(true)}
         >
           <Icons.trash /> Keluarkan Member
-        </Button>
-
-        <Button variant='outline' size='sm' className='rounded-full' onClick={onClearSelection}>
-          Batal Pilih
         </Button>
       </div>
 
