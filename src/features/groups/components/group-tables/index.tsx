@@ -29,7 +29,7 @@ export function GroupTable({ onEdit, onBulkDelete, toolbarActions, emptyState }:
   const { table } = useDataTable({
     data: groups,
     columns,
-    pageCount: 1,
+    pageCount: -1,
     shallow: true,
     debounceMs: 500,
     initialState: {

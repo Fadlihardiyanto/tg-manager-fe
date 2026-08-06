@@ -1,6 +1,7 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-header';
 import type { TelegramGroup } from '../../api/types';
@@ -18,6 +19,32 @@ const roleLabels: Record<string, string> = {
 
 export function getColumns(onEdit?: (group: TelegramGroup) => void): ColumnDef<TelegramGroup>[] {
   return [
+    {
+      id: 'select',
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && 'indeterminate')
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label='Pilih semua grup di halaman ini'
+          className='translate-y-[2px]'
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label='Pilih grup'
+          className='translate-y-[2px]'
+        />
+      ),
+      enableSorting: false,
+      enableColumnFilter: false,
+      size: 36,
+      meta: { label: 'Pilih' }
+    },
     {
       id: 'name',
       accessorKey: 'name',
