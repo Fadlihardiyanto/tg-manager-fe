@@ -184,7 +184,7 @@ export function BulkActionBar({
   if (selectedIds.length === 0) return null;
 
   const packageList = (
-    <div className='space-y-2'>
+    <div className='max-h-[220px] space-y-2 overflow-y-auto pr-1'>
       {packageScopes.length === 0 ? (
         <p className='text-sm text-muted-foreground'>
           Tidak ada paket aktif dari member yang sedang dipilih.
