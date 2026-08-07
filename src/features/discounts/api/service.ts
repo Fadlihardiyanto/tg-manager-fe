@@ -21,6 +21,7 @@ import type {
   UpdateMemberDiscountRequest,
   DiscountsListResponse,
   DiscountResponse,
+  BulkDeleteResponse,
   ApiResponse
 } from './types';
 
@@ -86,5 +87,21 @@ export async function deleteDiscount(id: string): Promise<ApiResponse<null>> {
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Gagal menghapus diskon';
     return { success: false, code: 400, message, data: null };
+  }
+}
+
+// ─── Bulk Delete Discounts (DELETE /api/v1/tenant/discounts/bulk) ────
+export async function bulkDeleteDiscounts(ids: string[]): Promise<BulkDeleteResponse> {
+  const authHeaders = await getAuthHeaders();
+
+  try {
+    return await apiClient<BulkDeleteResponse>('/api/v1/tenant/discounts/bulk', {
+      method: 'DELETE',
+      headers: { ...authHeaders },
+      body: JSON.stringify({ ids })
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Gagal menghapus diskon';
+    return { success: false, code: 400, message, data: { deleted: 0, failed: null } };
   }
 }

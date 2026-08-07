@@ -67,3 +67,17 @@ export type DiscountsListResponse = ApiResponse<MemberDiscount[]>;
 // ─── Single Response ────────────────────────────────────────────────
 
 export type DiscountResponse = ApiResponse<MemberDiscount>;
+
+// ─── Bulk Delete (DELETE /api/v1/tenant/discounts/bulk) ─────────────
+
+export interface BulkDeleteFailedItem {
+  id: string;
+  error: string;
+}
+
+export interface BulkDeleteData {
+  deleted: number;
+  failed: BulkDeleteFailedItem[] | null;
+}
+
+export type BulkDeleteResponse = ApiResponse<BulkDeleteData>;

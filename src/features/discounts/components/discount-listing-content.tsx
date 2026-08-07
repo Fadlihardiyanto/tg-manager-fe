@@ -9,17 +9,26 @@ import { DiscountTable } from './discount-tables';
 import { DiscountFormDialog } from './discount-form-dialog';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
+import { AlertModal } from '@/components/modal/alert-modal';
 import { useActivePlan } from '@/features/billing/components/active-plan-provider';
 import type { MemberDiscount } from '../api/types';
+import { bulkDeleteDiscounts } from '../api/service';
+import { discountKeys } from '../api/queries';
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 import { useTenantPath } from '@/lib/tenant-path';
 
 export function DiscountListingContent() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingDiscount, setEditingDiscount] = useState<MemberDiscount | null>(null);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [bulkDeleteIds, setBulkDeleteIds] = useState<string[]>([]);
+  const [bulkDeleting, setBulkDeleting] = useState(false);
   const { canUseFeature } = useActivePlan();
   const { getTenantHref } = useTenantPath();
   const allowDiscountSystem = canUseFeature('allow_discount_system');
+  const queryClient = useQueryClient();
 
   const handleEdit = useCallback((discount: MemberDiscount) => {
     setEditingDiscount(discount);
@@ -38,8 +47,53 @@ export function DiscountListingContent() {
     setDialogOpen(true);
   }, []);
 
+  const handleBulkDelete = useCallback((ids: string[]) => {
+    setBulkDeleteIds(ids);
+    setBulkDeleteOpen(true);
+  }, []);
+
+  const handleBulkDeleteConfirm = useCallback(async () => {
+    setBulkDeleting(true);
+    try {
+      const res = await bulkDeleteDiscounts(bulkDeleteIds);
+      const deleted = res.data?.deleted ?? 0;
+      const failed = res.data?.failed ?? [];
+
+      if (res.success && deleted > 0) {
+        if (failed.length > 0) {
+          toast.error(`${deleted} diskon dihapus, ${failed.length} gagal`);
+        } else {
+          toast.success(`${deleted} diskon berhasil dihapus`);
+        }
+      } else if (failed.length > 0) {
+        toast.error(`${failed.length} diskon gagal dihapus`);
+      } else {
+        toast.error(res.message || 'Gagal menghapus diskon');
+      }
+    } catch {
+      toast.error('Gagal menghapus diskon');
+    }
+
+    setBulkDeleting(false);
+    setBulkDeleteOpen(false);
+    setBulkDeleteIds([]);
+    void queryClient.invalidateQueries({ queryKey: discountKeys.all });
+  }, [bulkDeleteIds, queryClient]);
+
   return (
     <div className='flex min-h-0 flex-1 flex-col gap-4'>
+      <AlertModal
+        isOpen={bulkDeleteOpen}
+        onClose={() => {
+          setBulkDeleteOpen(false);
+          setBulkDeleteIds([]);
+        }}
+        onConfirm={handleBulkDeleteConfirm}
+        loading={bulkDeleting}
+        title={`Hapus ${bulkDeleteIds.length} diskon?`}
+        description={`${bulkDeleteIds.length} diskon akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.`}
+      />
+
       <div className='relative flex min-h-0 flex-1'>
         <div
           className={
@@ -50,6 +104,7 @@ export function DiscountListingContent() {
         >
           <DiscountTable
             onEdit={handleEdit}
+            onBulkDelete={handleBulkDelete}
             toolbarActions={
               <Button
                 onClick={handleAdd}

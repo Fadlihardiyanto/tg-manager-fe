@@ -1,6 +1,7 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-header';
 import type { MemberDiscount } from '../../api/types';
 import type { ColumnDef } from '@tanstack/react-table';
@@ -20,6 +21,32 @@ export function getColumns(
   onEdit?: (discount: MemberDiscount) => void
 ): ColumnDef<MemberDiscount>[] {
   return [
+    {
+      id: 'select',
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && 'indeterminate')
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label='Pilih semua diskon di halaman ini'
+          className='translate-y-[2px]'
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label='Pilih diskon'
+          className='translate-y-[2px]'
+        />
+      ),
+      enableSorting: false,
+      enableColumnFilter: false,
+      enableHiding: false,
+      size: 40
+    },
     {
       id: 'name',
       accessorKey: 'name',
