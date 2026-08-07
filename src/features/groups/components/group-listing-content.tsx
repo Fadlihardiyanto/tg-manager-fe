@@ -9,9 +9,9 @@ import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import { AlertModal } from '@/components/modal/alert-modal';
 import type { TelegramGroup } from '../api/types';
-import { syncGroupsMutation, deleteGroupMutation } from '../api/mutations';
+import { syncGroupsMutation } from '../api/mutations';
 import { groupKeys } from '../api/queries';
-import { deleteGroup } from '../api/service';
+import { bulkDeleteGroups } from '../api/service';
 import { toast } from 'sonner';
 
 export function GroupListingContent() {
@@ -47,15 +47,24 @@ export function GroupListingContent() {
 
   const handleBulkDeleteConfirm = useCallback(async () => {
     setBulkDeleting(true);
-    const results = await Promise.allSettled(bulkDeleteIds.map((id) => deleteGroup(id)));
-    const failed = results.filter((r) => r.status === 'rejected').length;
-    const succeeded = results.length - failed;
+    try {
+      const res = await bulkDeleteGroups(bulkDeleteIds);
+      const deleted = res.data?.deleted ?? 0;
+      const failed = res.data?.failed ?? [];
 
-    if (succeeded > 0) {
-      toast.success(`${succeeded} grup berhasil dihapus`);
-    }
-    if (failed > 0) {
-      toast.error(`${failed} grup gagal dihapus`);
+      if (res.success && deleted > 0) {
+        if (failed.length > 0) {
+          toast.error(`${deleted} grup dihapus, ${failed.length} gagal`);
+        } else {
+          toast.success(`${deleted} grup berhasil dihapus`);
+        }
+      } else if (failed.length > 0) {
+        toast.error(`${failed.length} grup gagal dihapus`);
+      } else {
+        toast.error(res.message || 'Gagal menghapus grup');
+      }
+    } catch {
+      toast.error('Gagal menghapus grup');
     }
 
     setBulkDeleting(false);

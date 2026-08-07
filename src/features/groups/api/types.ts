@@ -61,3 +61,17 @@ export type GroupsListResponse = ApiResponse<TelegramGroup[]>;
 // ─── Single Response ────────────────────────────────────────────────
 
 export type GroupResponse = ApiResponse<TelegramGroup>;
+
+// ─── Bulk Delete (DELETE /api/v1/tenant/groups/bulk) ────────────────
+
+export interface BulkDeleteFailedItem {
+  id: string;
+  error: string;
+}
+
+export interface BulkDeleteData {
+  deleted: number;
+  failed: BulkDeleteFailedItem[] | null;
+}
+
+export type BulkDeleteResponse = ApiResponse<BulkDeleteData>;

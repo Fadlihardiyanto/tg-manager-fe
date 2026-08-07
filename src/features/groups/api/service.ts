@@ -22,6 +22,7 @@ import type {
   GroupsListResponse,
   GroupResponse,
   ConnectTokenResponse,
+  BulkDeleteResponse,
   ApiResponse
 } from './types';
 
@@ -83,6 +84,22 @@ export async function deleteGroup(id: string): Promise<ApiResponse<null>> {
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Gagal menghapus grup';
     return { success: false, code: 400, message, data: null };
+  }
+}
+
+// ─── Bulk Delete Groups (DELETE /api/v1/tenant/groups/bulk) ────────
+export async function bulkDeleteGroups(ids: string[]): Promise<BulkDeleteResponse> {
+  const authHeaders = await getAuthHeaders();
+
+  try {
+    return await apiClient<BulkDeleteResponse>('/api/v1/tenant/groups/bulk', {
+      method: 'DELETE',
+      headers: { ...authHeaders },
+      body: JSON.stringify({ ids })
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Gagal menghapus grup';
+    return { success: false, code: 400, message, data: { deleted: 0, failed: null } };
   }
 }
 
