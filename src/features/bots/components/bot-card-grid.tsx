@@ -3,7 +3,7 @@
 // ============================================================
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -51,10 +51,19 @@ interface BotCardGridProps {
 export function BotCardGrid({ onEdit, onBulkDelete, search = '' }: BotCardGridProps) {
   const { data: botsData } = useSuspenseQuery(botsQueryOptions());
   const { data: groupsData } = useSuspenseQuery(groupsQueryOptions());
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const bots = botsData.data ?? [];
   const groups = groupsData.data ?? [];
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  // ponytail: prune selection ids that no longer exist in data (after delete)
+  useEffect(() => {
+    const validIds = new Set(bots.map((b) => b.id));
+    setSelectedIds((prev) => {
+      const next = prev.filter((id) => validIds.has(id));
+      return next.length === prev.length ? prev : next;
+    });
+  }, [bots]);
 
   // Filter by search
   const query = search.toLowerCase().trim();

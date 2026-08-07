@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { packagesQueryOptions } from '../../api/queries';
 import { Icons } from '@/components/icons';
@@ -166,6 +166,15 @@ export function PackageTable({ onEdit, onBulkDelete, toolbarActions, notice }: P
   const packages = data.data ?? [];
   const [search, setSearch] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  // ponytail: prune selection ids that no longer exist in data (after delete)
+  useEffect(() => {
+    const validIds = new Set(packages.map((p) => p.id));
+    setSelectedIds((prev) => {
+      const next = prev.filter((id) => validIds.has(id));
+      return next.length === prev.length ? prev : next;
+    });
+  }, [packages]);
 
   const query = search.toLowerCase().trim();
   const filtered = query ? packages.filter((p) => p.name.toLowerCase().includes(query)) : packages;

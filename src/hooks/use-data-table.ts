@@ -278,6 +278,9 @@ export function useDataTable<TData>(props: UseDataTableProps<TData>) {
     },
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
+    // ponytail: key selection by row id, not index — otherwise selection shifts to
+    // a different row after data changes (delete/refetch)
+    getRowId: (row) => (row as { id?: string }).id ?? '',
     onPaginationChange,
     onSortingChange,
     onColumnFiltersChange,
