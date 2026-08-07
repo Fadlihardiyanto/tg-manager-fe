@@ -12,6 +12,7 @@ import { useTenantPath } from '@/lib/tenant-path';
 import { AlertModal } from '@/components/modal/alert-modal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,12 +44,14 @@ const BOT_ROLE_STRIPE: Record<BotRole, string> = {
 
 interface BotCardGridProps {
   onEdit: (bot: TelegramBot) => void;
+  onBulkDelete?: (ids: string[]) => void;
   search?: string;
 }
 
-export function BotCardGrid({ onEdit, search = '' }: BotCardGridProps) {
+export function BotCardGrid({ onEdit, onBulkDelete, search = '' }: BotCardGridProps) {
   const { data: botsData } = useSuspenseQuery(botsQueryOptions());
   const { data: groupsData } = useSuspenseQuery(groupsQueryOptions());
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const bots = botsData.data ?? [];
   const groups = groupsData.data ?? [];
@@ -63,6 +66,14 @@ export function BotCardGrid({ onEdit, search = '' }: BotCardGridProps) {
     if (!group.is_active) continue;
     groupCountByBotId.set(group.bot_id, (groupCountByBotId.get(group.bot_id) ?? 0) + 1);
   }
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((bid) => bid !== id) : [...prev, id]
+    );
+  };
+
+  const clearSelection = () => setSelectedIds([]);
 
   if (bots.length === 0) {
     return (
@@ -93,16 +104,40 @@ export function BotCardGrid({ onEdit, search = '' }: BotCardGridProps) {
   }
 
   return (
-    <div className='grid gap-5 sm:grid-cols-2 xl:grid-cols-3'>
-      {filtered.map((bot, i) => (
-        <BotCard
-          key={bot.id}
-          bot={bot}
-          groupCount={groupCountByBotId.get(bot.id) ?? 0}
-          onEdit={onEdit}
-          index={i}
-        />
-      ))}
+    <div className='flex flex-col gap-4'>
+      {selectedIds.length > 0 && onBulkDelete && (
+        <div className='flex items-center gap-3'>
+          <span className='text-sm font-medium text-primary'>{selectedIds.length} bot dipilih</span>
+          <div className='flex gap-2'>
+            <Button variant='outline' size='sm' className='rounded-full' onClick={clearSelection}>
+              Batal Pilih
+            </Button>
+            <Button
+              variant='destructive'
+              size='sm'
+              className='rounded-full'
+              onClick={() => onBulkDelete(selectedIds)}
+            >
+              <Icons.trash className='mr-2 h-4 w-4' />
+              Hapus {selectedIds.length} Bot
+            </Button>
+          </div>
+        </div>
+      )}
+
+      <div className='grid gap-5 sm:grid-cols-2 xl:grid-cols-3'>
+        {filtered.map((bot, i) => (
+          <BotCard
+            key={bot.id}
+            bot={bot}
+            groupCount={groupCountByBotId.get(bot.id) ?? 0}
+            onEdit={onEdit}
+            index={i}
+            isSelected={selectedIds.includes(bot.id)}
+            onToggleSelect={onBulkDelete ? () => toggleSelect(bot.id) : undefined}
+          />
+        ))}
+      </div>
     </div>
   );
 }
@@ -112,9 +147,11 @@ interface BotCardProps {
   groupCount: number;
   onEdit: (bot: TelegramBot) => void;
   index: number;
+  isSelected: boolean;
+  onToggleSelect?: () => void;
 }
 
-function BotCard({ bot, groupCount, onEdit, index }: BotCardProps) {
+function BotCard({ bot, groupCount, onEdit, index, isSelected, onToggleSelect }: BotCardProps) {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [toggleOpen, setToggleOpen] = useState(false);
   const queryClient = useQueryClient();
@@ -179,6 +216,7 @@ function BotCard({ bot, groupCount, onEdit, index }: BotCardProps) {
         className={cn(
           'group relative flex flex-col rounded-xl border border-border/70 bg-card shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-primary/20',
           !bot.is_active && 'opacity-75',
+          isSelected && 'border-primary ring-1 ring-primary/30',
           animClass
         )}
       >
@@ -189,6 +227,16 @@ function BotCard({ bot, groupCount, onEdit, index }: BotCardProps) {
             BOT_ROLE_STRIPE[bot.bot_role]
           )}
         />
+
+        {onToggleSelect && (
+          <div className='absolute left-3 top-3 z-10'>
+            <Checkbox
+              checked={isSelected}
+              onCheckedChange={() => onToggleSelect?.()}
+              aria-label={`Pilih bot @${bot.username}`}
+            />
+          </div>
+        )}
 
         <div className='flex flex-1 flex-col p-5'>
           {/* Top row: avatar + identity + dropdown */}

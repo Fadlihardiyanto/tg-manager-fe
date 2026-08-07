@@ -60,6 +60,20 @@ export type BotsListResponse = ApiResponse<TelegramBot[]>;
 
 export type BotResponse = ApiResponse<TelegramBot>;
 
+// ─── Bulk Delete (DELETE /api/v1/tenant/bots/bulk) ──────────────────
+
+export interface BulkDeleteFailedItem {
+  id: string;
+  error: string;
+}
+
+export interface BulkDeleteData {
+  deleted: number;
+  failed: BulkDeleteFailedItem[] | null;
+}
+
+export type BulkDeleteResponse = ApiResponse<BulkDeleteData>;
+
 // ─── Shared Display Constants ───────────────────────────────────────
 
 export const BOT_ROLE_LABELS: Record<BotRole, string> = {

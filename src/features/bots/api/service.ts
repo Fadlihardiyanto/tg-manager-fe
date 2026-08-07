@@ -22,6 +22,7 @@ import type {
   UpdateBotRequest,
   BotsListResponse,
   BotResponse,
+  BulkDeleteResponse,
   ApiResponse
 } from './types';
 
@@ -99,5 +100,21 @@ export async function deleteBot(id: string): Promise<ApiResponse<null>> {
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Gagal menghapus bot';
     return { success: false, code: 400, message, data: null };
+  }
+}
+
+// ─── Bulk Delete Bots (DELETE /api/v1/tenant/bots/bulk) ─────────────
+export async function bulkDeleteBots(ids: string[]): Promise<BulkDeleteResponse> {
+  const authHeaders = await getAuthHeaders();
+
+  try {
+    return await apiClient<BulkDeleteResponse>('/api/v1/tenant/bots/bulk', {
+      method: 'DELETE',
+      headers: { ...authHeaders },
+      body: JSON.stringify({ ids })
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Gagal menghapus bot';
+    return { success: false, code: 400, message, data: { deleted: 0, failed: null } };
   }
 }
