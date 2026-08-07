@@ -238,7 +238,7 @@ function BotCard({ bot, groupCount, onEdit, index, isSelected, onToggleSelect }:
           </div>
         )}
 
-        <div className='flex flex-1 flex-col p-5'>
+        <div className={cn('flex flex-1 flex-col px-5 pb-5', onToggleSelect ? 'pt-9' : 'pt-5')}>
           {/* Top row: avatar + identity + dropdown */}
           <div className='flex items-start justify-between'>
             <div className='flex items-center gap-3'>
