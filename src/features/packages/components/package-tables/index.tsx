@@ -9,16 +9,29 @@ import { formatDate, formatRupiah } from '@/lib/format';
 import type { Package } from '../../api/types';
 import { StatusCell } from './columns';
 import { CellAction } from './cell-action';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import type { ReactNode } from 'react';
 
 interface PackageTableProps {
   onEdit: (pkg: Package) => void;
+  onBulkDelete?: (ids: string[]) => void;
   toolbarActions?: ReactNode;
   notice?: ReactNode;
 }
 
-function PackageCard({ pkg, onEdit }: { pkg: Package; onEdit: (pkg: Package) => void }) {
+function PackageCard({
+  pkg,
+  onEdit,
+  isSelected,
+  onToggleSelect
+}: {
+  pkg: Package;
+  onEdit: (pkg: Package) => void;
+  isSelected: boolean;
+  onToggleSelect?: () => void;
+}) {
   const groups = pkg.groups ?? [];
   const MAX_VISIBLE_GROUPS = 3;
   const visibleGroups = groups.slice(0, MAX_VISIBLE_GROUPS);
@@ -28,11 +41,22 @@ function PackageCard({ pkg, onEdit }: { pkg: Package; onEdit: (pkg: Package) => 
     <div
       className={cn(
         'group relative flex flex-col rounded-xl border border-border/70 bg-card shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-primary/20',
-        !pkg.is_active && 'opacity-75'
+        !pkg.is_active && 'opacity-75',
+        isSelected && 'border-primary ring-1 ring-primary/30'
       )}
     >
       {/* Command Blue accent stripe */}
       <div className='h-1.5 w-full rounded-t-xl bg-gradient-to-r from-primary/80 to-primary' />
+
+      {onToggleSelect && (
+        <div className='absolute left-3 top-3 z-10'>
+          <Checkbox
+            checked={isSelected}
+            onCheckedChange={() => onToggleSelect?.()}
+            aria-label={`Pilih paket ${pkg.name}`}
+          />
+        </div>
+      )}
 
       <div className='flex flex-1 flex-col p-5'>
         {/* Top row: icon + identity + kebab */}
@@ -137,13 +161,22 @@ function PackageCard({ pkg, onEdit }: { pkg: Package; onEdit: (pkg: Package) => 
   );
 }
 
-export function PackageTable({ onEdit, toolbarActions, notice }: PackageTableProps) {
+export function PackageTable({ onEdit, onBulkDelete, toolbarActions, notice }: PackageTableProps) {
   const { data } = useSuspenseQuery(packagesQueryOptions());
   const packages = data.data ?? [];
   const [search, setSearch] = useState('');
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const query = search.toLowerCase().trim();
   const filtered = query ? packages.filter((p) => p.name.toLowerCase().includes(query)) : packages;
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((pid) => pid !== id) : [...prev, id]
+    );
+  };
+
+  const clearSelection = () => setSelectedIds([]);
 
   if (packages.length === 0) {
     return (
@@ -186,7 +219,36 @@ export function PackageTable({ onEdit, toolbarActions, notice }: PackageTablePro
             </button>
           )}
         </div>
-        <div className='shrink-0'>{toolbarActions}</div>
+        <div className='shrink-0'>
+          {selectedIds.length > 0 && onBulkDelete ? (
+            <div className='flex items-center gap-3'>
+              <span className='text-sm font-medium text-primary'>
+                {selectedIds.length} paket dipilih
+              </span>
+              <div className='flex gap-2'>
+                <Button
+                  variant='outline'
+                  size='sm'
+                  className='rounded-full'
+                  onClick={clearSelection}
+                >
+                  Batal Pilih
+                </Button>
+                <Button
+                  variant='destructive'
+                  size='sm'
+                  className='rounded-full'
+                  onClick={() => onBulkDelete(selectedIds)}
+                >
+                  <Icons.trash className='mr-2 h-4 w-4' />
+                  Hapus {selectedIds.length} Paket
+                </Button>
+              </div>
+            </div>
+          ) : (
+            toolbarActions
+          )}
+        </div>
       </div>
 
       {/* Title + description */}
@@ -214,7 +276,13 @@ export function PackageTable({ onEdit, toolbarActions, notice }: PackageTablePro
       {filtered.length > 0 && (
         <div className='grid gap-5 sm:grid-cols-2 xl:grid-cols-3'>
           {filtered.map((pkg) => (
-            <PackageCard key={pkg.id} pkg={pkg} onEdit={onEdit} />
+            <PackageCard
+              key={pkg.id}
+              pkg={pkg}
+              onEdit={onEdit}
+              isSelected={selectedIds.includes(pkg.id)}
+              onToggleSelect={onBulkDelete ? () => toggleSelect(pkg.id) : undefined}
+            />
           ))}
         </div>
       )}

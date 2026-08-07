@@ -63,3 +63,17 @@ export type PackagesListResponse = ApiResponse<Package[]>;
 // ─── Single Response ────────────────────────────────────────────────
 
 export type PackageResponse = ApiResponse<Package>;
+
+// ─── Bulk Delete (DELETE /api/v1/tenant/packages/bulk) ──────────────
+
+export interface BulkDeleteFailedItem {
+  id: string;
+  error: string;
+}
+
+export interface BulkDeleteData {
+  deleted: number;
+  failed: BulkDeleteFailedItem[] | null;
+}
+
+export type BulkDeleteResponse = ApiResponse<BulkDeleteData>;
