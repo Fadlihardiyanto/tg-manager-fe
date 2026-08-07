@@ -42,7 +42,7 @@ function PackageCard({
       className={cn(
         'group relative flex flex-col rounded-xl border border-border/70 bg-card shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-primary/20',
         !pkg.is_active && 'opacity-75',
-        isSelected && 'border-primary ring-1 ring-primary/30'
+        isSelected && 'border-primary/60 bg-primary/[0.03]'
       )}
     >
       {/* Command Blue accent stripe */}
