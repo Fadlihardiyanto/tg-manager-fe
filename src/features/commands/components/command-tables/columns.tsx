@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Switch } from '@/components/ui/switch';
 import {
   AlertDialog,
@@ -100,6 +101,32 @@ export function getColumns(
   onEdit?: (cmd: Command) => void
 ): ColumnDef<Command>[] {
   return [
+    {
+      id: 'select',
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && 'indeterminate')
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label='Pilih semua perintah di halaman ini'
+          className='translate-y-[2px]'
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label='Pilih perintah'
+          className='translate-y-[2px]'
+        />
+      ),
+      enableSorting: false,
+      enableColumnFilter: false,
+      enableHiding: false,
+      size: 40
+    },
     {
       id: 'command_trigger',
       accessorKey: 'command_trigger',

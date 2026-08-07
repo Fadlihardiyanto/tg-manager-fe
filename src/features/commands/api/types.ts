@@ -61,3 +61,17 @@ export type PresignedUrlResponse = ApiResponse<PresignedUrlData>;
 
 export type CommandsListResponse = ApiResponse<Command[]>;
 export type CommandResponse = ApiResponse<Command>;
+
+// ─── Bulk Delete (DELETE /api/v1/tenant/commands/bulk) ──────────────
+
+export interface BulkDeleteFailedItem {
+  id: string;
+  error: string;
+}
+
+export interface BulkDeleteData {
+  deleted: number;
+  failed: BulkDeleteFailedItem[] | null;
+}
+
+export type BulkDeleteResponse = ApiResponse<BulkDeleteData>;

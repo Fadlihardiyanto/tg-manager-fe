@@ -6,14 +6,23 @@ import { CommandFormDialog } from './command-form-dialog';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import { QuotaCard } from '@/features/billing/components/quota-card';
+import { AlertModal } from '@/components/modal/alert-modal';
 import { useActivePlan } from '@/features/billing/components/active-plan-provider';
 import type { Command } from '../api/types';
+import { bulkDeleteCommands } from '../api/service';
+import { commandKeys } from '../api/queries';
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 export function CommandListingContent() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingCommand, setEditingCommand] = useState<Command | null>(null);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [bulkDeleteIds, setBulkDeleteIds] = useState<string[]>([]);
+  const [bulkDeleting, setBulkDeleting] = useState(false);
   const { hasQuota } = useActivePlan();
   const canCreateCommand = hasQuota('custom_commands');
+  const queryClient = useQueryClient();
 
   const handleEdit = useCallback((cmd: Command) => {
     setEditingCommand(cmd);
@@ -32,10 +41,56 @@ export function CommandListingContent() {
     setDialogOpen(true);
   }, []);
 
+  const handleBulkDelete = useCallback((ids: string[]) => {
+    setBulkDeleteIds(ids);
+    setBulkDeleteOpen(true);
+  }, []);
+
+  const handleBulkDeleteConfirm = useCallback(async () => {
+    setBulkDeleting(true);
+    try {
+      const res = await bulkDeleteCommands(bulkDeleteIds);
+      const deleted = res.data?.deleted ?? 0;
+      const failed = res.data?.failed ?? [];
+
+      if (res.success && deleted > 0) {
+        if (failed.length > 0) {
+          toast.error(`${deleted} perintah dihapus, ${failed.length} gagal`);
+        } else {
+          toast.success(`${deleted} perintah berhasil dihapus`);
+        }
+      } else if (failed.length > 0) {
+        toast.error(`${failed.length} perintah gagal dihapus`);
+      } else {
+        toast.error(res.message || 'Gagal menghapus perintah');
+      }
+    } catch {
+      toast.error('Gagal menghapus perintah');
+    }
+
+    setBulkDeleting(false);
+    setBulkDeleteOpen(false);
+    setBulkDeleteIds([]);
+    void queryClient.invalidateQueries({ queryKey: commandKeys.all });
+  }, [bulkDeleteIds, queryClient]);
+
   return (
     <div className='flex min-h-0 flex-1 flex-col gap-4'>
+      <AlertModal
+        isOpen={bulkDeleteOpen}
+        onClose={() => {
+          setBulkDeleteOpen(false);
+          setBulkDeleteIds([]);
+        }}
+        onConfirm={handleBulkDeleteConfirm}
+        loading={bulkDeleting}
+        title={`Hapus ${bulkDeleteIds.length} perintah?`}
+        description={`${bulkDeleteIds.length} perintah akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.`}
+      />
+
       <CommandTable
         onEdit={handleEdit}
+        onBulkDelete={handleBulkDelete}
         notice={<QuotaCard resource='custom_commands' title='Kuota perintah kustom' />}
         toolbarActions={
           <Button

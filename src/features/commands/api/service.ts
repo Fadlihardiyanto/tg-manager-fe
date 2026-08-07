@@ -9,6 +9,7 @@ import type {
   CommandResponse,
   PresignedUrlRequest,
   PresignedUrlResponse,
+  BulkDeleteResponse,
   ApiResponse
 } from './types';
 
@@ -85,5 +86,21 @@ export async function deleteCommand(id: string): Promise<ApiResponse<null>> {
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Gagal menghapus perintah';
     return { success: false, code: 400, message, data: null };
+  }
+}
+
+// ─── Bulk Delete Commands (DELETE /api/v1/tenant/commands/bulk) ──────
+export async function bulkDeleteCommands(ids: string[]): Promise<BulkDeleteResponse> {
+  const authHeaders = await getAuthHeaders();
+
+  try {
+    return await apiClient<BulkDeleteResponse>('/api/v1/tenant/commands/bulk', {
+      method: 'DELETE',
+      headers: { ...authHeaders },
+      body: JSON.stringify({ ids })
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Gagal menghapus perintah';
+    return { success: false, code: 400, message, data: { deleted: 0, failed: null } };
   }
 }
