@@ -91,8 +91,16 @@ export const columns: ColumnDef<Transaction>[] = [
   {
     id: 'amount',
     accessorFn: (row) => Number(row.amount ?? 0),
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Total Bayar' />,
-    cell: ({ row }) => (row.original.amount ? formatRupiah(Number(row.original.amount)) : '-'),
+    header: ({ column }) => (
+      <div className='flex justify-end'>
+        <DataTableColumnHeader column={column} title='Total Bayar' />
+      </div>
+    ),
+    cell: ({ row }) => (
+      <div className='text-right font-medium tabular-nums'>
+        {row.original.amount ? formatRupiah(Number(row.original.amount)) : '-'}
+      </div>
+    ),
     enableSorting: true,
     enableColumnFilter: false,
     meta: { label: 'Total Bayar' }
