@@ -128,7 +128,13 @@ export function BotListingContent() {
       </div>
 
       <div className='animate-fade-up-delay-3 flex min-h-0 flex-1 flex-col'>
-        <BotCardGrid onEdit={handleEdit} onBulkDelete={handleBulkDelete} search={search} />
+        <BotCardGrid
+          onEdit={handleEdit}
+          onBulkDelete={handleBulkDelete}
+          onAdd={handleAdd}
+          canCreate={canCreateBot}
+          search={search}
+        />
       </div>
 
       <BotFormDialog bot={editingBot} open={dialogOpen} onOpenChange={handleDialogChange} />

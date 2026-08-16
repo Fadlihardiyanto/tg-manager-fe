@@ -39,10 +39,18 @@ const BOT_ROLE_STRIPE: Record<BotRole, string> = {
 interface BotCardGridProps {
   onEdit: (bot: TelegramBot) => void;
   onBulkDelete?: (ids: string[]) => void;
+  onAdd?: () => void;
+  canCreate?: boolean;
   search?: string;
 }
 
-export function BotCardGrid({ onEdit, onBulkDelete, search = '' }: BotCardGridProps) {
+export function BotCardGrid({
+  onEdit,
+  onBulkDelete,
+  onAdd,
+  canCreate = true,
+  search = ''
+}: BotCardGridProps) {
   const { data: botsData } = useSuspenseQuery(botsQueryOptions());
   const { data: groupsData } = useSuspenseQuery(groupsQueryOptions());
 
@@ -88,6 +96,16 @@ export function BotCardGrid({ onEdit, onBulkDelete, search = '' }: BotCardGridPr
         <p className='mt-1 text-sm text-muted-foreground'>
           Tambahkan bot Telegram pertama Anda untuk mulai mengelola grup.
         </p>
+        {onAdd && (
+          <Button onClick={onAdd} disabled={!canCreate} className='mt-5 rounded-full'>
+            {canCreate ? (
+              <Icons.add className='mr-2 h-4 w-4' />
+            ) : (
+              <Icons.lock className='mr-2 h-4 w-4' />
+            )}
+            {canCreate ? 'Tambah Bot' : 'Limit Tercapai'}
+          </Button>
+        )}
       </div>
     );
   }
