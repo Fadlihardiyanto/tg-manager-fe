@@ -13,13 +13,7 @@ import { AlertModal } from '@/components/modal/alert-modal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Icons } from '@/components/icons';
 import { cn } from '@/lib/utils';
 import { formatDate } from '@/lib/format';
@@ -248,10 +242,10 @@ function BotCard({ bot, groupCount, onEdit, index, isSelected, onToggleSelect }:
         )}
 
         <div className={cn('flex flex-1 flex-col px-5 pb-5', onToggleSelect ? 'pt-9' : 'pt-5')}>
-          {/* Top row: avatar + identity + dropdown */}
-          <div className='flex items-start justify-between'>
-            <div className='flex items-center gap-3'>
-              <div className='relative'>
+          {/* Top row: avatar + identity + actions */}
+          <div className='flex items-start justify-between gap-2'>
+            <div className='flex min-w-0 flex-1 items-center gap-3'>
+              <div className='relative shrink-0'>
                 <div
                   className={cn(
                     'flex size-12 shrink-0 items-center justify-center rounded-xl transition-colors',
@@ -274,59 +268,82 @@ function BotCard({ bot, groupCount, onEdit, index, isSelected, onToggleSelect }:
                   )}
                 />
               </div>
-              <div>
+              <div className='min-w-0'>
                 <h6 className='text-base font-semibold'>
                   <button
                     type='button'
                     onClick={() => router.push(getTenantHref(`/dashboard/bots/${bot.id}`))}
-                    className='hover:text-primary hover:underline transition-colors text-left'
+                    className='block max-w-full truncate hover:text-primary hover:underline transition-colors text-left'
                   >
                     @{bot.username}
                   </button>
                 </h6>
-                <p className='text-xs text-muted-foreground'>ID: {bot.telegram_bot_id}</p>
+                <p className='truncate text-xs text-muted-foreground'>ID: {bot.telegram_bot_id}</p>
               </div>
             </div>
 
-            <DropdownMenu modal={false}>
-              <DropdownMenuTrigger asChild>
-                <Button variant='ghost' size='icon' className='size-8 opacity-60 hover:opacity-100'>
-                  <Icons.ellipsis className='size-4' />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align='end'>
-                <DropdownMenuItem onClick={() => onEdit(bot)}>
-                  <Icons.edit className='mr-2 size-4' />
-                  Ubah
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setToggleOpen(true)}>
-                  {bot.is_active ? (
-                    <Icons.circleX className='mr-2 size-4' />
-                  ) : (
-                    <Icons.circleCheck className='mr-2 size-4' />
-                  )}
-                  {bot.is_active ? 'Nonaktifkan' : 'Aktifkan'}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => router.push(getTenantHref(`/dashboard/bots/${bot.id}`))}
-                >
-                  <Icons.network className='mr-2 size-4' />
-                  Jaringan
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  className='text-destructive focus:text-destructive'
-                  onClick={() => setDeleteOpen(true)}
-                >
-                  <Icons.trash className='mr-2 size-4' />
-                  Hapus
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className='flex shrink-0 items-center gap-1'>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant='ghost'
+                    size='icon'
+                    className='size-8 opacity-60 hover:opacity-100'
+                    onClick={() => onEdit(bot)}
+                  >
+                    <Icons.edit className='size-4' />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Ubah</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant='ghost'
+                    size='icon'
+                    className='size-8 opacity-60 hover:opacity-100'
+                    onClick={() => setToggleOpen(true)}
+                  >
+                    {bot.is_active ? (
+                      <Icons.circleX className='size-4 text-muted-foreground' />
+                    ) : (
+                      <Icons.circleCheck className='size-4 text-emerald-500 dark:text-emerald-400' />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>{bot.is_active ? 'Nonaktifkan' : 'Aktifkan'}</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant='ghost'
+                    size='icon'
+                    className='size-8 opacity-60 hover:opacity-100'
+                    onClick={() => router.push(getTenantHref(`/dashboard/bots/${bot.id}`))}
+                  >
+                    <Icons.network className='size-4' />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Jaringan</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant='ghost'
+                    size='icon'
+                    className='size-8 opacity-60 hover:opacity-100 text-destructive hover:text-destructive'
+                    onClick={() => setDeleteOpen(true)}
+                  >
+                    <Icons.trash className='size-4' />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Hapus</TooltipContent>
+              </Tooltip>
+            </div>
           </div>
 
           {/* Badges: status + role */}
-          <div className='mt-4 flex items-center gap-2.5'>
+          <div className='mt-4 flex flex-wrap items-center gap-2.5'>
             <Badge
               variant={bot.is_active ? 'default' : 'outline'}
               className={cn(

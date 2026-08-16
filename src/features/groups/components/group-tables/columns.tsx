@@ -211,7 +211,7 @@ export function getColumns(onEdit?: (group: TelegramGroup) => void): ColumnDef<T
     {
       id: 'actions',
       cell: ({ row }) => <CellAction data={row.original} onEdit={onEdit} />,
-      size: 50
+      size: 90
     }
   ];
 }

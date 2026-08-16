@@ -59,9 +59,9 @@ function PackageCard({
       )}
 
       <div className={cn('flex flex-1 flex-col px-5 pb-5', onToggleSelect ? 'pt-9' : 'pt-5')}>
-        {/* Top row: icon + identity + kebab */}
-        <div className='flex items-start justify-between'>
-          <div className='flex items-center gap-3 min-w-0'>
+        {/* Top row: icon + identity + actions */}
+        <div className='flex items-start justify-between gap-2'>
+          <div className='flex min-w-0 flex-1 items-center gap-3'>
             <div className='relative shrink-0'>
               <div
                 className={cn(
@@ -90,7 +90,9 @@ function PackageCard({
             </div>
           </div>
 
-          <CellAction data={pkg} onEdit={onEdit} />
+          <div className='shrink-0'>
+            <CellAction data={pkg} onEdit={onEdit} />
+          </div>
         </div>
 
         {/* Badges row: duration + all-access + status */}

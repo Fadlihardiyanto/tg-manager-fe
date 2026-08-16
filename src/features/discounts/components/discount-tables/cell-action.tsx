@@ -2,14 +2,7 @@
 
 import { AlertModal } from '@/components/modal/alert-modal';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { deleteDiscountMutation, updateDiscountMutation } from '../../api/mutations';
 import { discountKeys } from '../../api/queries';
 import type { MemberDiscount } from '../../api/types';
@@ -60,48 +53,58 @@ export function CellAction({ data, onEdit }: CellActionProps) {
         onConfirm={() => deleteMutation.mutate(data.id)}
         loading={deleteMutation.isPending}
       />
-      <DropdownMenu modal={false}>
-        <DropdownMenuTrigger asChild>
-          <Button variant='ghost' className='h-8 w-8 p-0'>
-            <span className='sr-only'>Buka menu</span>
-            <Icons.ellipsis className='h-4 w-4' />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align='end'>
-          <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          {onEdit && (
-            <DropdownMenuItem onClick={() => onEdit(data)}>
-              <Icons.edit className='mr-2 h-4 w-4' /> Ubah Diskon
-            </DropdownMenuItem>
-          )}
-          <DropdownMenuItem
-            onClick={() =>
-              toggleActiveMutation.mutate({
-                id: data.id,
-                values: { is_active: !data.is_active }
-              })
-            }
-          >
-            {data.is_active ? (
-              <>
-                <Icons.circleX className='mr-2 h-4 w-4' /> Nonaktifkan
-              </>
-            ) : (
-              <>
-                <Icons.circleCheck className='mr-2 h-4 w-4' /> Aktifkan
-              </>
-            )}
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            className='text-destructive focus:text-destructive'
-            onClick={() => setDeleteOpen(true)}
-          >
-            <Icons.trash className='mr-2 h-4 w-4' /> Hapus
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <div className='flex items-center gap-2'>
+        {onEdit && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant='ghost'
+                size='icon'
+                className='size-9 min-w-9 min-h-9'
+                onClick={() => onEdit(data)}
+              >
+                <Icons.edit className='h-4 w-4' />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Ubah Diskon</TooltipContent>
+          </Tooltip>
+        )}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant='ghost'
+              size='icon'
+              className='size-9 min-w-9 min-h-9'
+              onClick={() =>
+                toggleActiveMutation.mutate({
+                  id: data.id,
+                  values: { is_active: !data.is_active }
+                })
+              }
+            >
+              {data.is_active ? (
+                <Icons.circleX className='h-4 w-4 text-muted-foreground hover:text-destructive' />
+              ) : (
+                <Icons.circleCheck className='h-4 w-4 text-emerald-500 dark:text-emerald-400' />
+              )}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>{data.is_active ? 'Nonaktifkan' : 'Aktifkan'}</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant='ghost'
+              size='icon'
+              className='size-9 min-w-9 min-h-9 text-destructive hover:bg-destructive/10 hover:text-destructive'
+              onClick={() => setDeleteOpen(true)}
+            >
+              <Icons.trash className='h-4 w-4' />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Hapus</TooltipContent>
+        </Tooltip>
+      </div>
     </>
   );
 }
