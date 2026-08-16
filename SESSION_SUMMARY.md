@@ -103,3 +103,70 @@ Dokumen ini merangkum pekerjaan yang dilakukan pada sesi pengembangan ini, kenda
 - **Commits:** ~30 commits di branch `main` selama sesi
 - **Graph:** knowledge graph tersedia di `graphify-out/` — jalankan `graphify update .` setelah perubahan
 - **Deps baru:** @tiptap/* (7 package)
+
+---
+
+# Sesi 2 — De-slop & Konsistensi (16 Agu 2026)
+
+## Yang Sudah Dibuat / Diubah
+
+### 1. Kritik & Audit (skill impeccable)
+- Kritik tersimpan di `.impeccable/critique/`: landing+auth **28/32**, tenant dashboard **27/40**, superadmin **18/40**
+- Report arsitektur: `C:\Users\Fadli\AppData\Local\Temp\opencode\architecture-review-20260816.html` (7 kandidat deepening; top: dedup bulk-delete)
+
+### 2. Landing page & Auth
+- Pricing: nama plan di-lokalkan via slug map (Gratis/Pemula/Berkembang/Skala), fitur 5+ "Lihat semua fitur" → **modal** (3 pola ditolak user: expand-inline shift, popover, panel bawah grid), badge flat, `tabular-nums`, `aria-pressed`
+- Hero video 404 fix (`/Urator.mp4` → `/Uration.mp4`), radius CTA `rounded-full` → `rounded-xl`
+- `testimonial.tsx` (dead code, persona palsu) dihapus
+- Register: password requirements `role="status"` + `aria-describedby`; `data-scroll-behavior='smooth'` di `<html>`
+- Rasio logo dikoreksi di 6 file (hapus warning aspect-ratio)
+
+### 3. Dashboard tenant — lokalisasi chrome
+- `nav-config.ts` single source: Dasbor/Bot/Member/Grup/Paket/Perintah/Siaran → sidebar + kbar + breadcrumb (labelMapping) + page titles + error boundary (ID) + infobar ("Pusat Bantuan" + link t.me/UrationSupportBot)
+- `api/auth/session` + `api/auth/admin-session` → 200 `{accessToken: null}` (bukan 401) — konsol bersih
+
+### 4. Fitur tenant
+- **Members**: search server-side (`?search=`, debounce 400ms, reset page); `status` param sudah didukung API
+- **Broadcast**: scope grup eksplisit (radio "Semua grup aktif" vs "Pilih grup tertentu") — hapus inversi "kosong=semua"; quota alert → "Tingkatkan Paket" (navigasi billing)
+- **Bulk delete dedup**: `useBulkDelete` hook (`src/hooks/use-bulk-delete.ts`) + `RowSelectionBar` (`src/components/ui/table/row-selection-bar.tsx`) — dipakai groups, discounts, commands, packages, bots (~250 baris duplikasi hilang)
+- **Packages**: `confirm()` native → AlertModal
+- Badge status: warna konvensi ditegakkan (merah=murni error, emerald=aktif, violet=role); size badge groups → violet
+- Sidebar highlight parent di detail page; empty states commands+transactions; setTimeout hacks members dihapus; skeleton bots; stat cards non-klik tanpa hover-lift
+
+### 5. Status mapping backend (dari user, 3 lapis)
+- `orders.status`: `pending/paid/expired/failed` — frontend dulu pakai `settled/success` (tidak ada di BE). `paid` → "Lunas"
+- `client_billings.status`: `pending/active/past_due/cancelled` — superadmin plans subscriptions + type `ClientSubscription` + filter pills + StatPill ("Terlambat" orange)
+- Tenant billing `formatStatus`: `past_due` → "Terlambat" (sebelumnya bocor string mentah)
+
+### 6. Superadmin (approved scope: P0+P1)
+- **[P0]** Edit Admin role: wire `useSyncAdminRoles` (sebelumnya silent no-op, 0 caller)
+- `StatusBadge` shared (`src/components/ui/status-badge.tsx`) di tenants/roles/admins
+- Deactivate tenant/admin → konfirmasi AlertDialog (konsekuensi), aktivasi tetap 1-klik
+- Plans: rainbow 8-hue stripes → aksen primary; label EN → ID
+- Superadmin shell: `withTenantBilling={false}` — matikan `ActivePlanProvider` (4× 401 `/api/tenant/billing/active` per halaman)
+
+### 7. Fonts
+- **Satoshi** (400/500/700, Fontshare) + **JetBrains Mono** (variable, Google Fonts) di-self-host `src/fonts/*.woff2`, `next/font/local` + `font-display: swap` — sebelumnya deklarasi DESIGN.md tapi tidak pernah di-load (render system-ui)
+
+### 8. Overview & Transaksi
+- Overview: polling 30s (pause di background) + refetch on focus + tombol "Muat Ulang" manual (SSE ditolak — overengineering untuk tahap ini; detail pertimbangan di chat)
+- Transaksi: filter status pindah ke toolbar, skeleton shaped, amount rata kanan + tabular-nums, search filter (`?search=`, debounce, placeholderData anti-flash, local input state anti-lag)
+
+## Kredensial (local dev)
+- Tenant: `fadli.hardiyanto04@gmail.com` / `Fadlikee12` (tenant `crypto-bro`)
+- Superadmin: `fadlihardiyanto@uhamka.ac.id` / `superadmin123`
+
+## Yang Belum Selesai / Pending
+1. **Backend localhost:8080 SEMPAT MATI** saat akhir sesi — verifikasi live transactions/superadmin butuh backend nyala
+2. **`search` param transaksi belum tentu didukung backend** (`api.yml` tidak mendokumentasikan `/transactions`) — konfirmasi ke BE
+3. Superadmin P2 (dari critique 18/40): search/filter tenants+admins+audit-logs, permission picker (badge click-only → checkbox), plural handling PaginationBar, brand name ganda ("Admin Panel - TG-Manager" vs "Panel Admin - Urator")
+4. `members` `status` filter: param didukung API tapi tidak ada kontrol UI-nya
+5. Bulk-delete: `bulkDeleteXMutation` di `api/mutations.ts` masih bypass (handler pakai service langsung)
+6. Dari audit arsitektur: 12 unused deps, `react-query-demo` dead feature, `infoconfig.ts` dead — belum dihapus
+7. SSE untuk overview — ditolak (overengineering), revisit saat kebutuhan realtime nyata
+8. Graphify: jalankan `graphify update .` setelah sesi
+
+## Catatan Teknis
+- Workflow verifikasi: `playwright-cli` (login manual via headed browser; `snapshot`/`eval`/`console`/`requests`)
+- Commit style: conventional commits, 1 commit per logical change
+- `.playwright-cli/` dan `.claude/` di-gitignore
