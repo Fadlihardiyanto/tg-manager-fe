@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { parseAsString, useQueryState } from 'nuqs';
+import { useQuery } from '@tanstack/react-query';
+import { parseAsInteger, parseAsString, useQueryState } from 'nuqs';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import { Input } from '@/components/ui/input';
@@ -24,6 +24,13 @@ import { BulkActionBar } from '../bulk-action-bar';
 
 import type { MemberFilters } from '../../api/types';
 
+const STATUS_OPTIONS = [
+  { value: 'active', label: 'Aktif' },
+  { value: 'expired', label: 'Kedaluwarsa' },
+  { value: 'cancelled', label: 'Dikeluarkan' },
+  { value: 'pending', label: 'Menunggu' }
+];
+
 export function MembersTable({ filters }: { filters: MemberFilters }) {
   const [search, setSearch] = useQueryState(
     'search',
@@ -39,6 +46,11 @@ export function MembersTable({ filters }: { filters: MemberFilters }) {
     'package_id',
     parseAsString.withOptions({ shallow: true, history: 'replace' })
   );
+  const [status, setStatus] = useQueryState(
+    'status',
+    parseAsString.withOptions({ shallow: true, history: 'replace', clearOnDefault: true })
+  );
+  const [, setPage] = useQueryState('page', parseAsInteger.withDefault(1));
 
   const { data, isError, isLoading, refetch } = useQuery({
     ...membersQueryOptions(filters),
@@ -125,22 +137,46 @@ export function MembersTable({ filters }: { filters: MemberFilters }) {
               onClearSelection={() => table.toggleAllRowsSelected(false)}
             />
           ) : (
-            <Select
-              value={packageId ?? 'all'}
-              onValueChange={(v) => setPackageId(v === 'all' ? null : v)}
-            >
-              <SelectTrigger className='h-10 w-44 rounded-full border-border font-semibold'>
-                <SelectValue placeholder='Semua paket' />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='all'>Semua paket</SelectItem>
-                {packages.map((pkg) => (
-                  <SelectItem key={pkg.id} value={pkg.id}>
-                    {pkg.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <>
+              <Select
+                value={status ?? 'all'}
+                onValueChange={(v) => {
+                  void setPage(1);
+                  setStatus(v === 'all' ? null : v);
+                }}
+              >
+                <SelectTrigger className='h-10 w-40 rounded-full border-border font-semibold'>
+                  <SelectValue placeholder='Semua status' />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='all'>Semua status</SelectItem>
+                  {STATUS_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select
+                value={packageId ?? 'all'}
+                onValueChange={(v) => {
+                  void setPage(1);
+                  setPackageId(v === 'all' ? null : v);
+                }}
+              >
+                <SelectTrigger className='h-10 w-44 rounded-full border-border font-semibold'>
+                  <SelectValue placeholder='Semua paket' />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='all'>Semua paket</SelectItem>
+                  {packages.map((pkg) => (
+                    <SelectItem key={pkg.id} value={pkg.id}>
+                      {pkg.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </>
           )}
         </DataTableToolbar>
       </DataTable>
