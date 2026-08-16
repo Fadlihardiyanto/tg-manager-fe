@@ -38,6 +38,14 @@ import {
 import { PaginationBar } from '@/components/layout/pagination-bar';
 import { usePagination } from '@/hooks/use-pagination';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
+import { useDebouncedCallback } from '@/hooks/use-debounced-callback';
+import {
   clientsQueryOptions,
   clientUsersQueryOptions,
   useCreateClient,
@@ -46,10 +54,28 @@ import {
   useDeactivateClient,
   useCreateClientUser
 } from '../../../../features/superadmin/api/queries';
+import type { Client } from '../../../../features/superadmin/api/types';
 
 export default function TenantsPage() {
   const { page, setPage, limit, handleLimitChange, limitOptions } = usePagination();
-  const { data: clientsRes, isPlaceholderData } = useQuery(clientsQueryOptions(page, limit));
+  const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const setSearchDebounced = useDebouncedCallback((value: string) => {
+    setDebouncedSearch(value);
+    setPage(1);
+  }, 400);
+  const [active, setActive] = useState<string>('all');
+  const {
+    data: clientsRes,
+    isLoading,
+    isPlaceholderData
+  } = useQuery({
+    ...clientsQueryOptions(page, limit, {
+      ...(debouncedSearch && { name: debouncedSearch }),
+      ...(active !== 'all' && { active })
+    }),
+    placeholderData: (previous) => previous
+  });
   const createMut = useCreateClient();
   const deleteMut = useDeleteClient();
   const activateMut = useActivateClient();
@@ -111,7 +137,7 @@ export default function TenantsPage() {
     setStatusChanging(null);
   };
 
-  const openUsers = (client: any) => {
+  const openUsers = (client: Client) => {
     setSelectedClient(client);
     setUserDialog({ open: true, clientId: client.id });
     setUserForm({ name: '', email: '', password: '' });
@@ -137,7 +163,34 @@ export default function TenantsPage() {
 
   return (
     <PageContainer pageTitle='Tenants' pageDescription='Kelola semua tenant (klien) platform'>
-      <div className='flex justify-end mb-4'>
+      <div className='mb-4 flex flex-wrap items-center justify-between gap-3'>
+        <div className='flex flex-wrap items-center gap-2'>
+          <Input
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setSearchDebounced(e.target.value);
+            }}
+            placeholder='Cari nama tenant...'
+            className='h-10 w-full rounded-full border-border bg-background px-4 text-sm font-semibold sm:w-60'
+          />
+          <Select
+            value={active}
+            onValueChange={(v) => {
+              setActive(v);
+              setPage(1);
+            }}
+          >
+            <SelectTrigger className='h-10 w-40 rounded-full border-border font-semibold'>
+              <SelectValue placeholder='Semua status' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='all'>Semua status</SelectItem>
+              <SelectItem value='true'>Aktif</SelectItem>
+              <SelectItem value='false'>Nonaktif</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         <Button
           onClick={() => {
             setForm({ name: '', slug: '', category: '' });
@@ -160,10 +213,18 @@ export default function TenantsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {clients.length === 0 ? (
+            {isLoading && !clientsRes ? (
               <TableRow>
                 <TableCell colSpan={5} className='text-center text-muted-foreground py-8'>
-                  Belum ada tenant
+                  Memuat...
+                </TableCell>
+              </TableRow>
+            ) : clients.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className='text-center text-muted-foreground py-8'>
+                  {debouncedSearch || active !== 'all'
+                    ? 'Tidak ada tenant yang cocok'
+                    : 'Belum ada tenant'}
                 </TableCell>
               </TableRow>
             ) : (

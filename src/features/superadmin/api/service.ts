@@ -399,11 +399,21 @@ export async function syncAdminRoles(
 
 // ─── Clients / Tenants ───────────────────────────────────────────────
 
-export async function getClients(page = 1, limit = 20): Promise<PaginatedListResponse<Client>> {
+export interface ClientFilters {
+  name?: string;
+  active?: string;
+}
+
+export async function getClients(
+  page = 1,
+  limit = 20,
+  filters: ClientFilters = {}
+): Promise<PaginatedListResponse<Client>> {
   try {
-    return await adminFetch<PaginatedListResponse<Client>>(
-      `/admin/v1/clients?page=${page}&limit=${limit}`
-    );
+    const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+    if (filters.name) params.set('name', filters.name);
+    if (filters.active) params.set('active', filters.active);
+    return await adminFetch<PaginatedListResponse<Client>>(`/admin/v1/clients?${params}`);
   } catch (e) {
     const m = e instanceof Error ? e.message : 'Failed';
     return { success: false, code: 400, message: m, data: [] };

@@ -34,6 +34,7 @@ import {
   cancelSubscription,
   getAuditLogs
 } from './service';
+import type { ClientFilters } from './service';
 import type {
   CreateRoleRequest,
   UpdateRoleRequest,
@@ -71,8 +72,8 @@ export const superadminKeys = {
   },
   clients: {
     all: () => [...superadminKeys.all, 'clients'] as const,
-    list: (page: number, limit: number) =>
-      [...superadminKeys.clients.all(), 'list', { page, limit }] as const,
+    list: (page: number, limit: number, filters?: ClientFilters) =>
+      [...superadminKeys.clients.all(), 'list', { page, limit, filters }] as const,
     detail: (id: string) => [...superadminKeys.clients.all(), 'detail', id] as const
   },
   clientUsers: {
@@ -113,10 +114,10 @@ export const adminsQueryOptions = (page: number, limit: number) =>
   });
 export const adminByIdQueryOptions = (id: string) =>
   queryOptions({ queryKey: superadminKeys.admins.detail(id), queryFn: () => getAdmin(id) });
-export const clientsQueryOptions = (page: number, limit: number) =>
+export const clientsQueryOptions = (page: number, limit: number, filters?: ClientFilters) =>
   queryOptions({
-    queryKey: superadminKeys.clients.list(page, limit),
-    queryFn: () => getClients(page, limit)
+    queryKey: superadminKeys.clients.list(page, limit, filters),
+    queryFn: () => getClients(page, limit, filters)
   });
 export const clientByIdQueryOptions = (id: string) =>
   queryOptions({ queryKey: superadminKeys.clients.detail(id), queryFn: () => getClient(id) });

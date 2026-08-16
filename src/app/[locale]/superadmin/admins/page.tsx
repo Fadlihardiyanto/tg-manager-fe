@@ -64,6 +64,19 @@ export default function AdminsPage() {
   const total = pagination?.total ?? admins.length;
   const roles = rolesRes?.success ? rolesRes.data : [];
 
+  // ponytail: BE /admin/v1/admins belum dukung ?search= — filter client-side
+  // per halaman; upgrade ke server-side saat param tersedia.
+  const [search, setSearch] = useState('');
+  const query = search.trim().toLowerCase();
+  const filteredAdmins = query
+    ? admins.filter(
+        (a) =>
+          a.name.toLowerCase().includes(query) ||
+          a.email.toLowerCase().includes(query) ||
+          (a.roles?.[0]?.name ?? '').toLowerCase().includes(query)
+      )
+    : admins;
+
   // Form state
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<any>(null);
@@ -147,7 +160,13 @@ export default function AdminsPage() {
 
   return (
     <PageContainer pageTitle='Admin' pageDescription='Kelola akun admin platform'>
-      <div className='flex justify-end mb-4'>
+      <div className='mb-4 flex flex-wrap items-center justify-between gap-3'>
+        <Input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder='Cari nama, email, atau role...'
+          className='h-10 w-full rounded-full border-border bg-background px-4 text-sm font-semibold sm:w-60'
+        />
         <Button onClick={openCreate}>
           <Icons.add className='mr-2 size-4' />
           Tambah Admin
@@ -165,14 +184,14 @@ export default function AdminsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {admins.length === 0 ? (
+            {filteredAdmins.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className='text-center text-muted-foreground py-8'>
-                  Belum ada admin
+                  {query ? 'Tidak ada admin yang cocok' : 'Belum ada admin'}
                 </TableCell>
               </TableRow>
             ) : (
-              admins.map((admin) => (
+              filteredAdmins.map((admin) => (
                 <TableRow key={admin.id}>
                   <TableCell className='font-medium'>{admin.name}</TableCell>
                   <TableCell>{admin.email}</TableCell>

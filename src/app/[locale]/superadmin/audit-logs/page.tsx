@@ -1,9 +1,16 @@
 'use client';
 
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Icons } from '@/components/icons';
 import PageContainer from '@/components/layout/page-container';
 import { Badge } from '@/components/ui/badge';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -37,6 +44,8 @@ const resourceLabels: Record<string, string> = {
 
 export default function AuditLogsPage() {
   const { page, setPage, limit, handleLimitChange, limitOptions } = usePagination();
+  const [filterAction, setFilterAction] = useState('all');
+  const [filterResource, setFilterResource] = useState('all');
   const {
     data: logsRes,
     isLoading,
@@ -48,8 +57,45 @@ export default function AuditLogsPage() {
   const totalPages = pagination?.total_pages ?? 1;
   const total = pagination?.total ?? logs.length;
 
+  // ponytail: BE /admin/v1/audit-logs belum dukung ?action=/&resource= —
+  // filter client-side per halaman; upgrade ke server-side saat param tersedia.
+  const filteredLogs = logs.filter(
+    (log) =>
+      (filterAction === 'all' || log.action === filterAction) &&
+      (filterResource === 'all' || log.resource === filterResource)
+  );
+  const knownResources = [...new Set(logs.map((l) => l.resource).filter(Boolean))].sort();
+
   return (
     <PageContainer pageTitle='Audit Logs' pageDescription='Log aktivitas seluruh platform'>
+      <div className='mb-4 flex flex-wrap items-center gap-2'>
+        <Select value={filterAction} onValueChange={setFilterAction}>
+          <SelectTrigger className='h-10 w-40 rounded-full border-border font-semibold'>
+            <SelectValue placeholder='Semua aksi' />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value='all'>Semua aksi</SelectItem>
+            {Object.entries(actionLabels).map(([value, label]) => (
+              <SelectItem key={value} value={value}>
+                {label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={filterResource} onValueChange={setFilterResource}>
+          <SelectTrigger className='h-10 w-44 rounded-full border-border font-semibold'>
+            <SelectValue placeholder='Semua resource' />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value='all'>Semua resource</SelectItem>
+            {knownResources.map((r) => (
+              <SelectItem key={r} value={r}>
+                {resourceLabels[r] || r}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
       <div className='overflow-hidden rounded-xl border border-border/70 shadow-sm'>
         <Table>
           <TableHeader>
@@ -76,14 +122,14 @@ export default function AuditLogsPage() {
                   Memuat...
                 </TableCell>
               </TableRow>
-            ) : logs.length === 0 ? (
+            ) : filteredLogs.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className='text-muted-foreground py-8 text-center'>
-                  Belum ada log
+                  Tidak ada log yang cocok
                 </TableCell>
               </TableRow>
             ) : (
-              logs.map((log) => (
+              filteredLogs.map((log) => (
                 <TableRow key={log.id} className='transition-colors hover:bg-muted/35'>
                   <TableCell className='text-muted-foreground whitespace-nowrap text-xs'>
                     {log.created_at ? format(new Date(log.created_at), 'dd MMM HH:mm') : '-'}
