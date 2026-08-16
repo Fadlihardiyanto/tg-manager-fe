@@ -7,7 +7,6 @@ import { Icons } from '@/components/icons';
 import PageContainer from '@/components/layout/page-container';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { StatusBadge } from '@/components/ui/status-badge';
 import {
   Table,
@@ -37,6 +36,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { PaginationBar } from '@/components/layout/pagination-bar';
 import { usePagination } from '@/hooks/use-pagination';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   rolesQueryOptions,
   permissionsQueryOptions,
@@ -45,7 +45,7 @@ import {
   useDeleteRole,
   useSyncPermissions
 } from '../../../../features/superadmin/api/queries';
-import type { Role, Permission } from '../../../../features/superadmin/api/types';
+import type { Role } from '../../../../features/superadmin/api/types';
 
 export default function RolesPage() {
   const { page, setPage, limit, handleLimitChange, limitOptions } = usePagination();
@@ -258,32 +258,60 @@ export default function RolesPage() {
             <DialogTitle>Permissions: {permRole?.name}</DialogTitle>
             <DialogDescription>Pilih hak akses untuk role ini.</DialogDescription>
           </DialogHeader>
-          <div className='space-y-4 max-h-96 overflow-y-auto'>
-            {permGroups.map((group) => (
-              <div key={group}>
-                <h4 className='text-sm font-semibold capitalize mb-2 text-muted-foreground'>
-                  {group.replace(/_/g, ' ')}
-                </h4>
-                <div className='flex flex-wrap gap-2'>
-                  {permissions
-                    .filter((p) => p.group === group)
-                    .map((p) => (
-                      <Badge
+          <div className='space-y-5 max-h-96 overflow-y-auto'>
+            {permGroups.map((group) => {
+              const groupPerms = permissions.filter((p) => p.group === group);
+              const selectedCount = groupPerms.filter((p) => permSelected.includes(p.id)).length;
+              const allSelected = selectedCount === groupPerms.length;
+              const someSelected = selectedCount > 0 && !allSelected;
+              return (
+                <div key={group}>
+                  <div className='mb-2 flex items-center justify-between'>
+                    <h4 className='text-sm font-semibold text-muted-foreground capitalize'>
+                      {group.replace(/_/g, ' ')}
+                    </h4>
+                    <label
+                      htmlFor={`perm-${group}-all`}
+                      className='flex cursor-pointer items-center gap-2 text-xs font-medium'
+                    >
+                      <Checkbox
+                        id={`perm-${group}-all`}
+                        checked={allSelected ? true : someSelected ? 'indeterminate' : false}
+                        onCheckedChange={(checked) => {
+                          setPermSelected((prev) => {
+                            const groupIds = new Set(groupPerms.map((p) => p.id));
+                            return checked
+                              ? [...new Set([...prev, ...groupIds])]
+                              : prev.filter((id) => !groupIds.has(id));
+                          });
+                        }}
+                      />
+                      Pilih Semua
+                    </label>
+                  </div>
+                  <div className='grid grid-cols-1 gap-1.5 sm:grid-cols-2'>
+                    {groupPerms.map((p) => (
+                      <label
                         key={p.id}
-                        variant={permSelected.includes(p.id) ? 'default' : 'outline'}
-                        className='cursor-pointer'
-                        onClick={() =>
-                          setPermSelected((prev) =>
-                            prev.includes(p.id) ? prev.filter((x) => x !== p.id) : [...prev, p.id]
-                          )
-                        }
+                        htmlFor={`perm-${p.id}`}
+                        className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-muted/50'
                       >
-                        {p.name}
-                      </Badge>
+                        <Checkbox
+                          id={`perm-${p.id}`}
+                          checked={permSelected.includes(p.id)}
+                          onCheckedChange={() =>
+                            setPermSelected((prev) =>
+                              prev.includes(p.id) ? prev.filter((x) => x !== p.id) : [...prev, p.id]
+                            )
+                          }
+                        />
+                        <span className='font-mono text-xs'>{p.name}</span>
+                      </label>
                     ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
           <DialogFooter>
             <Button onClick={handleSavePerms}>Simpan</Button>
