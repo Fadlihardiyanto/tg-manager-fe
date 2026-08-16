@@ -35,6 +35,7 @@ type PackageFormValues = {
   price: string;
   duration_days: string;
   is_all_access: boolean;
+  limit_enabled: boolean;
   max_purchases_per_member: string;
 };
 
@@ -53,11 +54,12 @@ const packageFormSchema = z.object({
       'Durasi harus berupa bilangan bulat >= 1'
     ),
   is_all_access: z.boolean(),
+  limit_enabled: z.boolean(),
   max_purchases_per_member: z
     .string()
     .refine(
-      (val) => val === '' || (Number.isInteger(Number(val)) && Number(val) >= 0),
-      'Harus berupa bilangan bulat >= 0'
+      (val) => !isNaN(Number(val)) && Number.isInteger(Number(val)) && Number(val) >= 1,
+      'Harus berupa bilangan bulat >= 1'
     )
 });
 
@@ -95,7 +97,12 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
       price: package_?.price?.toString() ?? '',
       duration_days: package_?.duration_days?.toString() ?? '',
       is_all_access: package_?.is_all_access ?? false,
-      max_purchases_per_member: package_?.max_purchases_per_member?.toString() ?? '0'
+      limit_enabled: (package_?.max_purchases_per_member ?? 0) > 0,
+      max_purchases_per_member:
+        package_?.max_purchases_per_member?.toString() &&
+        Number(package_.max_purchases_per_member) > 0
+          ? package_.max_purchases_per_member.toString()
+          : '1'
     } as PackageFormValues,
     validators: {
       onSubmit: packageFormSchema
@@ -106,7 +113,7 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
         price: Number(value.price.replace(/\./g, '')),
         duration_days: Number(value.duration_days),
         is_all_access: value.is_all_access,
-        max_purchases_per_member: Number(value.max_purchases_per_member || '0'),
+        max_purchases_per_member: value.limit_enabled ? Number(value.max_purchases_per_member) : 0,
         ...(value.description.trim() ? { description: value.description.trim() } : {})
       };
 
@@ -124,6 +131,7 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
   const { FormTextField, FormTextareaField, FormSwitchField } = useFormFields<PackageFormValues>();
 
   const isAllAccess = useStore(form.store, (state) => state.values.is_all_access);
+  const limitEnabled = useStore(form.store, (state) => state.values.limit_enabled);
   const isDirty = useStore(form.store, (state) => state.isDirty);
   const submissionAttempts = useStore(form.store, (state) => state.submissionAttempts);
 
@@ -322,24 +330,33 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
               />
 
               <FormSwitchField
+                name='limit_enabled'
+                label='Batasi Pembelian per Member'
+                description='Aktifkan untuk membatasi jumlah pembelian paket ini per member seumur hidup.'
+              />
+
+              {limitEnabled && (
+                <FormTextField
+                  name='max_purchases_per_member'
+                  label='Maksimal Pembelian (Kali)'
+                  required
+                  placeholder='1'
+                  validators={{
+                    onBlur: z
+                      .string()
+                      .refine(
+                        (val) =>
+                          !isNaN(Number(val)) && Number.isInteger(Number(val)) && Number(val) >= 1,
+                        'Harus berupa bilangan bulat >= 1'
+                      )
+                  }}
+                />
+              )}
+
+              <FormSwitchField
                 name='is_all_access'
                 label='Akses Penuh'
                 description='Berikan akses ke semua grup tanpa batasan.'
-              />
-
-              <FormTextField
-                name='max_purchases_per_member'
-                label='Batas Pembelian per Member'
-                placeholder='0'
-                description='0 = tanpa batas. Nilai di atas 0 membatasi jumlah pembelian per member seumur hidup.'
-                validators={{
-                  onBlur: z
-                    .string()
-                    .refine(
-                      (val) => val === '' || (Number.isInteger(Number(val)) && Number(val) >= 0),
-                      'Harus berupa bilangan bulat >= 0'
-                    )
-                }}
               />
 
               {/* Group multi-select: show only when !is_all_access */}
