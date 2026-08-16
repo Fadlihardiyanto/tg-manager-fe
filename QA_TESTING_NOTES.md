@@ -49,7 +49,7 @@ via E2E manual playwright-cli di browser headed, lalu diverifikasi setelah fix.
 
 ## Bug Ditemukan
 
-### BUG-BE-001: Superadmin 403 di semua operasi (BLOCKER, backend)
+### BUG-BE-001: Superadmin 403 di semua operasi (BLOCKER, backend) — PARTIAL FIX
 - **Gejala:** Semua endpoint /admin/v1 (clients, admins, roles, billing/plans) return
   403 "Anda memerlukan izin X.read" padahal login sebagai superadmin.
 - **Root cause:** RBAC 2 lapis tidak konsisten:
@@ -59,36 +59,32 @@ via E2E manual playwright-cli di browser headed, lalu diverifikasi setelah fix.
   - JWT superadmin sengaja TIDAK berisi `permissions` claim (role superadmin tidak
     di-seed `admin_role_permissions` by design, seed_admin_rbac.sql:106-107), jadi
     claim kosong → usecase tolak semua.
-  - Bukti: `pkg/jwt.GenerateAdminTokens` menyertakan permissions (jwt.go:56,61),
-    `admin_auth_usecase.finalizeLogin` fetch permissions (admin_auth_usecase.go:406),
-    tapi hasilnya `[]` untuk superadmin karena query join admin_role_permissions kosong.
-  - Catatan: ada pola bypass yang BENAR di `admin_permission_usecase.go:41`
-    (`if !rbac.IsSuperAdmin(req.CallerRoles)`), dan controller lain sudah mengisi
-    `req.CallerRoles` (admin_user_controller.go:270-272, admin_permission_controller.go:33).
-- **Fix yang disarankan (tim BE):**
-  1. `requirePermission` (admin_role_usecase.go:363) terima `callerRoles` juga:
-     ```go
-     if rbac.IsSuperAdmin(callerRoles) { return nil }
-     ```
-  2. Semua controller admin isi `req.CallerRoles = middleware.GetAdminRoles(ctx)`.
-  3. Alternatif lebih kecil: saat `finalizeLogin`, kalau admin punya role superadmin,
-     isi permissions claim dengan semua permission yang ada.
-- **Dampak frontend:** halaman Tenants/Admins/Roles/Plans superadmin menampilkan
-  empty state (data kosong) — UI siap, tinggal backend di-fix.
-- **File backend terkait:**
-  - `internal/usecase/admin_role_usecase.go:363` (requirePermission)
-  - `internal/usecase/admin_tenant_usecase.go:70`, `admin_user_management_usecase.go:66`
-  - `internal/delivery/http/controller/admin_client_controller.go:49` (isi CallerRoles)
-  - `internal/delivery/http/middleware/authorize.go:17` (bypass benar, layer 1)
+- **Status 16 Agu 11:05 (setelah restart BE, commit 0572fd6):**
+  - ✅ FIXED: `requirePermission` kini variadic terima callerRoles + bypass superadmin;
+    `admins` & `roles` jalan live (data tampil, `?search=` bekerja)
+  - ❌ BELUM: `clients` & `billing/plans` masih 403 — controller
+    `admin_client_controller.go` (7 titik) & `client_billing_controller.go` (3 titik)
+    belum mengisi `req.CallerRoles`; `platform_plan_usecase.go` & `client_billing_usecase.go`
+    (3 titik) masih `rbac.HasPermission(callerPermissions, ...)` tanpa bypass.
+  - File terkait yang masih perlu diedit (untuk tim BE):
+    - `internal/delivery/http/controller/admin_client_controller.go` (tambah
+      `CallerRoles: middleware.GetAdminRoles(ctx)` di semua 7 req)
+    - `internal/delivery/http/controller/admin_client_user_controller.go` (5 titik)
+    - `internal/delivery/http/controller/client_billing_controller.go` (3 titik,
+      model sudah punya CallerRoles)
+    - `internal/delivery/http/controller/platform_plan_controller.go` + interface
+      `IPlatformPlanUseCase` (5 fungsi terima callerRoles)
+    - `internal/usecase/client_billing_usecase.go:519,618,653` →
+      `requirePermission(req.CallerPermissions, "...", req.CallerRoles)`
 
-### BUG-BE-002: /admin/v1/admins & /audit-logs tidak mendukung filter
-- **Gejala:** tidak ada param search/status/action — frontend terpaksa filter
-  client-side per halaman (kompromi).
-- **Bukti:** `AdminUserListRequest` hanya Offset/Limit (admin_model.go),
-  `AuditLogController.GetPlatformLogs` hanya page/limit (audit_log_controller.go:49-60).
-- **Fix yang disarankan:** tambah `?search=` (name/email) di `/admin/v1/admins` dan
+### BUG-BE-002: /admin/v1/admins & /audit-logs tidak mendukung filter — FIXED ✅
+- **Seharusnya:** tambah `?search=` (name/email) di `/admin/v1/admins` dan
   `?action=&resource=` di `/admin/v1/audit-logs` (pola `order_repository.go:186`
   / `telegram_user_repository.go:60`).
+- **Status:** FIXED di commit 0572fd6 — verified live 16 Agu 11:05:
+  - `admins?search=uhamka` → 1, `?search=zzz_bogus` → 0
+  - `audit-logs?action=kick_member` → hanya kick_member; `?resource=subscription` → 16
+  - Frontend sudah di-upgrade ke server-side (commit 39ea29f)
 
 ### BUG-FE-001: (tidak ada — semua halaman tenant & superadmin non-RBAC PASS)
 
@@ -103,10 +99,10 @@ Midtrans, 409 order duplikat, 404 /register) semuanya false-positive/third-party
 | GET /api/v1/tenant/transactions | search | ✅ (username/first/last_name/external_id ILIKE) |
 | GET /api/v1/tenant/transactions | status | ✅ |
 | GET /api/v1/tenant/members | search/status/package_id | ✅ |
-| GET /admin/v1/clients | name/slug/active/subscription_tier | ✅ (name ILIKE partial) |
+| GET /admin/v1/clients | name/slug/active/subscription_tier | ✅ (name ILIKE partial) — tapi endpoint masih 403 (lihat BUG-BE-001) |
 | GET /admin/v1/clients | search | ❌ (pakai `name`) |
-| GET /admin/v1/admins | search | ❌ (belum ada) |
-| GET /admin/v1/audit-logs | search/action/resource | ❌ (belum ada) |
+| GET /admin/v1/admins | search | ✅ (name/email, commit 0572fd6) |
+| GET /admin/v1/audit-logs | search/action/resource | ✅ (action + entity_type, commit 0572fd6) |
 
 ## Catatan Perbaikan yang Sudah Dilakukan (commit sesi ini)
 
