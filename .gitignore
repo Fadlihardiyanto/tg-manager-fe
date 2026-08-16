@@ -63,3 +63,6 @@ next-env.d.ts
 /graphify-out/
 .graphify_python
 .graphify_root
+
+# Playwright CLI test artifacts
+.playwright-cli/
