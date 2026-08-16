@@ -7,6 +7,7 @@ import { useCallback, useState } from 'react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { PackageTable } from './package-tables';
 import { PackageFormDialog } from './package-form-dialog';
+import PageContainer from '@/components/layout/page-container';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import { AlertModal } from '@/components/modal/alert-modal';
@@ -54,7 +55,39 @@ export function PackageListingContent() {
   }, []);
 
   return (
-    <div className='flex min-h-0 flex-1 flex-col gap-4'>
+    <PageContainer
+      pageTitle='Paket'
+      pageDescription='Kelola paket langganan dan harga'
+      pageHeaderAction={
+        canCreatePackage ? (
+          hasActiveGroups ? (
+            <Button onClick={handleAdd} className='rounded-full'>
+              <Icons.add className='mr-2 h-4 w-4' />
+              Tambah Paket
+            </Button>
+          ) : (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span>
+                  <Button onClick={handleAdd} disabled className='rounded-full'>
+                    <Icons.add className='mr-2 h-4 w-4' />
+                    Tambah Paket
+                  </Button>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>Hubungkan grup terlebih dahulu</TooltipContent>
+            </Tooltip>
+          )
+        ) : (
+          <Button asChild className='rounded-full'>
+            <Link href={getTenantHref('/dashboard/billing')}>
+              <Icons.lock className='mr-2 h-4 w-4' />
+              Upgrade Paket
+            </Link>
+          </Button>
+        )
+      }
+    >
       <AlertModal
         isOpen={bulkDelete.confirmOpen}
         onClose={bulkDelete.closeConfirm}
@@ -80,37 +113,6 @@ export function PackageListingContent() {
         onEdit={handleEdit}
         onBulkDelete={bulkDelete.requestDelete}
         notice={<QuotaCard resource='packages' title='Kuota paket' />}
-        toolbarActions={
-          <>
-            {canCreatePackage ? (
-              hasActiveGroups ? (
-                <Button onClick={handleAdd} size='sm' className='rounded-full'>
-                  <Icons.add className='mr-2 h-4 w-4' />
-                  Tambah Paket
-                </Button>
-              ) : (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span>
-                      <Button onClick={handleAdd} size='sm' disabled className='rounded-full'>
-                        <Icons.add className='mr-2 h-4 w-4' />
-                        Tambah Paket
-                      </Button>
-                    </span>
-                  </TooltipTrigger>
-                  <TooltipContent>Hubungkan grup terlebih dahulu</TooltipContent>
-                </Tooltip>
-              )
-            ) : (
-              <Button asChild size='sm' className='rounded-full'>
-                <Link href={getTenantHref('/dashboard/billing')}>
-                  <Icons.lock className='mr-2 h-4 w-4' />
-                  Upgrade Paket
-                </Link>
-              </Button>
-            )}
-          </>
-        }
       />
 
       <PackageFormDialog
@@ -118,6 +120,6 @@ export function PackageListingContent() {
         open={dialogOpen}
         onOpenChange={handleDialogChange}
       />
-    </div>
+    </PageContainer>
   );
 }

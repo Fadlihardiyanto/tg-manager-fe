@@ -3,6 +3,7 @@
 import { useCallback, useState } from 'react';
 import { CommandTable } from './command-tables';
 import { CommandFormDialog } from './command-form-dialog';
+import PageContainer from '@/components/layout/page-container';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import { QuotaCard } from '@/features/billing/components/quota-card';
@@ -42,7 +43,20 @@ export function CommandListingContent() {
   }, []);
 
   return (
-    <div className='flex min-h-0 flex-1 flex-col gap-4'>
+    <PageContainer
+      pageTitle='Perintah'
+      pageDescription='Buat perintah kustom untuk bot Telegram Anda'
+      pageHeaderAction={
+        <Button onClick={handleAdd} disabled={!canCreateCommand} className='rounded-full'>
+          {canCreateCommand ? (
+            <Icons.add className='mr-2 h-4 w-4' />
+          ) : (
+            <Icons.lock className='mr-2 h-4 w-4' />
+          )}
+          {canCreateCommand ? 'Tambah Perintah' : 'Limit Tercapai'}
+        </Button>
+      }
+    >
       <AlertModal
         isOpen={bulkDelete.confirmOpen}
         onClose={bulkDelete.closeConfirm}
@@ -72,21 +86,6 @@ export function CommandListingContent() {
             </Button>
           </div>
         }
-        toolbarActions={
-          <Button
-            onClick={handleAdd}
-            size='sm'
-            disabled={!canCreateCommand}
-            className='rounded-full'
-          >
-            {canCreateCommand ? (
-              <Icons.add className='mr-2 h-4 w-4' />
-            ) : (
-              <Icons.lock className='mr-2 h-4 w-4' />
-            )}
-            {canCreateCommand ? 'Tambah Perintah' : 'Limit Tercapai'}
-          </Button>
-        }
       />
 
       <CommandFormDialog
@@ -94,6 +93,6 @@ export function CommandListingContent() {
         open={dialogOpen}
         onOpenChange={handleDialogChange}
       />
-    </div>
+    </PageContainer>
   );
 }

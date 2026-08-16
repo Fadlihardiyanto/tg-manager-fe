@@ -7,6 +7,7 @@ import { useCallback, useState } from 'react';
 import { BotCardGrid } from './bot-card-grid';
 import { BotStats } from './bot-stats';
 import { BotFormDialog } from './bot-form-dialog';
+import PageContainer from '@/components/layout/page-container';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Icons } from '@/components/icons';
@@ -48,7 +49,20 @@ export function BotListingContent() {
   }, []);
 
   return (
-    <div className='flex min-h-0 flex-1 flex-col gap-4'>
+    <PageContainer
+      pageTitle='Bot'
+      pageDescription='Kelola bot Telegram, peran, dan status koneksinya'
+      pageHeaderAction={
+        <Button onClick={handleAdd} disabled={!canCreateBot} className='rounded-full shrink-0'>
+          {canCreateBot ? (
+            <Icons.add className='mr-2 h-4 w-4' />
+          ) : (
+            <Icons.lock className='mr-2 h-4 w-4' />
+          )}
+          {canCreateBot ? 'Tambah Bot' : 'Limit Tercapai'}
+        </Button>
+      }
+    >
       <AlertModal
         isOpen={bulkDelete.confirmOpen}
         onClose={bulkDelete.closeConfirm}
@@ -81,14 +95,6 @@ export function BotListingContent() {
             </button>
           )}
         </div>
-        <Button onClick={handleAdd} disabled={!canCreateBot} className='rounded-full shrink-0'>
-          {canCreateBot ? (
-            <Icons.add className='mr-2 h-4 w-4' />
-          ) : (
-            <Icons.lock className='mr-2 h-4 w-4' />
-          )}
-          {canCreateBot ? 'Tambah Bot' : 'Limit Tercapai'}
-        </Button>
       </div>
 
       <div className='animate-fade-up-delay-3 flex min-h-0 flex-1 flex-col'>
@@ -102,6 +108,6 @@ export function BotListingContent() {
       </div>
 
       <BotFormDialog bot={editingBot} open={dialogOpen} onOpenChange={handleDialogChange} />
-    </div>
+    </PageContainer>
   );
 }

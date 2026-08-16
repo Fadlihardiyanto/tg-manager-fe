@@ -1,4 +1,3 @@
-import PageContainer from '@/components/layout/page-container';
 import BotListing from '@/features/bots/components/bot-listing';
 
 export const metadata = {
@@ -6,12 +5,5 @@ export const metadata = {
 };
 
 export default function BotsPage() {
-  return (
-    <PageContainer
-      pageTitle='Bot'
-      pageDescription='Kelola bot Telegram, peran, dan status koneksinya'
-    >
-      <BotListing />
-    </PageContainer>
-  );
+  return <BotListing />;
 }

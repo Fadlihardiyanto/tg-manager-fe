@@ -1,4 +1,3 @@
-import PageContainer from '@/components/layout/page-container';
 import PackageListing from '@/features/packages/components/package-listing';
 
 export const metadata = {
@@ -6,9 +5,5 @@ export const metadata = {
 };
 
 export default function PackagesPage() {
-  return (
-    <PageContainer pageTitle='Paket' pageDescription='Kelola paket langganan dan harga'>
-      <PackageListing />
-    </PageContainer>
-  );
+  return <PackageListing />;
 }

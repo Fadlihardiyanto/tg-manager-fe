@@ -5,6 +5,7 @@ import { useMutation } from '@tanstack/react-query';
 import { GroupTable } from './group-tables';
 import { GroupFormDialog } from './group-form-dialog';
 import { ConnectGroupModal } from './connect-group-modal';
+import PageContainer from '@/components/layout/page-container';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import { AlertModal } from '@/components/modal/alert-modal';
@@ -42,8 +43,34 @@ export function GroupListingContent() {
     setConnectOpen(true);
   }, []);
 
+  const handleSync = () => {
+    toast.promise(syncMutation.mutateAsync(), {
+      loading: 'Memulai sync groups...',
+      success: (res) => res.message || 'Sync groups dimulai',
+      error: 'Gagal menjalankan sync groups'
+    });
+  };
+
   return (
-    <div className='flex min-h-0 flex-1 flex-col gap-4'>
+    <PageContainer
+      pageTitle='Grup'
+      pageDescription='Kelola grup Telegram dan koneksi bot'
+      pageHeaderAction={
+        <div className='flex items-center gap-2'>
+          <Button
+            variant='outline'
+            className='rounded-full'
+            isLoading={syncMutation.isPending}
+            onClick={handleSync}
+          >
+            <Icons.refresh className='mr-2 h-4 w-4' /> Sinkronisasi Grup
+          </Button>
+          <Button onClick={handleAdd} className='rounded-full'>
+            <Icons.add className='mr-2 h-4 w-4' /> Tambah Grup Baru
+          </Button>
+        </div>
+      }
+    >
       <AlertModal
         isOpen={bulkDelete.confirmOpen}
         onClose={bulkDelete.closeConfirm}
@@ -72,33 +99,11 @@ export function GroupListingContent() {
             </Button>
           </div>
         }
-        toolbarActions={
-          <>
-            <Button
-              variant='outline'
-              size='sm'
-              className='rounded-full'
-              isLoading={syncMutation.isPending}
-              onClick={() => {
-                toast.promise(syncMutation.mutateAsync(), {
-                  loading: 'Memulai sync groups...',
-                  success: (res) => res.message || 'Sync groups dimulai',
-                  error: 'Gagal menjalankan sync groups'
-                });
-              }}
-            >
-              <Icons.refresh className='mr-2 h-4 w-4' /> Sinkronisasi Grup
-            </Button>
-            <Button onClick={handleAdd} size='sm' className='rounded-full'>
-              <Icons.add className='mr-2 h-4 w-4' /> Tambah Grup Baru
-            </Button>
-          </>
-        }
       />
 
       <GroupFormDialog group={editingGroup} open={dialogOpen} onOpenChange={handleDialogChange} />
 
       <ConnectGroupModal open={connectOpen} onOpenChange={setConnectOpen} />
-    </div>
+    </PageContainer>
   );
 }
