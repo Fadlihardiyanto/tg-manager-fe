@@ -115,6 +115,13 @@ function PackageCard({
             {pkg.is_all_access ? 'Akses Penuh' : 'Per Grup'}
           </span>
 
+          <span className='inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground'>
+            <Icons.lock className='size-3' />
+            {pkg.max_purchases_per_member > 0
+              ? `Maks. ${pkg.max_purchases_per_member}x/member`
+              : 'Tanpa Batas'}
+          </span>
+
           <div className='ml-auto'>
             <StatusCell pkg={pkg} />
           </div>

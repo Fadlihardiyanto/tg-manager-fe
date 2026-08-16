@@ -25,6 +25,8 @@ export interface Package {
   duration_days: number;
   is_all_access: boolean;
   is_active: boolean;
+  /** 0 = tanpa batas; N>0 = maksimum pembelian per member seumur hidup */
+  max_purchases_per_member: number;
   created_at: string;
   updated_at: string;
   groups?: PackageGroup[];
@@ -38,6 +40,7 @@ export interface CreatePackageRequest {
   price: number;
   duration_days: number;
   is_all_access?: boolean;
+  max_purchases_per_member?: number;
 }
 
 // ─── Update Package (PUT /api/v1/tenant/packages/{id}) ──────────────
@@ -48,6 +51,7 @@ export interface UpdatePackageRequest {
   price?: number;
   duration_days?: number;
   is_all_access?: boolean;
+  max_purchases_per_member?: number;
 }
 
 // ─── Associate Groups (POST /api/v1/tenant/packages/{id}/groups) ─────
