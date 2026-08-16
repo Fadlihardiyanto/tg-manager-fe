@@ -28,8 +28,8 @@ const Footer = () => {
     {
       title: t('legal'),
       links: [
-        { title: t('termsOfService'), href: '#' as const },
-        { title: t('privacyPolicy'), href: '#' as const }
+        { title: t('termsOfService'), href: '/terms-of-service' as const },
+        { title: t('privacyPolicy'), href: '/privacy-policy' as const }
       ]
     }
   ];
@@ -78,6 +78,8 @@ const Footer = () => {
                             | '/'
                             | '/login'
                             | '/register-tenant'
+                            | '/terms-of-service'
+                            | '/privacy-policy'
                             | '#features'
                             | '#pricing'
                             | '#faq'
