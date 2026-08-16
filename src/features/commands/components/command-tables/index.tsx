@@ -2,6 +2,7 @@
 
 import { DataTable } from '@/components/ui/table/data-table';
 import { DataTableToolbar } from '@/components/ui/table/data-table-toolbar';
+import { RowSelectionBar } from '@/components/ui/table/row-selection-bar';
 import { useDataTable } from '@/hooks/use-data-table';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { commandsQueryOptions } from '../../api/queries';
@@ -63,31 +64,14 @@ export function CommandTable({
 
   const selectionBar =
     selectedCount > 0 && onBulkDelete ? (
-      <div className='flex items-center gap-3'>
-        <span className='text-sm font-medium text-primary'>{selectedCount} perintah dipilih</span>
-        <div className='flex gap-2'>
-          <Button
-            variant='outline'
-            size='sm'
-            className='rounded-full'
-            onClick={() => table.toggleAllRowsSelected(false)}
-          >
-            Batal Pilih
-          </Button>
-          <Button
-            variant='destructive'
-            size='sm'
-            className='rounded-full'
-            onClick={() => {
-              const ids = table.getFilteredSelectedRowModel().rows.map((r) => r.original.id);
-              onBulkDelete(ids);
-            }}
-          >
-            <Icons.trash className='mr-2 h-4 w-4' />
-            Hapus {selectedCount} Perintah
-          </Button>
-        </div>
-      </div>
+      <RowSelectionBar
+        selectedCount={selectedCount}
+        noun='perintah'
+        onClearSelection={() => table.toggleAllRowsSelected(false)}
+        onDelete={() =>
+          onBulkDelete(table.getFilteredSelectedRowModel().rows.map((r) => r.original.id))
+        }
+      />
     ) : undefined;
 
   return (
