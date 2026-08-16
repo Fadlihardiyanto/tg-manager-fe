@@ -563,20 +563,20 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end'>
           <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-          <DropdownMenuItem onClick={() => setTimeout(() => setMemberId(data.id), 150)}>
+          <DropdownMenuItem onClick={() => setMemberId(data.id)}>
             <Icons.eye /> Lihat Detail
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setTimeout(() => setIsExtendOpen(true), 150)}>
+          <DropdownMenuItem onClick={() => setIsExtendOpen(true)}>
             <Icons.calendar /> Perpanjang Akses
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setIsSyncConfirmOpen(true)}>
             <Icons.settings /> Sinkron Manual
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setTimeout(() => setIsResendOpen(true), 150)}>
+          <DropdownMenuItem onClick={() => setIsResendOpen(true)}>
             <Icons.send /> Kirim Ulang Tautan
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() => setTimeout(() => setIsKickOpen(true), 150)}
+            onClick={() => setIsKickOpen(true)}
             className='text-destructive focus:text-destructive'
           >
             <Icons.trash /> Keluarkan Member

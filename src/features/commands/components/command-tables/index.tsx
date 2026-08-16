@@ -17,9 +17,16 @@ interface CommandTableProps {
   onBulkDelete?: (ids: string[]) => void;
   toolbarActions?: ReactNode;
   notice?: ReactNode;
+  emptyState?: ReactNode;
 }
 
-export function CommandTable({ onEdit, onBulkDelete, toolbarActions, notice }: CommandTableProps) {
+export function CommandTable({
+  onEdit,
+  onBulkDelete,
+  toolbarActions,
+  notice,
+  emptyState
+}: CommandTableProps) {
   const { data } = useSuspenseQuery(commandsQueryOptions());
 
   const commands = data.data ?? [];
@@ -88,6 +95,7 @@ export function CommandTable({ onEdit, onBulkDelete, toolbarActions, notice }: C
       <DataTable
         table={table}
         notice={notice}
+        emptyState={emptyState}
         title='Daftar Perintah'
         description='Kelola perintah kustom, akses, tipe balasan, dan status aktifnya.'
       >

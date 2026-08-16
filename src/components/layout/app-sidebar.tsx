@@ -52,7 +52,10 @@ function isActivePath(pathname: string, url: string) {
   const currentPath = normalizePathname(pathname);
   const targetPath = normalizePathname(url);
 
-  return currentPath === targetPath;
+  if (currentPath === targetPath) return true;
+
+  // Detail pages (e.g. /dashboard/members/[id]) keep their parent menu highlighted
+  return currentPath.startsWith(`${targetPath}/`);
 }
 
 function AvatarInitial() {

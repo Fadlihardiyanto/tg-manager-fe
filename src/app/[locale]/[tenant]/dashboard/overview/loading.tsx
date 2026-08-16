@@ -6,7 +6,7 @@ import PageContainer from '@/components/layout/page-container';
 
 export default function OverviewLoading() {
   return (
-    <PageContainer pageTitle='Overview' pageDescription='Memuat data...'>
+    <PageContainer pageTitle='Dasbor' pageDescription='Memuat data...'>
       <div className='flex flex-1 flex-col gap-6'>
         <StatsCardsSkeleton />
 

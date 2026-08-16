@@ -281,12 +281,12 @@ export default function BotDetailContent({ botId }: { botId: string }) {
         <div className='flex flex-wrap gap-2'>
           <Button onClick={() => setEditOpen(true)} size='sm' variant='outline'>
             <Icons.edit className='mr-2 h-4 w-4' />
-            Edit Bot
+            Ubah Bot
           </Button>
           <Button onClick={() => setConnectSheetOpen(true)} size='sm' variant='outline'>
             <Icons.add className='mr-2 h-4 w-4' />
             Hubungkan Grup
-          </Button>
+          </Button>{' '}
           <Button
             onClick={() => syncMutation.mutate()}
             size='sm'
