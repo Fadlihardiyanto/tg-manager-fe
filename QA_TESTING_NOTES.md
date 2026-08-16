@@ -104,6 +104,15 @@ Midtrans, 409 order duplikat, 404 /register) semuanya false-positive/third-party
 | GET /admin/v1/admins | search | ✅ (name/email, commit 0572fd6) |
 | GET /admin/v1/audit-logs | search/action/resource | ✅ (action + entity_type, commit 0572fd6) |
 
+## Incident (16 Agu 11:07)
+
+- **Gejala:** `Module transactions-listing-content.tsx ... but the module factory is not
+  available` — 500 sekali lalu 200, halaman transactions.
+- **Root cause:** state Turbopack korup (dev server di-kill paksa saat kompilasi berjalan
+  di sesi sebelumnya) — BUKAN bug kode.
+- **Fix:** kill dev server + hapus `.next` + restart bersih. Verified: transactions,
+  members, broadcast, superadmin admins/audit-logs semua 200, 0 error di log.
+
 ## Catatan Perbaikan yang Sudah Dilakukan (commit sesi ini)
 
 - `feat(superadmin)`: search/filter tenants server-side (name+active) — didukung BE
