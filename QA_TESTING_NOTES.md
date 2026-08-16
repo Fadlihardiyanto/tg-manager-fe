@@ -123,3 +123,18 @@ Midtrans, 409 order duplikat, 404 /register) semuanya false-positive/third-party
 - `feat(members)`: status filter toolbar + reset page saat filter berubah
 - `refactor`: hapus bulkDelete*Mutation unused (dipakai useBulkDelete)
 - `chore`: hapus react-query-demo, infoconfig.ts, auth-axios.ts + 15 unused deps
+
+## Incident: Kirim Ulang Tautan — pilihan paket tidak muncul (16 Agu 15:36)
+
+- **Gejala:** pilih "Kirim ke satu paket" → Select "Memuat paket..." selamanya
+  (disabled); untuk member tanpa paket aktif muncul pesan "tidak punya paket aktif".
+- **Root cause:** `HeadersTimeoutError` (UND_ERR_HEADERS_TIMEOUT) di server action
+  `getMember` — keep-alive connection pool undici di dev server Next berisi koneksi
+  ke instance backend LAMA (BE di-restart berkali-kali); request dialokasikan ke
+  koneksi mati → hang ~6.5 menit → query member detail tidak pernah resolve.
+  Bukan bug kode frontend (log: "POST /dashboard/members 404 in 6.5min").
+- **Fix:** restart dev server Next (reset pool). Verified: dropdown paket aktif
+  tampil normal.
+- **Pelajaran:** setelah restart backend BE, restart juga dev server frontend;
+  kalau sering, pasang undici dispatcher dengan keepAliveTimeout pendek di
+  api-client (belum dilakukan — YAGNI sampai sering terjadi).
