@@ -66,3 +66,4 @@ next-env.d.ts
 
 # Playwright CLI test artifacts
 .playwright-cli/
+.claude/
