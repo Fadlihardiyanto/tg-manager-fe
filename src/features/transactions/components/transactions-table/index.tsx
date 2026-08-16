@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { parseAsInteger, parseAsString, useQueryState } from 'nuqs';
 import { DataTable } from '@/components/ui/table/data-table';
@@ -42,6 +43,11 @@ export function TransactionsTable({ status, onStatusChange }: TransactionsTableP
     void setSearch(value || null);
     if (page !== 1) void setPage(1);
   }, 400);
+
+  const [inputValue, setInputValue] = useState(search ?? '');
+  useEffect(() => {
+    setInputValue(search ?? '');
+  }, [search]);
 
   const filters = {
     page,
@@ -93,8 +99,11 @@ export function TransactionsTable({ status, onStatusChange }: TransactionsTableP
     >
       <DataTableToolbar table={table}>
         <Input
-          value={search ?? ''}
-          onChange={(e) => debouncedSetSearch(e.target.value)}
+          value={inputValue}
+          onChange={(e) => {
+            setInputValue(e.target.value);
+            debouncedSetSearch(e.target.value);
+          }}
           placeholder='Cari member atau ID transaksi...'
           className='h-10 w-full rounded-full border-border bg-background px-4 text-sm font-semibold sm:w-60'
         />

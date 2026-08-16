@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { parseAsString, useQueryState } from 'nuqs';
 import { Button } from '@/components/ui/button';
@@ -29,6 +30,11 @@ export function MembersTable({ filters }: { filters: MemberFilters }) {
     parseAsString.withOptions({ shallow: true, history: 'replace', clearOnDefault: true })
   );
   const debouncedSetSearch = useDebouncedCallback((value: string) => setSearch(value || null), 400);
+
+  const [inputValue, setInputValue] = useState(search ?? '');
+  useEffect(() => {
+    setInputValue(search ?? '');
+  }, [search]);
   const [packageId, setPackageId] = useQueryState(
     'package_id',
     parseAsString.withOptions({ shallow: true, history: 'replace' })
@@ -104,8 +110,11 @@ export function MembersTable({ filters }: { filters: MemberFilters }) {
       >
         <DataTableToolbar table={table} hideViewOptions={selectedIds.length > 0}>
           <Input
-            value={search ?? ''}
-            onChange={(e) => debouncedSetSearch(e.target.value)}
+            value={inputValue}
+            onChange={(e) => {
+              setInputValue(e.target.value);
+              debouncedSetSearch(e.target.value);
+            }}
             placeholder='Cari nama atau username...'
             className='h-10 w-full rounded-full border-border bg-background px-4 text-sm font-semibold sm:w-56'
           />
