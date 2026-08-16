@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { parseAsString, useQueryState } from 'nuqs';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
+import { Input } from '@/components/ui/input';
 import { DataTable } from '@/components/ui/table/data-table';
 import { DataTableToolbar } from '@/components/ui/table/data-table-toolbar';
 import {
@@ -14,6 +15,7 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { useDataTable } from '@/hooks/use-data-table';
+import { useDebouncedCallback } from '@/hooks/use-debounced-callback';
 import { membersQueryOptions } from '../../api/queries';
 import { packagesQueryOptions } from '@/features/packages/api/queries';
 import { columns } from './columns';
@@ -22,6 +24,11 @@ import { BulkActionBar } from '../bulk-action-bar';
 import type { MemberFilters } from '../../api/types';
 
 export function MembersTable({ filters }: { filters: MemberFilters }) {
+  const [search, setSearch] = useQueryState(
+    'search',
+    parseAsString.withOptions({ shallow: true, history: 'replace', clearOnDefault: true })
+  );
+  const debouncedSetSearch = useDebouncedCallback((value: string) => setSearch(value || null), 400);
   const [packageId, setPackageId] = useQueryState(
     'package_id',
     parseAsString.withOptions({ shallow: true, history: 'replace' })
@@ -96,6 +103,12 @@ export function MembersTable({ filters }: { filters: MemberFilters }) {
         }
       >
         <DataTableToolbar table={table} hideViewOptions={selectedIds.length > 0}>
+          <Input
+            value={search ?? ''}
+            onChange={(e) => debouncedSetSearch(e.target.value)}
+            placeholder='Cari nama atau username...'
+            className='h-10 w-full rounded-full border-border bg-background px-4 text-sm font-semibold sm:w-56'
+          />
           {selectedIds.length > 0 ? (
             <BulkActionBar
               selectedIds={selectedIds}

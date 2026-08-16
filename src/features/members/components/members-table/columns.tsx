@@ -110,12 +110,9 @@ export const columns: ColumnDef<Member>[] = [
       );
     },
     meta: {
-      label: 'Nama',
-      placeholder: 'Cari member...',
-      variant: 'text' as const,
-      icon: Icons.text
+      label: 'Nama'
     },
-    enableColumnFilter: true
+    enableColumnFilter: false
   },
   {
     id: 'phone',
