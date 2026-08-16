@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { GroupTable } from './group-tables';
 import { GroupFormDialog } from './group-form-dialog';
 import { ConnectGroupModal } from './connect-group-modal';
@@ -12,17 +12,19 @@ import type { TelegramGroup } from '../api/types';
 import { syncGroupsMutation } from '../api/mutations';
 import { groupKeys } from '../api/queries';
 import { bulkDeleteGroups } from '../api/service';
+import { useBulkDelete } from '@/hooks/use-bulk-delete';
 import { toast } from 'sonner';
 
 export function GroupListingContent() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [connectOpen, setConnectOpen] = useState(false);
   const [editingGroup, setEditingGroup] = useState<TelegramGroup | null>(null);
-  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
-  const [bulkDeleteIds, setBulkDeleteIds] = useState<string[]>([]);
-  const [bulkDeleting, setBulkDeleting] = useState(false);
   const syncMutation = useMutation(syncGroupsMutation);
-  const queryClient = useQueryClient();
+  const bulkDelete = useBulkDelete({
+    deleteFn: bulkDeleteGroups,
+    noun: 'grup',
+    queryKeys: [groupKeys.all]
+  });
 
   const handleEdit = useCallback((group: TelegramGroup) => {
     setEditingGroup(group);
@@ -40,56 +42,20 @@ export function GroupListingContent() {
     setConnectOpen(true);
   }, []);
 
-  const handleBulkDelete = useCallback((ids: string[]) => {
-    setBulkDeleteIds(ids);
-    setBulkDeleteOpen(true);
-  }, []);
-
-  const handleBulkDeleteConfirm = useCallback(async () => {
-    setBulkDeleting(true);
-    try {
-      const res = await bulkDeleteGroups(bulkDeleteIds);
-      const deleted = res.data?.deleted ?? 0;
-      const failed = res.data?.failed ?? [];
-
-      if (res.success && deleted > 0) {
-        if (failed.length > 0) {
-          toast.error(`${deleted} grup dihapus, ${failed.length} gagal`);
-        } else {
-          toast.success(`${deleted} grup berhasil dihapus`);
-        }
-      } else if (failed.length > 0) {
-        toast.error(`${failed.length} grup gagal dihapus`);
-      } else {
-        toast.error(res.message || 'Gagal menghapus grup');
-      }
-    } catch {
-      toast.error('Gagal menghapus grup');
-    }
-
-    setBulkDeleting(false);
-    setBulkDeleteOpen(false);
-    setBulkDeleteIds([]);
-    void queryClient.invalidateQueries({ queryKey: groupKeys.all });
-  }, [bulkDeleteIds, queryClient]);
-
   return (
     <div className='flex min-h-0 flex-1 flex-col gap-4'>
       <AlertModal
-        isOpen={bulkDeleteOpen}
-        onClose={() => {
-          setBulkDeleteOpen(false);
-          setBulkDeleteIds([]);
-        }}
-        onConfirm={handleBulkDeleteConfirm}
-        loading={bulkDeleting}
-        title={`Hapus ${bulkDeleteIds.length} grup?`}
-        description={`${bulkDeleteIds.length} grup akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.`}
+        isOpen={bulkDelete.confirmOpen}
+        onClose={bulkDelete.closeConfirm}
+        onConfirm={bulkDelete.confirmDelete}
+        loading={bulkDelete.isDeleting}
+        title={`Hapus ${bulkDelete.ids.length} grup?`}
+        description={`${bulkDelete.ids.length} grup akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.`}
       />
 
       <GroupTable
         onEdit={handleEdit}
-        onBulkDelete={handleBulkDelete}
+        onBulkDelete={bulkDelete.requestDelete}
         emptyState={
           <div className='flex flex-col items-center gap-3 py-6'>
             <div className='flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary'>
