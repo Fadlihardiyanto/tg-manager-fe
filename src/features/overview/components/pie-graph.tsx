@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { LabelList, Pie, PieChart } from 'recharts';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,6 +25,19 @@ export function PieGraph({ data }: { data: PackagePopularityItem[] }) {
     ])
   ) satisfies ChartConfig;
 
+  // ponytail: recharts sector path punya role="img" tanpa nama (axe svg-img-alt) —
+  // salin atribut `name` ke aria-label tiap sector (path dirender setelah animasi,
+  // jadi tunggu dulu sebelum menempel).
+  useEffect(() => {
+    const t = setTimeout(() => {
+      document.querySelectorAll<SVGPathElement>('path.recharts-sector').forEach((p) => {
+        const name = p.getAttribute('name');
+        if (name && !p.getAttribute('aria-label')) p.setAttribute('aria-label', name);
+      });
+    }, 600);
+    return () => clearTimeout(t);
+  }, [data]);
+
   return (
     <Card className='flex h-full flex-col'>
       <CardHeader className='items-center pb-0'>
@@ -35,7 +49,7 @@ export function PieGraph({ data }: { data: PackagePopularityItem[] }) {
           config={chartConfig}
           className='[&_.recharts-text]:fill-background mx-auto aspect-square max-h-[300px] min-h-[250px]'
         >
-          <PieChart>
+          <PieChart accessibilityLayer aria-label='Diagram popularitas paket'>
             <ChartTooltip content={<ChartTooltipContent nameKey='package_name' hideLabel />} />
             <Pie
               data={chartData}

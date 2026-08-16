@@ -71,7 +71,9 @@ export default async function RootLayout({
             <ThemeProvider>
               <Providers>
                 <Toaster />
-                {children}
+                <div id='main-content' className='contents'>
+                  {children}
+                </div>
               </Providers>
             </ThemeProvider>
           </NextIntlClientProvider>
