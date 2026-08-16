@@ -5,8 +5,8 @@ import { navGroups } from '@/config/nav-config';
 import { filterNavGroups } from '@/lib/filter-nav';
 
 export const metadata: Metadata = {
-  title: 'Dashboard TG-Manager',
-  description: 'Dashboard dasar untuk TG-Manager',
+  title: 'Dashboard - Urator',
+  description: 'Dashboard dasar untuk Urator',
   robots: {
     index: false,
     follow: false

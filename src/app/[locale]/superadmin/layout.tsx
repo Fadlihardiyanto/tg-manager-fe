@@ -6,8 +6,8 @@ import { superadminNavGroups } from '@/config/superadmin-nav-config';
 import { filterNavGroups } from '@/lib/filter-nav';
 
 export const metadata: Metadata = {
-  title: 'Admin Panel - TG-Manager',
-  description: 'Dashboard operator platform TG-Manager',
+  title: 'Panel Admin - Urator',
+  description: 'Dashboard operator platform Urator',
   robots: { index: false, follow: false }
 };
 
