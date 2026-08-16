@@ -8,6 +8,7 @@ import PageContainer from '@/components/layout/page-container';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { StatusBadge } from '@/components/ui/status-badge';
 import {
   Table,
   TableBody,
@@ -173,9 +174,7 @@ export default function RolesPage() {
                   <TableCell className='font-medium'>{role.name}</TableCell>
                   <TableCell className='text-muted-foreground'>{role.description || '—'}</TableCell>
                   <TableCell>
-                    <Badge variant={role.is_active ? 'secondary' : 'outline'}>
-                      {role.is_active ? 'Aktif' : 'Nonaktif'}
-                    </Badge>
+                    <StatusBadge active={role.is_active} />
                   </TableCell>
                   <TableCell className='text-right'>
                     <div className='flex justify-end gap-1'>

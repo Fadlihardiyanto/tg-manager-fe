@@ -7,7 +7,7 @@ import { Icons } from '@/components/icons';
 import PageContainer from '@/components/layout/page-container';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
+import { StatusBadge } from '@/components/ui/status-badge';
 import {
   Table,
   TableBody,
@@ -43,7 +43,8 @@ import {
   useUpdateAdmin,
   useDeleteAdmin,
   useActivateAdmin,
-  useDeactivateAdmin
+  useDeactivateAdmin,
+  useSyncAdminRoles
 } from '../../../../features/superadmin/api/queries';
 
 export default function AdminsPage() {
@@ -55,6 +56,7 @@ export default function AdminsPage() {
   const deleteMut = useDeleteAdmin();
   const activateMut = useActivateAdmin();
   const deactivateMut = useDeactivateAdmin();
+  const syncRolesMut = useSyncAdminRoles();
 
   const admins = adminsRes?.success ? adminsRes.data : [];
   const pagination = adminsRes?.success ? adminsRes.pagination : undefined;
@@ -67,6 +69,7 @@ export default function AdminsPage() {
   const [editing, setEditing] = useState<any>(null);
   const [form, setForm] = useState({ name: '', email: '', password: '', role_id: '' });
   const [deleting, setDeleting] = useState<any>(null);
+  const [statusChanging, setStatusChanging] = useState<any>(null);
 
   const openCreate = () => {
     setEditing(null);
@@ -92,6 +95,13 @@ export default function AdminsPage() {
         password: form.password || undefined
       });
       if (res.success) {
+        const currentRoleId = editing.roles?.[0]?.id || '';
+        if (form.role_id !== currentRoleId) {
+          await syncRolesMut.mutateAsync({
+            id: editing.id,
+            role_ids: form.role_id ? [form.role_id] : []
+          });
+        }
         toast.success('Admin diperbarui');
         setDialogOpen(false);
       } else toast.error(res.message);
@@ -121,7 +131,7 @@ export default function AdminsPage() {
     setDeleting(null);
   };
 
-  const toggleStatus = async (admin: any) => {
+  const handleToggleStatus = async (admin: any) => {
     const res = admin.is_active
       ? await deactivateMut.mutateAsync(admin.id)
       : await activateMut.mutateAsync(admin.id);
@@ -129,8 +139,14 @@ export default function AdminsPage() {
     else toast.error(res.message);
   };
 
+  const confirmStatusChange = async () => {
+    if (!statusChanging) return;
+    await handleToggleStatus(statusChanging);
+    setStatusChanging(null);
+  };
+
   return (
-    <PageContainer pageTitle='Admin Users' pageDescription='Kelola akun admin platform'>
+    <PageContainer pageTitle='Admin' pageDescription='Kelola akun admin platform'>
       <div className='flex justify-end mb-4'>
         <Button onClick={openCreate}>
           <Icons.add className='mr-2 size-4' />
@@ -162,16 +178,18 @@ export default function AdminsPage() {
                   <TableCell>{admin.email}</TableCell>
                   <TableCell>{admin.roles?.[0]?.name || '—'}</TableCell>
                   <TableCell>
-                    <Badge variant={admin.is_active ? 'secondary' : 'outline'}>
-                      {admin.is_active ? 'Aktif' : 'Nonaktif'}
-                    </Badge>
+                    <StatusBadge active={admin.is_active} />
                   </TableCell>
                   <TableCell className='text-right'>
                     <div className='flex justify-end gap-1'>
                       <Button
                         variant='ghost'
                         size='icon'
-                        onClick={() => toggleStatus(admin)}
+                        onClick={() =>
+                          admin.is_active
+                            ? setStatusChanging(admin)
+                            : void handleToggleStatus(admin)
+                        }
                         title={admin.is_active ? 'Nonaktifkan' : 'Aktifkan'}
                       >
                         {admin.is_active ? (
@@ -211,6 +229,11 @@ export default function AdminsPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{editing ? 'Edit Admin' : 'Tambah Admin'}</DialogTitle>
+            <DialogDescription>
+              {editing
+                ? 'Perbarui data admin. Kosongkan password jika tidak diubah.'
+                : 'Buat akun admin baru untuk mengelola platform.'}
+            </DialogDescription>
           </DialogHeader>
           <div className='space-y-4 py-2'>
             <div className='flex flex-col gap-2'>
@@ -295,6 +318,32 @@ export default function AdminsPage() {
               className='bg-destructive text-destructive-foreground'
             >
               Hapus
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={!!statusChanging}
+        onOpenChange={(o) => {
+          if (!o) setStatusChanging(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Nonaktifkan Admin</AlertDialogTitle>
+            <AlertDialogDescription>
+              Admin &quot;{statusChanging?.name}&quot; akan kehilangan akses ke panel superadmin.
+              Tindakan ini dapat dibatalkan dengan mengaktifkannya kembali.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmStatusChange}
+              className='bg-destructive text-destructive-foreground'
+            >
+              Nonaktifkan
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -24,7 +24,7 @@ export default async function SuperadminLayout({ children }: { children: React.R
   const filteredGroups = filterNavGroups(superadminNavGroups, permissions, role);
 
   return (
-    <DashboardShell navGroups={filteredGroups} defaultOpen={false}>
+    <DashboardShell navGroups={filteredGroups} defaultOpen={false} withTenantBilling={false}>
       {children}
     </DashboardShell>
   );

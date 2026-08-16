@@ -7,7 +7,7 @@ import { Icons } from '@/components/icons';
 import PageContainer from '@/components/layout/page-container';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
+import { StatusBadge } from '@/components/ui/status-badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Table,
@@ -64,6 +64,7 @@ export default function TenantsPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [form, setForm] = useState({ name: '', slug: '', category: '' });
   const [deleting, setDeleting] = useState<any>(null);
+  const [statusChanging, setStatusChanging] = useState<any>(null);
   const [userDialog, setUserDialog] = useState<{ open: boolean; clientId: string | null }>({
     open: false,
     clientId: null
@@ -96,12 +97,18 @@ export default function TenantsPage() {
     setDeleting(null);
   };
 
-  const toggleStatus = async (client: any) => {
+  const handleToggleStatus = async (client: any) => {
     const res = client.is_active
       ? await deactivateMut.mutateAsync(client.id)
       : await activateMut.mutateAsync(client.id);
     if (res.success) toast.success(client.is_active ? 'Tenant dinonaktifkan' : 'Tenant diaktifkan');
     else toast.error(res.message);
+  };
+
+  const confirmStatusChange = async () => {
+    if (!statusChanging) return;
+    await handleToggleStatus(statusChanging);
+    setStatusChanging(null);
   };
 
   const openUsers = (client: any) => {
@@ -166,16 +173,22 @@ export default function TenantsPage() {
                   <TableCell className='font-mono text-xs'>{client.slug}</TableCell>
                   <TableCell>{client.category || '—'}</TableCell>
                   <TableCell>
-                    <Badge variant={client.is_active ? 'secondary' : 'outline'}>
-                      {client.is_active ? 'Aktif' : 'Nonaktif'}
-                    </Badge>
+                    <StatusBadge active={client.is_active} />
                   </TableCell>
                   <TableCell className='text-right'>
                     <div className='flex justify-end gap-1'>
                       <Button variant='ghost' size='icon' onClick={() => openUsers(client)}>
                         <Icons.user className='size-4' />
                       </Button>
-                      <Button variant='ghost' size='icon' onClick={() => toggleStatus(client)}>
+                      <Button
+                        variant='ghost'
+                        size='icon'
+                        onClick={() =>
+                          client.is_active
+                            ? setStatusChanging(client)
+                            : void handleToggleStatus(client)
+                        }
+                      >
                         {client.is_active ? (
                           <Icons.eyeOff className='size-4' />
                         ) : (
@@ -315,6 +328,31 @@ export default function TenantsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <AlertDialog
+        open={!!statusChanging}
+        onOpenChange={(o) => {
+          if (!o) setStatusChanging(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Nonaktifkan Tenant</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tenant &quot;{statusChanging?.name}&quot; akan kehilangan akses platform beserta
+              seluruh bot dan grupnya. Tindakan ini dapat dibatalkan dengan mengaktifkannya kembali.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmStatusChange}
+              className='bg-destructive text-destructive-foreground'
+            >
+              Nonaktifkan
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </PageContainer>
   );
 }
@@ -344,9 +382,7 @@ function ClientUsersList({ clientId }: { clientId: string }) {
               <TableCell>{u.name}</TableCell>
               <TableCell>{u.email}</TableCell>
               <TableCell>
-                <Badge variant={u.is_active ? 'secondary' : 'outline'}>
-                  {u.is_active ? 'Aktif' : 'Nonaktif'}
-                </Badge>
+                <StatusBadge active={u.is_active} />
               </TableCell>
             </TableRow>
           ))

@@ -66,15 +66,15 @@ const FORMATTER = new Intl.NumberFormat('id-ID', {
 });
 
 const STATUS_STYLES: Record<string, string> = {
-  active: 'border-emerald-300 bg-emerald-50 text-emerald-700',
-  expired: 'border-amber-300 bg-amber-50 text-amber-700',
-  cancelled: 'border-red-300 bg-red-50 text-red-700'
+  active: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:text-emerald-400',
+  expired: 'bg-amber-500/10 text-amber-600 border-amber-500/20 dark:text-amber-400',
+  cancelled: 'bg-red-500/10 text-red-600 border-red-500/20 dark:text-red-400'
 };
 
 const STATUS_LABELS: Record<string, string> = {
-  active: 'Active',
-  expired: 'Expired',
-  cancelled: 'Cancelled'
+  active: 'Aktif',
+  expired: 'Kedaluwarsa',
+  cancelled: 'Dibatalkan'
 };
 
 function initPlanForm(): CreatePlanRequest {
@@ -256,19 +256,7 @@ function PlansTab() {
             className='group overflow-hidden border-border/70 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md'
           >
             {/* Gradient header */}
-            <div
-              className={cn(
-                'h-2 bg-gradient-to-r',
-                i % 8 === 0 && 'from-sky-400 to-sky-300',
-                i % 8 === 1 && 'from-emerald-400 to-emerald-300',
-                i % 8 === 2 && 'from-violet-400 to-violet-300',
-                i % 8 === 3 && 'from-amber-400 to-amber-300',
-                i % 8 === 4 && 'from-rose-400 to-rose-300',
-                i % 8 === 5 && 'from-teal-400 to-teal-300',
-                i % 8 === 6 && 'from-indigo-400 to-indigo-300',
-                i % 8 === 7 && 'from-orange-400 to-orange-300'
-              )}
-            />
+            <div className='h-2 bg-gradient-to-r from-primary/50 to-primary/10' />
 
             <CardHeader className='pb-1'>
               <div className='flex items-start justify-between'>
@@ -646,19 +634,19 @@ function SubscriptionsTab() {
           accent='from-sky-500/10 via-sky-500/5 to-transparent'
         />
         <StatPill
-          label='Active'
+          label='Aktif'
           value={String(counts.active)}
           icon={Icons.check}
           accent='from-emerald-500/10 via-emerald-500/5 to-transparent'
         />
         <StatPill
-          label='Expired'
+          label='Kedaluwarsa'
           value={String(counts.expired)}
           icon={Icons.warning}
           accent='from-amber-500/10 via-amber-500/5 to-transparent'
         />
         <StatPill
-          label='Cancelled'
+          label='Dibatalkan'
           value={String(counts.cancelled)}
           icon={Icons.close}
           accent='from-red-500/10 via-red-500/5 to-transparent'
