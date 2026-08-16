@@ -28,7 +28,7 @@ const ResultItem = React.forwardRef(
         {active && (
           <div
             id='kbar-result-item'
-            className='border-primary bg-accent/50 absolute inset-0 z-[-1]! border-l-4'
+            className='border-primary bg-accent/50 absolute inset-0 z-[-1]! border-l-2'
           ></div>
         )}
         <div className='relative z-10 flex items-center gap-2'>
