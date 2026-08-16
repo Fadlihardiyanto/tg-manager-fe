@@ -32,13 +32,16 @@ interface TransactionsTableProps {
 }
 
 export function TransactionsTable({ status, onStatusChange }: TransactionsTableProps) {
-  const [page] = useQueryState('page', parseAsInteger.withDefault(1));
+  const [page, setPage] = useQueryState('page', parseAsInteger.withDefault(1));
   const [perPage] = useQueryState('perPage', parseAsInteger.withDefault(10));
   const [search, setSearch] = useQueryState(
     'search',
     parseAsString.withOptions({ shallow: true, history: 'replace', clearOnDefault: true })
   );
-  const debouncedSetSearch = useDebouncedCallback((value: string) => setSearch(value || null), 400);
+  const debouncedSetSearch = useDebouncedCallback((value: string) => {
+    void setSearch(value || null);
+    if (page !== 1) void setPage(1);
+  }, 400);
 
   const filters = {
     page,
@@ -47,7 +50,10 @@ export function TransactionsTable({ status, onStatusChange }: TransactionsTableP
     search: search ?? undefined
   };
 
-  const { data, isError, isLoading } = useQuery(transactionsQueryOptions(filters));
+  const { data, isError, isLoading } = useQuery({
+    ...transactionsQueryOptions(filters),
+    placeholderData: (previous) => previous
+  });
   const items = data?.data ?? [];
   const pageCount = data?.meta?.total_pages ?? 1;
 
