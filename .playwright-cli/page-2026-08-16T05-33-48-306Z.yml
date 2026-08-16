@@ -1,0 +1,195 @@
+- generic [active] [ref=e1]:
+  - link "Lewati ke konten utama" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - region "Notifications alt+T"
+  - generic [ref=e95] [cursor=pointer]
+  - alert [ref=e101]: "Dashboard: Dasbor"
+  - generic [ref=e102]:
+    - generic [ref=e105]:
+      - img "Urator" [ref=e109]
+      - generic [ref=e111]:
+        - generic [ref=e112]: Overview
+        - list [ref=e113]:
+          - listitem [ref=e114]:
+            - link [ref=e115] [cursor=pointer]:
+              - /url: /crypto-bro/dashboard/overview
+          - listitem [ref=e121]:
+            - link [ref=e122] [cursor=pointer]:
+              - /url: /crypto-bro/dashboard/midtrans
+          - listitem [ref=e126]:
+            - link [ref=e127] [cursor=pointer]:
+              - /url: /crypto-bro/dashboard/transactions
+          - listitem [ref=e131]:
+            - link [ref=e132] [cursor=pointer]:
+              - /url: /crypto-bro/dashboard/bots
+          - listitem [ref=e136]:
+            - link [ref=e137] [cursor=pointer]:
+              - /url: /crypto-bro/dashboard/members
+          - listitem [ref=e141]:
+            - link [ref=e142] [cursor=pointer]:
+              - /url: /crypto-bro/dashboard/groups
+          - listitem [ref=e150]:
+            - link [ref=e151] [cursor=pointer]:
+              - /url: /crypto-bro/dashboard/packages
+          - listitem [ref=e155]:
+            - link [ref=e156] [cursor=pointer]:
+              - /url: /crypto-bro/dashboard/commands
+          - listitem [ref=e159]:
+            - link [ref=e160] [cursor=pointer]:
+              - /url: /crypto-bro/dashboard/broadcast
+      - list [ref=e165]:
+        - listitem [ref=e166]:
+          - button "Menu akun" [ref=e167] [cursor=pointer]:
+            - generic [ref=e168]: F
+      - button "Toggle Sidebar" [ref=e169]
+    - main [ref=e170]:
+      - generic [ref=e171]:
+        - generic [ref=e172]:
+          - button "Toggle Sidebar" [ref=e173] [cursor=pointer]
+          - navigation "breadcrumb" [ref=e175]:
+            - list [ref=e176]:
+              - listitem [ref=e177]:
+                - link "Dasbor" [ref=e178] [cursor=pointer]:
+                  - /url: /crypto-bro/dashboard/overview
+              - listitem [ref=e179]
+              - link "Dasbor" [disabled] [ref=e182]
+        - button "Search... Ctrl K" [ref=e186] [cursor=pointer]:
+          - text: Search...
+          - generic:
+            - generic: Ctrl
+            - text: K
+      - generic [ref=e187]:
+        - generic [ref=e188]:
+          - generic [ref=e192]:
+            - heading "Dasbor" [level=1] [ref=e194]
+            - paragraph [ref=e195]: Pantau performa bisnis Anda
+          - generic [ref=e196]:
+            - generic [ref=e197]:
+              - generic [ref=e198]:
+                - generic [ref=e199]:
+                  - generic [ref=e200]: Pendapatan Bulan Ini
+                  - generic [ref=e201]: Rp 0
+                - generic [ref=e204]: Total pendapatan bulan ini
+              - generic [ref=e206]:
+                - generic [ref=e207]:
+                  - generic [ref=e208]: Pelanggan Aktif
+                  - generic [ref=e209]: "2"
+                - generic [ref=e212]: Total member aktif
+              - generic [ref=e214]:
+                - generic [ref=e215]:
+                  - generic [ref=e216]: Grup & Total Member
+                  - generic [ref=e217]: 3 / 8
+                - generic [ref=e220]: Grup dan total anggota
+              - generic [ref=e222]:
+                - generic [ref=e223]:
+                  - generic [ref=e224]: Transaksi Berhasil
+                  - generic [ref=e225]: "30"
+                - generic [ref=e228]: Total transaksi sukses bulan ini
+            - generic [ref=e230]:
+              - link "Tambah Bot" [ref=e231] [cursor=pointer]:
+                - /url: /dashboard/bots
+              - link "Hubungkan Grup" [ref=e232] [cursor=pointer]:
+                - /url: /dashboard/groups
+              - link "Buat Broadcast" [ref=e233] [cursor=pointer]:
+                - /url: /dashboard/broadcast
+              - link "Kelola Paket" [ref=e234] [cursor=pointer]:
+                - /url: /dashboard/packages
+            - generic [ref=e235]:
+              - generic [ref=e237]:
+                - generic [ref=e238]:
+                  - generic [ref=e239]: Tren Pendapatan
+                  - generic [ref=e240]: Pendapatan periode terakhir
+                - application [ref=e245]:
+                  - generic [ref=e247]:
+                    - generic [ref=e248]: 18 Jul
+                    - generic [ref=e250]: 20 Jul
+                    - generic [ref=e252]: 22 Jul
+                    - generic [ref=e254]: 24 Jul
+                    - generic [ref=e256]: 26 Jul
+                    - generic [ref=e258]: 28 Jul
+                    - generic [ref=e260]: 30 Jul
+                    - generic [ref=e262]: 02 Agu
+                    - generic [ref=e264]: 05 Agu
+                    - generic [ref=e266]: 08 Agu
+                    - generic [ref=e268]: 11 Agu
+                    - generic [ref=e270]: 16 Agu
+                  - generic [ref=e273]:
+                    - generic [ref=e274]: Rp0
+                    - generic [ref=e276]: Rp1
+                    - generic [ref=e278]: Rp2
+                    - generic [ref=e280]: Rp3
+                    - generic [ref=e282]: Rp4
+              - generic [ref=e286]:
+                - generic [ref=e287]: Popularitas Paket
+                - generic [ref=e288]: Proporsi penjualan per paket
+            - generic [ref=e294]:
+              - generic [ref=e295]:
+                - generic [ref=e296]: Pesanan Terbaru
+                - generic [ref=e297]: 5 transaksi terakhir
+              - generic [ref=e299]:
+                - generic [ref=e300]:
+                  - generic [ref=e301]: FH
+                  - generic [ref=e303]:
+                    - paragraph [ref=e304]: Fadli Hardiyanto
+                    - paragraph [ref=e305]: "@fadlihardiyanto · Paket B"
+                    - paragraph [ref=e306]: ORDER-7954499305-a8f77855-1784041197025316900 · 14 Jul, 21.59
+                  - generic [ref=e307]:
+                    - paragraph [ref=e308]: Rp 150.000
+                    - generic [ref=e309]: expired
+                - generic [ref=e310]:
+                  - generic [ref=e311]: FH
+                  - generic [ref=e313]:
+                    - paragraph [ref=e314]: Fadli Hardiyanto
+                    - paragraph [ref=e315]: "@fadlihardiyanto · Paket C"
+                    - paragraph [ref=e316]: ORDER-7954499305-52677a46-1783694052145453700 · 10 Jul, 21.34
+                  - generic [ref=e317]:
+                    - paragraph [ref=e318]: Rp 150.000
+                    - generic [ref=e319]: paid
+                - generic [ref=e320]:
+                  - generic [ref=e321]: FH
+                  - generic [ref=e323]:
+                    - paragraph [ref=e324]: Fadli Hardiyanto
+                    - paragraph [ref=e325]: "@fadlihardiyanto · Paket A"
+                    - paragraph [ref=e326]: ORDER-7954499305-c092cc05-1783692663253828000 · 10 Jul, 21.11
+                  - generic [ref=e327]:
+                    - paragraph [ref=e328]: Rp 150.000
+                    - generic [ref=e329]: expired
+                - generic [ref=e330]:
+                  - generic [ref=e331]: FH
+                  - generic [ref=e333]:
+                    - paragraph [ref=e334]: Fadli Hardiyanto
+                    - paragraph [ref=e335]: "@fadlihardiyanto · Paket B"
+                    - paragraph [ref=e336]: ORDER-7954499305-a8f77855-1783691731618792600 · 10 Jul, 20.55
+                  - generic [ref=e337]:
+                    - paragraph [ref=e338]: Rp 150.000
+                    - generic [ref=e339]: expired
+                - generic [ref=e340]:
+                  - generic [ref=e341]: FH
+                  - generic [ref=e343]:
+                    - paragraph [ref=e344]: Fadli Hardiyanto
+                    - paragraph [ref=e345]: "@fadlihardiyanto · Paket A"
+                    - paragraph [ref=e346]: ORDER-7954499305-c092cc05-1783438995458576000 · 07 Jul, 22.43
+                  - generic [ref=e347]:
+                    - paragraph [ref=e348]: Rp 150.000
+                    - generic [ref=e349]: paid
+        - generic:
+          - generic:
+            - generic:
+              - generic [ref=e350]:
+                - generic:
+                  - heading "Pusat Bantuan" [level=2]
+                - button "Close info panel" [ref=e352] [cursor=pointer]
+              - generic [ref=e354]:
+                - generic:
+                  - heading "Butuh bantuan?" [level=3]
+                  - paragraph: Konsultasikan kendala Anda dengan tim dukungan kami melalui Telegram.
+                  - generic:
+                    - heading "Pelajari lebih lanjut" [level=4]
+                    - list:
+                      - listitem:
+                        - link "Hubungi Dukungan":
+                          - /url: https://t.me/UrationSupportBot
+                          - img:
+                            - generic [ref=e356] [cursor=pointer]
+              - button "Toggle Infobar" [ref=e357]
+  - generic [ref=e358]: Rp0

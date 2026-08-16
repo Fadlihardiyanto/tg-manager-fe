@@ -7,7 +7,7 @@ export async function GET() {
     const refreshToken = cookieStore.get('refresh_token')?.value;
 
     if (!refreshToken) {
-      return NextResponse.json({ error: 'No session' }, { status: 401 });
+      return NextResponse.json({ accessToken: null });
     }
 
     const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080';
@@ -19,14 +19,14 @@ export async function GET() {
     });
 
     if (!refreshRes.ok) {
-      return NextResponse.json({ error: 'Refresh failed' }, { status: 401 });
+      return NextResponse.json({ accessToken: null });
     }
 
     const refreshData = await refreshRes.json();
     const accessToken = refreshData?.data?.access_token;
 
     if (!accessToken) {
-      return NextResponse.json({ error: 'No access token in refresh response' }, { status: 401 });
+      return NextResponse.json({ accessToken: null });
     }
 
     const meRes = await fetch(`${BASE_URL}/api/v1/auth/me`, {
@@ -35,13 +35,13 @@ export async function GET() {
     });
 
     if (!meRes.ok) {
-      return NextResponse.json({ error: 'Failed to fetch user' }, { status: 401 });
+      return NextResponse.json({ accessToken: null });
     }
 
     const meData = await meRes.json();
 
     if (!meData?.success || !meData?.data) {
-      return NextResponse.json({ error: 'Invalid user data' }, { status: 401 });
+      return NextResponse.json({ accessToken: null });
     }
 
     return NextResponse.json({

@@ -28,7 +28,7 @@ const Hero = () => {
             {t('description')}
           </p>
           <div className='mt-12 flex flex-col sm:flex-row items-center gap-4 animate-fade-up-delay-2'>
-            <Button size='lg' className='w-full sm:w-auto rounded-full text-base' asChild>
+            <Button size='lg' className='w-full sm:w-auto rounded-xl text-base' asChild>
               <Link href='/register-tenant'>
                 {t('getStarted')} <Icons.arrowUpRight className='h-5! w-5!' />
               </Link>
@@ -36,7 +36,7 @@ const Hero = () => {
             <Button
               variant='outline'
               size='lg'
-              className='w-full sm:w-auto rounded-full text-base shadow-none'
+              className='w-full sm:w-auto rounded-xl text-base shadow-none'
               onClick={() => setIsDemoOpen(true)}
             >
               <Icons.play className='h-5! w-5!' /> {t('watchDemo')}
@@ -57,7 +57,7 @@ const Hero = () => {
         <div className='overflow-hidden rounded-lg border border-border bg-background'>
           <video
             key={isDemoOpen ? 'open' : 'closed'}
-            src='/Urator.mp4'
+            src='/Uration.mp4'
             controls
             autoPlay
             muted

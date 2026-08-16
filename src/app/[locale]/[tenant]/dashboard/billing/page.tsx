@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function BillingPage() {
   return (
-    <PageContainer pageTitle='Billing Plan'>
+    <PageContainer pageTitle='Paket Billing'>
       <ActivePlanPage />
     </PageContainer>
   );

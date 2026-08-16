@@ -15,7 +15,7 @@ export default function AdminLoginPageLayout() {
               <Image
                 src='/uration-landscape.png'
                 alt='Urator Logo'
-                width={160}
+                width={96}
                 height={32}
                 className='h-8 w-auto object-contain'
               />

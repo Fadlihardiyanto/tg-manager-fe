@@ -1,0 +1,22 @@
+- generic [active] [ref=e1]:
+  - link "Lewati ke konten utama" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - region "Notifications alt+T"
+  - generic [ref=e9]:
+    - link "Kembali ke Beranda" [ref=e11] [cursor=pointer]:
+      - /url: /
+    - generic [ref=e13]:
+      - banner [ref=e14]:
+        - img "Urator Logo" [ref=e16]
+        - heading "Lupa kata sandi?" [level=1] [ref=e17]
+        - paragraph [ref=e18]: Masukkan email Anda, kami akan mengirim tautan reset.
+      - generic [ref=e19]:
+        - group [ref=e20]:
+          - group [ref=e21]:
+            - generic [ref=e22] [cursor=pointer]: Alamat email
+            - textbox "Alamat email" [ref=e24]
+        - button "Kirim Tautan Reset" [ref=e26] [cursor=pointer]
+      - contentinfo [ref=e28]:
+        - link "Kembali ke Masuk" [ref=e29] [cursor=pointer]:
+          - /url: /login
+  - button "Open Next.js Dev Tools" [ref=e38] [cursor=pointer]

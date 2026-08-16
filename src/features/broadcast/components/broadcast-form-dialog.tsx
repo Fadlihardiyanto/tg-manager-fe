@@ -63,7 +63,7 @@ const broadcastFormSchema = z.object({
 type BroadcastFormValues = z.infer<typeof broadcastFormSchema>;
 
 const TARGET_OPTIONS = [
-  { value: 'group', label: 'Grup (semua grup aktif)' },
+  { value: 'group', label: 'Grup' },
   { value: 'member', label: 'Member (semua chat DM member)' }
 ];
 
@@ -84,6 +84,7 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
   const { canUseFeature, hasQuota } = useActivePlan();
   const [showQuotaAlert, setShowQuotaAlert] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [groupScope, setGroupScope] = useState<'all' | 'selected'>('all');
 
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -218,6 +219,11 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
         }
       }
 
+      if (value.target_type === 'group' && groupScope === 'selected' && !value.group_ids?.length) {
+        toast.error('Pilih minimal satu grup untuk dikirim');
+        return;
+      }
+
       await mutation.mutateAsync({
         botId,
         data: {
@@ -303,6 +309,7 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
             form.reset();
             setUploadError(null);
             setIsUploading(false);
+            setGroupScope('all');
           }
           onOpenChange(v);
         }}
@@ -342,72 +349,102 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
 
                 {targetType === 'group' && botGroups.length > 0 && (
                   <div className='space-y-2'>
-                    <div className='flex items-center justify-between gap-2'>
-                      <p className='text-xs text-muted-foreground'>
-                        {selectedGroupIds.length > 0
-                          ? `${selectedGroupIds.length} grup terpilih`
-                          : 'Semua grup (kosongkan = semua)'}
-                      </p>
-                      <button
-                        type='button'
-                        className='text-xs text-primary hover:underline'
-                        onClick={() =>
-                          form.setFieldValue(
-                            'group_ids',
-                            selectedGroupIds.length > 0 ? [] : botGroups.map((g) => g.id)
-                          )
-                        }
-                      >
-                        {selectedGroupIds.length > 0 ? 'Hapus Semua' : 'Pilih Semua'}
-                      </button>
+                    <div className='flex flex-col gap-1.5'>
+                      <label className='flex cursor-pointer items-center gap-2 text-sm'>
+                        <input
+                          type='radio'
+                          aria-label='Semua grup aktif'
+                          className='accent-primary'
+                          checked={groupScope === 'all'}
+                          onChange={() => {
+                            setGroupScope('all');
+                            form.setFieldValue('group_ids', []);
+                          }}
+                        />
+                        Semua grup aktif
+                      </label>
+                      <label className='flex cursor-pointer items-center gap-2 text-sm'>
+                        <input
+                          type='radio'
+                          aria-label='Pilih grup tertentu'
+                          className='accent-primary'
+                          checked={groupScope === 'selected'}
+                          onChange={() => setGroupScope('selected')}
+                        />
+                        Pilih grup tertentu
+                      </label>
                     </div>
-                    <div className='max-h-[160px] overflow-y-auto rounded-lg border p-2 space-y-0.5'>
-                      {botGroups.length === 0 && (
-                        <p className='py-2 text-center text-xs text-muted-foreground'>
-                          Tidak ada grup terhubung
-                        </p>
-                      )}
-                      {botGroups.map((group) => {
-                        return (
-                          <div
-                            key={group.id}
-                            role='checkbox'
-                            aria-checked={selectedGroupIds.includes(group.id)}
-                            aria-label={group.name}
-                            tabIndex={0}
-                            className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted/50 text-sm'
-                            onClick={() => {
-                              const isChecked = selectedGroupIds.includes(group.id);
-                              const next = isChecked
-                                ? selectedGroupIds.filter((id) => id !== group.id)
-                                : [...selectedGroupIds, group.id];
-                              form.setFieldValue('group_ids', next);
-                            }}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter' || e.key === ' ') {
-                                e.preventDefault();
-                                const isChecked = selectedGroupIds.includes(group.id);
-                                const next = isChecked
-                                  ? selectedGroupIds.filter((id) => id !== group.id)
-                                  : [...selectedGroupIds, group.id];
-                                form.setFieldValue('group_ids', next);
-                              }
-                            }}
+
+                    {groupScope === 'selected' && (
+                      <div className='space-y-2'>
+                        <div className='flex items-center justify-between gap-2'>
+                          <p className='text-xs text-muted-foreground'>
+                            {selectedGroupIds.length > 0
+                              ? `${selectedGroupIds.length} grup terpilih`
+                              : 'Belum ada grup dipilih'}
+                          </p>
+                          <button
+                            type='button'
+                            className='text-xs text-primary hover:underline'
+                            onClick={() =>
+                              form.setFieldValue(
+                                'group_ids',
+                                selectedGroupIds.length > 0 ? [] : botGroups.map((g) => g.id)
+                              )
+                            }
                           >
-                            <Checkbox
-                              checked={selectedGroupIds.includes(group.id)}
-                              tabIndex={-1}
-                              aria-hidden
-                              className='pointer-events-none'
-                            />
-                            <span className='flex-1 truncate'>{group.name}</span>
-                            <span className='shrink-0 text-xs text-muted-foreground tabular-nums'>
-                              {group.member_count}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
+                            {selectedGroupIds.length > 0 ? 'Hapus Semua' : 'Pilih Semua'}
+                          </button>
+                        </div>
+                        <div className='max-h-[160px] overflow-y-auto rounded-lg border p-2 space-y-0.5'>
+                          {botGroups.length === 0 && (
+                            <p className='py-2 text-center text-xs text-muted-foreground'>
+                              Tidak ada grup terhubung
+                            </p>
+                          )}
+                          {botGroups.map((group) => {
+                            return (
+                              <div
+                                key={group.id}
+                                role='checkbox'
+                                aria-checked={selectedGroupIds.includes(group.id)}
+                                aria-label={group.name}
+                                tabIndex={0}
+                                className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted/50 text-sm'
+                                onClick={() => {
+                                  const isChecked = selectedGroupIds.includes(group.id);
+                                  const next = isChecked
+                                    ? selectedGroupIds.filter((id) => id !== group.id)
+                                    : [...selectedGroupIds, group.id];
+                                  form.setFieldValue('group_ids', next);
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    const isChecked = selectedGroupIds.includes(group.id);
+                                    const next = isChecked
+                                      ? selectedGroupIds.filter((id) => id !== group.id)
+                                      : [...selectedGroupIds, group.id];
+                                    form.setFieldValue('group_ids', next);
+                                  }
+                                }}
+                              >
+                                <Checkbox
+                                  checked={selectedGroupIds.includes(group.id)}
+                                  tabIndex={-1}
+                                  aria-hidden
+                                  className='pointer-events-none'
+                                />
+                                <span className='flex-1 truncate'>{group.name}</span>
+                                <span className='shrink-0 text-xs text-muted-foreground tabular-nums'>
+                                  {group.member_count}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -562,7 +599,7 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
         targetLabel={targetLabel}
         file={uploadedFile}
         messageType={messageType}
-        groupCount={reach?.group_count}
+        groupCount={groupScope === 'selected' ? selectedGroupIds.length : reach?.group_count}
         memberCount={reach?.member_count}
         selectedGroupNames={selectedGroupNames}
         isScheduled={sendMode === 'scheduled'}

@@ -17,7 +17,7 @@ export default async function MembersPage(props: PageProps) {
   const activeTab = parsed.tab === 'migration' ? 'migration' : 'active';
 
   return (
-    <PageContainer pageTitle='Members' pageDescription='Kelola anggota grup dan langganan mereka'>
+    <PageContainer pageTitle='Member' pageDescription='Kelola anggota grup dan langganan mereka'>
       <div className='flex flex-1 flex-col gap-4 min-h-0'>
         <MembersPageTabs />
         {activeTab === 'migration' ? <MigrationMemberListing /> : <MemberListing />}

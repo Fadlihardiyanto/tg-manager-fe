@@ -44,7 +44,7 @@ const Footer = () => {
             <Image
               src='/uration-landscape.png'
               alt='Urator Logo'
-              width={160}
+              width={96}
               height={32}
               className='h-12 w-auto object-contain -ml-2'
             />

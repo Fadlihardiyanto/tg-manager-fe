@@ -10,26 +10,23 @@ import { formatDate, formatRupiah } from '@/lib/format';
 const statusConfig: Record<string, { label: string; className: string }> = {
   pending: {
     label: 'Menunggu',
-    className:
-      'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400 border-transparent'
+    className: 'bg-amber-500/10 text-amber-600 border-amber-500/20 dark:text-amber-400'
   },
   settled: {
     label: 'Selesai',
-    className:
-      'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 border-transparent'
+    className: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:text-emerald-400'
   },
   success: {
     label: 'Berhasil',
-    className:
-      'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 border-transparent'
+    className: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:text-emerald-400'
   },
   failed: {
     label: 'Gagal',
-    className: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 border-transparent'
+    className: 'bg-red-500/10 text-red-600 border-red-500/20 dark:text-red-400'
   },
   expired: {
     label: 'Kedaluwarsa',
-    className: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400 border-transparent'
+    className: 'bg-muted text-muted-foreground border-border'
   }
 };
 

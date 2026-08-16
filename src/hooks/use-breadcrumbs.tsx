@@ -53,15 +53,16 @@ const routeMapping: Record<string, BreadcrumbItem[]> = {
 };
 
 const labelMapping: Record<string, string> = {
-  Dashboard: 'Dashboard',
+  Dashboard: 'Dasbor',
+  Overview: 'Dasbor',
   Bots: 'Bot',
   Members: 'Member',
   Groups: 'Grup',
   Packages: 'Paket',
-  Commands: 'Command',
+  Commands: 'Perintah',
   Broadcast: 'Siaran',
   Midtrans: 'Midtrans',
-  Billing: 'Billing',
+  Billing: 'Penagihan',
   Discounts: 'Diskon'
 };
 

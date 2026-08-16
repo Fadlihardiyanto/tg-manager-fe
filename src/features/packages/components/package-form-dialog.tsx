@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dialog';
 import { FieldGroup, FieldLabel, FieldDescription } from '@/components/ui/field';
 import { Icons } from '@/components/icons';
+import { AlertModal } from '@/components/modal/alert-modal';
 import { useMutation, useSuspenseQuery, useQueryClient } from '@tanstack/react-query';
 import {
   createPackageMutation,
@@ -64,6 +65,7 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
   const queryClient = useQueryClient();
   const { hasQuota } = useActivePlan();
   const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
+  const [confirmDiscardOpen, setConfirmDiscardOpen] = useState(false);
   const canCreatePackage = isEdit || hasQuota('packages');
 
   // Seed group associations when editing an existing package
@@ -356,13 +358,7 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
               variant='outline'
               onClick={() => {
                 if (isDirty) {
-                  if (
-                    confirm('Anda memiliki perubahan yang belum disimpan. Yakin ingin membatalkan?')
-                  ) {
-                    form.reset();
-                    setSelectedGroupIds([]);
-                    onOpenChange(false);
-                  }
+                  setConfirmDiscardOpen(true);
                 } else {
                   form.reset();
                   setSelectedGroupIds([]);
@@ -384,6 +380,20 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
           </DialogFooter>
         </div>
       </DialogContent>
+
+      <AlertModal
+        isOpen={confirmDiscardOpen}
+        onClose={() => setConfirmDiscardOpen(false)}
+        onConfirm={() => {
+          form.reset();
+          setSelectedGroupIds([]);
+          setConfirmDiscardOpen(false);
+          onOpenChange(false);
+        }}
+        loading={false}
+        title='Batalkan perubahan?'
+        description='Anda memiliki perubahan yang belum disimpan. Yakin ingin membatalkan?'
+      />
     </Dialog>
   );
 }

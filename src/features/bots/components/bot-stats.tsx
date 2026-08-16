@@ -65,7 +65,7 @@ export function BotStats() {
           <Card
             key={c.label}
             className={cn(
-              'group relative gap-2 overflow-hidden border-border/70 bg-gradient-to-br py-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md',
+              'group relative gap-2 overflow-hidden border-border/70 bg-gradient-to-br py-5 shadow-sm transition-colors duration-200 hover:border-border',
               c.accent,
               ANIMATE[i]
             )}

@@ -72,8 +72,8 @@ const RegisterForm = () => {
           <Image
             src='/uration-blue-version.png'
             alt='Urator Logo'
-            width={160}
-            height={32}
+            width={64}
+            height={64}
             className='relative h-full w-auto object-contain'
           />
         </div>
@@ -130,6 +130,7 @@ const RegisterForm = () => {
                 autoComplete='new-password'
                 name='password'
                 hideError
+                aria-describedby='password-requirements'
                 leftIcon={<Icons.lock className='h-5 w-5' />}
                 rightElement={
                   <button
@@ -151,7 +152,12 @@ const RegisterForm = () => {
             )}
           />
 
-          <div className='-mt-1 mb-1 flex flex-col gap-1.5'>
+          <div
+            id='password-requirements'
+            role='status'
+            aria-live='polite'
+            className='-mt-1 mb-1 flex flex-col gap-1.5'
+          >
             <ValidationItem label='Minimal 8 karakter' valid={passwordChecks.length} />
             <ValidationItem
               label='Minimal satu angka (0-9) atau simbol'
@@ -231,9 +237,9 @@ function ValidationItem({ label, valid }: { label: string; valid: boolean }) {
       }`}
     >
       {valid ? (
-        <Icons.check className='h-3.5 w-3.5 text-green-500' />
+        <Icons.check aria-hidden='true' className='h-3.5 w-3.5 text-green-500' />
       ) : (
-        <span className='h-1.5 w-1.5 rounded-full bg-muted-foreground' />
+        <span aria-hidden='true' className='h-1.5 w-1.5 rounded-full bg-muted-foreground' />
       )}
       <span>{label}</span>
     </div>

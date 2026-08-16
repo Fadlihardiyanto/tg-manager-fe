@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function DiscountsPage() {
   return (
-    <PageContainer pageTitle='Discounts'>
+    <PageContainer pageTitle='Diskon'>
       <DiscountListing />
     </PageContainer>
   );

@@ -51,7 +51,7 @@ export function DataTableToolbar<TData>({
         ))}
         {isFiltered && (
           <Button
-            aria-label='Reset filters'
+            aria-label='Atur ulang filter'
             variant='outline'
             size='sm'
             className='h-10 rounded-full border-border px-4 text-sm font-bold'

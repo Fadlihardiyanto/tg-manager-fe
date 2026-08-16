@@ -13,22 +13,19 @@ import { formatDate } from '@/lib/format';
 const statusConfig: Record<string, { label: string; className: string }> = {
   pending: {
     label: 'Menunggu',
-    className:
-      'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400 border-transparent'
+    className: 'bg-amber-500/10 text-amber-600 border-amber-500/20 dark:text-amber-400'
   },
   processing: {
     label: 'Diproses',
-    className: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 border-transparent'
+    className: 'bg-sky-500/10 text-sky-600 border-sky-500/20 dark:text-sky-400'
   },
   completed: {
     label: 'Selesai',
-    className:
-      'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 border-transparent'
+    className: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:text-emerald-400'
   },
   scheduled: {
     label: 'Terjadwal',
-    className:
-      'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400 border-transparent'
+    className: 'bg-violet-500/10 text-violet-600 border-violet-500/20 dark:text-violet-400'
   }
 };
 

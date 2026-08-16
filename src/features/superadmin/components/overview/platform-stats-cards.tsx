@@ -76,7 +76,7 @@ export function PlatformStatsCards(props: PlatformStatsCardsProps) {
           <Card
             key={c.label}
             className={cn(
-              '@container/card overflow-hidden border-border/70 bg-gradient-to-br shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md',
+              '@container/card overflow-hidden border-border/70 bg-gradient-to-br shadow-sm transition-colors duration-200 hover:border-border',
               c.accent
             )}
           >

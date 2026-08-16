@@ -105,7 +105,7 @@ export function TenantLoginForm({ ...props }: React.ComponentProps<'form'>) {
           <Image
             src='/uration-landscape.png'
             alt='Urator Logo'
-            width={160}
+            width={96}
             height={32}
             className='relative h-full w-auto object-contain'
           />

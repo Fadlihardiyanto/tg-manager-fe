@@ -1,0 +1,154 @@
+- generic [active] [ref=f5e1]:
+  - link "Lewati ke konten utama" [ref=f5e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - region "Notifications alt+T"
+  - generic [ref=f5e3]:
+    - generic [ref=f5e6]:
+      - img "Urator" [ref=f5e10]
+      - generic [ref=f5e12]:
+        - generic [ref=f5e13]: Overview
+        - list [ref=f5e14]:
+          - listitem [ref=f5e15]:
+            - link [ref=f5e16] [cursor=pointer]:
+              - /url: /crypto-bro/dashboard/overview
+          - listitem [ref=f5e22]:
+            - link [ref=f5e23] [cursor=pointer]:
+              - /url: /crypto-bro/dashboard/midtrans
+          - listitem [ref=f5e27]:
+            - link [ref=f5e28] [cursor=pointer]:
+              - /url: /crypto-bro/dashboard/transactions
+          - listitem [ref=f5e32]:
+            - link [ref=f5e33] [cursor=pointer]:
+              - /url: /crypto-bro/dashboard/bots
+          - listitem [ref=f5e37]:
+            - link [ref=f5e38] [cursor=pointer]:
+              - /url: /crypto-bro/dashboard/members
+          - listitem [ref=f5e42]:
+            - link [ref=f5e43] [cursor=pointer]:
+              - /url: /crypto-bro/dashboard/groups
+          - listitem [ref=f5e51]:
+            - link [ref=f5e52] [cursor=pointer]:
+              - /url: /crypto-bro/dashboard/packages
+          - listitem [ref=f5e56]:
+            - link [ref=f5e57] [cursor=pointer]:
+              - /url: /crypto-bro/dashboard/commands
+          - listitem [ref=f5e60]:
+            - link [ref=f5e61] [cursor=pointer]:
+              - /url: /crypto-bro/dashboard/broadcast
+      - list [ref=f5e66]:
+        - listitem [ref=f5e67]:
+          - button "Menu akun" [ref=f5e68] [cursor=pointer]:
+            - generic [ref=f5e69]: U
+      - button "Toggle Sidebar" [ref=f5e70]
+    - main [ref=f5e71]:
+      - generic [ref=f5e72]:
+        - generic [ref=f5e73]:
+          - button "Toggle Sidebar" [ref=f5e74] [cursor=pointer]
+          - navigation "breadcrumb" [ref=f5e76]:
+            - list [ref=f5e77]:
+              - listitem [ref=f5e78]:
+                - link "Dasbor" [ref=f5e79] [cursor=pointer]:
+                  - /url: /crypto-bro/dashboard/overview
+              - listitem [ref=f5e80]
+              - link "Perintah" [disabled] [ref=f5e83]
+        - button "Search... Ctrl K" [ref=f5e87] [cursor=pointer]:
+          - text: Search...
+          - generic:
+            - generic: Ctrl
+            - text: K
+      - generic [ref=f5e88]:
+        - generic [ref=f5e89]:
+          - generic [ref=f5e93]:
+            - heading "Perintah" [level=1] [ref=f5e95]
+            - paragraph [ref=f5e96]: Buat perintah kustom untuk bot Telegram Anda
+          - generic [ref=f5e99]:
+            - generic [ref=f5e101]:
+              - heading "Daftar Perintah" [level=2] [ref=f5e102]
+              - paragraph [ref=f5e103]: Kelola perintah kustom, akses, tipe balasan, dan status aktifnya.
+            - toolbar [ref=f5e105]:
+              - generic [ref=f5e106]:
+                - textbox "Cari perintah..." [ref=f5e107]
+                - button "Username Bot" [ref=f5e108] [cursor=pointer]
+                - button "Akses" [ref=f5e109] [cursor=pointer]
+                - button "Tipe" [ref=f5e110] [cursor=pointer]
+                - button "Status" [ref=f5e111] [cursor=pointer]
+              - generic [ref=f5e112]:
+                - button "Limit Tercapai" [disabled]
+                - button "Toggle columns" [ref=f5e113] [cursor=pointer]: View
+            - table [ref=f5e119]:
+              - rowgroup [ref=f5e120]:
+                - row [ref=f5e121]:
+                  - columnheader [ref=f5e122]:
+                    - checkbox "Pilih semua perintah di halaman ini" [ref=f5e123] [cursor=pointer]
+                    - checkbox
+                  - columnheader [ref=f5e124]:
+                    - button "Perintah" [ref=f5e125] [cursor=pointer]
+                  - columnheader [ref=f5e128]:
+                    - button "Username Bot" [ref=f5e129] [cursor=pointer]
+                  - columnheader [ref=f5e132]:
+                    - button "Akses" [ref=f5e133] [cursor=pointer]
+                  - columnheader [ref=f5e134]:
+                    - button "Tipe" [ref=f5e135] [cursor=pointer]
+                  - columnheader [ref=f5e138]:
+                    - button "Balasan / Media" [ref=f5e139] [cursor=pointer]
+                  - columnheader [ref=f5e140]:
+                    - button "Status" [ref=f5e141] [cursor=pointer]
+                  - columnheader [ref=f5e142]:
+                    - button "Dibuat" [ref=f5e143] [cursor=pointer]
+                  - columnheader [ref=f5e146]
+              - rowgroup [ref=f5e147]:
+                - row [ref=f5e148]:
+                  - cell [ref=f5e149]:
+                    - checkbox "Pilih perintah" [ref=f5e150] [cursor=pointer]
+                    - checkbox
+                  - cell [ref=f5e151]:
+                    - code [ref=f5e153]: /halo
+                  - cell "@UratorBot" [ref=f5e154]
+                  - 'cell "Member / DM Paket: semua · Grup: semua" [ref=f5e155]':
+                    - generic [ref=f5e156]:
+                      - generic [ref=f5e157]: Member / DM
+                      - generic [ref=f5e158]: "Paket: semua · Grup: semua"
+                  - cell "Teks" [ref=f5e159]
+                  - cell "Halo saya budi" [ref=f5e161]
+                  - cell [ref=f5e164]:
+                    - switch "Nonaktifkan perintah" [checked] [ref=f5e165] [cursor=pointer]
+                    - checkbox [checked]
+                  - cell "Jul 31, 2026" [ref=f5e166]
+                  - cell [ref=f5e167]:
+                    - generic [ref=f5e168]:
+                      - button [ref=f5e169] [cursor=pointer]
+                      - button [ref=f5e170] [cursor=pointer]
+            - generic [ref=f5e172]:
+              - generic [ref=f5e173]: 1 baris total
+              - generic [ref=f5e174]:
+                - generic [ref=f5e175]:
+                  - paragraph [ref=f5e176]: Baris per halaman
+                  - combobox [ref=f5e177] [cursor=pointer]
+                  - combobox [ref=f5e178]
+                - generic [ref=f5e179]: Page 1 of -1
+                - generic [ref=f5e180]:
+                  - button "Go to first page" [disabled]
+                  - button "Go to previous page" [disabled]
+                  - button "Go to next page" [ref=f5e181] [cursor=pointer]
+                  - button "Go to last page" [ref=f5e182] [cursor=pointer]
+        - generic:
+          - generic:
+            - generic:
+              - generic [ref=f5e183]:
+                - generic:
+                  - heading "Documentation" [level=2]
+                - button "Close info panel" [ref=f5e185] [cursor=pointer]
+              - generic [ref=f5e187]:
+                - generic:
+                  - heading "Getting Started" [level=3]
+                  - paragraph: Learn how to get started with this application.
+                  - generic:
+                    - heading "Learn more" [level=4]
+                    - list:
+                      - listitem:
+                        - link "Installation Guide":
+                          - /url: "#"
+                          - img:
+                            - generic [ref=f5e189] [cursor=pointer]
+              - button "Toggle Infobar" [ref=f5e190]
+  - button "Open Next.js Dev Tools" [ref=f5e196] [cursor=pointer]

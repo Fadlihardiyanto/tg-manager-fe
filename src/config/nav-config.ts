@@ -38,7 +38,7 @@ export const navGroups: NavGroup[] = [
     label: 'Overview',
     items: [
       {
-        title: 'Dashboard',
+        title: 'Dasbor',
         url: '/dashboard/overview',
         icon: 'dashboard',
         isActive: false,
@@ -61,7 +61,7 @@ export const navGroups: NavGroup[] = [
       },
 
       {
-        title: 'Bots',
+        title: 'Bot',
         url: '/dashboard/bots',
         icon: 'bot',
         shortcut: ['b', 'b'],
@@ -69,14 +69,14 @@ export const navGroups: NavGroup[] = [
         items: []
       },
       {
-        title: 'Members',
+        title: 'Member',
         url: '/dashboard/members',
         icon: 'user',
         isActive: false,
         items: []
       },
       {
-        title: 'Groups',
+        title: 'Grup',
         url: '/dashboard/groups',
         icon: 'groups',
         shortcut: ['g', 'g'],
@@ -84,21 +84,21 @@ export const navGroups: NavGroup[] = [
         items: []
       },
       {
-        title: 'Packages',
+        title: 'Paket',
         url: '/dashboard/packages',
         icon: 'coin',
         isActive: false,
         items: []
       },
       {
-        title: 'Commands',
+        title: 'Perintah',
         url: '/dashboard/commands',
         icon: 'command',
         isActive: false,
         items: []
       },
       {
-        title: 'Broadcast',
+        title: 'Siaran',
         url: '/dashboard/broadcast',
         icon: 'send',
         shortcut: ['b', 'r'],

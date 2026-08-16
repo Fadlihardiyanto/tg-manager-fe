@@ -46,7 +46,7 @@ export function QuotaCard({ resource, title, className }: QuotaCardProps) {
         size='sm'
         className='self-start rounded-full text-xs font-bold tracking-wider uppercase sm:self-center'
       >
-        <Link href={getTenantHref('/dashboard/billing?tab=upgrade')}>Upgrade Plan</Link>
+        <Link href={getTenantHref('/dashboard/billing?tab=upgrade')}>Tingkatkan Paket</Link>
       </Button>
     </div>
   );

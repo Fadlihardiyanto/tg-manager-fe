@@ -110,7 +110,7 @@ The system is built around a **flat-rest, subtle-hover** philosophy: surfaces si
 - Clean, flat surfaces with crisp 1px borders
 - Warm blue primary accent (the "Command" blue) — used sparingly for actionable elements
 - Spacious typography with Satoshi as the primary voice — modern, approachable, professional
-- Generous rounded corners (12px on cards, 6px on buttons/inputs)
+- Generous rounded corners (16px on cards, 12px on buttons/inputs)
 - Subtle hover lift (`hover:-translate-y-0.5` + `hover:shadow-md`) as the primary interaction feedback
 - Indonesian-first UI with consistent, predictable patterns
 
@@ -202,11 +202,10 @@ The project's shadow CSS variables are currently set to `none`. Re-enabling for 
 
 | Token | Value | Used For |
 |-------|-------|----------|
-| `rounded-sm` | 4px | Buttons (compact), skeleton elements |
-| `rounded-md` | 6px | Default buttons, inputs, selects |
+| `rounded-sm` | 4px | Skeleton elements, compact surfaces |
+| `rounded-xl` | 12px | Buttons, inputs, selects, cards, dialogs, sheets, modals |
 | `rounded-lg` | 8px | Sidebar items, menu items |
-| `rounded-xl` | 12px | Cards, dialogs, sheets, modals |
-| `rounded-2xl` | 16px | Quota cards, large containers |
+| `rounded-2xl` | 16px | Quota cards, large containers, landing pricing cards |
 | `rounded-full` | 9999px | Badges, pills, status indicators, "Tambah" buttons |
 
 - **Borders:** 1px solid, `border-border` — the signature element that defines card boundaries without shadows.
@@ -218,7 +217,7 @@ The project's shadow CSS variables are currently set to `none`. Re-enabling for 
 
 ### Buttons
 
-- **Shape:** `rounded-md` (6px), 1px border for outline variant.
+- **Shape:** `rounded-xl` (12px), 1px border for outline variant.
 - **States:** Smooth `transition-all duration-200`. Hover reduces opacity for solid variants (`hover:bg-primary/90`); outline gets a background shift (`hover:bg-accent`). Focus state uses `focus-visible:ring-ring/50 focus-visible:ring-[3px]` ring.
 - **Loading:** Buttons with `isLoading` use a grid-overlay pattern — children become invisible, a `<Spinner />` appears in their place, maintaining the button's intrinsic width and preventing layout shift.
 - **Icons:** Icons in buttons are capped at 16px (`[&_svg:not([class*='size-'])]:size-4`) and aligned inline. The `has-[>svg]:px-*` pattern adjusts horizontal padding when a button only contains an icon.

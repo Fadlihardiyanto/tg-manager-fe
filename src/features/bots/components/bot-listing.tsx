@@ -28,7 +28,15 @@ export default async function BotListing() {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <Suspense fallback={<Skeleton className='h-64 w-full' />}>
+      <Suspense
+        fallback={
+          <div className='grid gap-5 sm:grid-cols-2 xl:grid-cols-3'>
+            {[1, 2, 3].map((i) => (
+              <Skeleton key={i} className='h-56 w-full rounded-2xl' />
+            ))}
+          </div>
+        }
+      >
         <BotListingContent />
       </Suspense>
     </HydrationBoundary>

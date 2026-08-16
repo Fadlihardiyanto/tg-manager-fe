@@ -5,7 +5,6 @@ import type { Member, Subscription } from '../../api/types';
 import { Column, ColumnDef } from '@tanstack/react-table';
 import { Icons } from '@/components/icons';
 import { CellAction } from './cell-action';
-import { STATUS_OPTIONS } from './options';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { id as idLocale } from 'date-fns/locale';
@@ -55,7 +54,7 @@ export const columns: ColumnDef<Member>[] = [
           table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label='Select all'
+        aria-label='Pilih semua'
         className='translate-y-[2px]'
       />
     ),
@@ -63,7 +62,7 @@ export const columns: ColumnDef<Member>[] = [
       <Checkbox
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label='Select row'
+        aria-label='Pilih baris'
         className='translate-y-[2px]'
       />
     ),

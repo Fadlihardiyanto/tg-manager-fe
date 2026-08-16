@@ -31,6 +31,17 @@ function getSubscriptionDateText(sub: Subscription) {
     : '-';
 }
 
+const subscriptionStatusLabels: Record<string, string> = {
+  active: 'Aktif',
+  expired: 'Kedaluwarsa',
+  cancelled: 'Dibatalkan',
+  pending: 'Menunggu'
+};
+
+function statusLabel(status: string) {
+  return `Langganan ${subscriptionStatusLabels[status] ?? status}`;
+}
+
 export function MemberDetail({ memberId }: MemberDetailProps) {
   const [_, setMemberId] = useQueryState('memberId');
   const [tab, setTab] = useState('overview');
@@ -270,7 +281,7 @@ export function MemberDetail({ memberId }: MemberDetailProps) {
                           ? format(new Date(sub.activated_at), 'MMM dd, yyyy')
                           : '-'}
                     </p>
-                    <p className='text-sm font-bold capitalize'>Langganan {sub.status}</p>
+                    <p className='text-sm font-bold'>{statusLabel(sub.status)}</p>
                     <p className='text-xs text-muted-foreground'>{sub.package_name}</p>
                   </div>
                 ))

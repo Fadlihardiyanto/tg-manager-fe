@@ -224,18 +224,18 @@ export function getColumns(
           type === 'text'
             ? {
                 className:
-                  'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 hover:bg-blue-100',
+                  'bg-sky-500/10 text-sky-600 border-sky-500/20 dark:text-sky-400 hover:bg-sky-500/10',
                 label: 'Teks'
               }
             : type === 'photo'
               ? {
                   className:
-                    'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 hover:bg-green-100',
+                    'bg-sky-500/10 text-sky-600 border-sky-500/20 dark:text-sky-400 hover:bg-sky-500/10',
                   label: 'Foto'
                 }
               : {
                   className:
-                    'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300 hover:bg-red-100',
+                    'bg-sky-500/10 text-sky-600 border-sky-500/20 dark:text-sky-400 hover:bg-sky-500/10',
                   label: 'Dokumen'
                 };
         return <Badge className={badge.className}>{badge.label}</Badge>;

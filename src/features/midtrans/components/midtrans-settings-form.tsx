@@ -115,11 +115,11 @@ export function MidtransSettingsForm() {
         setShowSwitchDialog(false);
         setPendingEnvironment(null);
       } else {
-        toast.error(res.message || 'Gagal switch environment');
+        toast.error(res.message || 'Gagal mengganti environment');
       }
     },
     onError: () => {
-      toast.error('Gagal switch environment');
+      toast.error('Gagal mengganti environment');
       setShowSwitchDialog(false);
       setPendingEnvironment(null);
     }
@@ -485,7 +485,7 @@ export function MidtransSettingsForm() {
                     {settings?.is_sandbox ? 'Sandbox' : 'Production'}
                   </p>
                   <p className='text-xs text-muted-foreground'>
-                    {settings?.is_sandbox ? 'Testing environment' : 'Live environment'}
+                    {settings?.is_sandbox ? 'Environment uji coba' : 'Environment live'}
                   </p>
                 </div>
               </div>
@@ -542,7 +542,7 @@ export function MidtransSettingsForm() {
               {switchEnvironmentMutation.isPending && (
                 <p className='text-xs text-muted-foreground flex items-center gap-1.5'>
                   <Icons.spinner className='h-3 w-3 animate-spin' />
-                  Switching environment...
+                  Mengganti environment...
                 </p>
               )}
             </div>
@@ -669,7 +669,7 @@ export function MidtransSettingsForm() {
               .
               {pendingEnvironment === 'production' && (
                 <span className='block mt-2 text-amber-600 dark:text-amber-400 font-medium'>
-                  ⚠️ Production environment akan memproses transaksi nyata dengan uang asli.
+                  Production environment akan memproses transaksi nyata dengan uang asli.
                 </span>
               )}
             </AlertDialogDescription>
@@ -690,7 +690,7 @@ export function MidtransSettingsForm() {
               {switchEnvironmentMutation.isPending ? (
                 <>
                   <Icons.spinner className='mr-2 h-4 w-4 animate-spin' />
-                  Switching...
+                  Mengganti...
                 </>
               ) : (
                 <>

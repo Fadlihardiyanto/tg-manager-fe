@@ -91,7 +91,10 @@
     "yearly": "Tahunan",
     "perYear": "per tahun",
     "error": "Gagal memuat harga. Silakan coba lagi.",
-    "retry": "Coba Lagi"
+    "retry": "Coba Lagi",
+    "showAllFeatures": "Lihat semua fitur ({count})",
+    "showLess": "Tampilkan lebih sedikit",
+    "allFeatures": "Semua Fitur"
   },
   "Footer": {
     "brandDescription": "Platform penjaga & monetisasi Telegram otomatis. Fokus pada membangun komunitas, biar kami yang menangani pembayaran dan akses.",

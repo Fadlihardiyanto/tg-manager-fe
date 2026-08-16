@@ -16,15 +16,15 @@ import {
 
 // Default/fallback data when no content is set
 const defaultData = {
-  title: 'Documentation',
+  title: 'Pusat Bantuan',
   sections: [
     {
-      title: 'Getting Started',
-      description: 'Learn how to get started with this application.',
+      title: 'Butuh bantuan?',
+      description: 'Konsultasikan kendala Anda dengan tim dukungan kami melalui Telegram.',
       links: [
         {
-          title: 'Installation Guide',
-          url: '#'
+          title: 'Hubungi Dukungan',
+          url: 'https://t.me/UrationSupportBot'
         }
       ]
     }
@@ -63,7 +63,7 @@ export function InfoSidebar({ ...props }: React.ComponentProps<typeof Infobar>) 
                     {section.links && section.links.length > 0 && (
                       <div className='flex flex-col gap-2'>
                         <h4 className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
-                          Learn more
+                          Pelajari lebih lanjut
                         </h4>
                         <ul className='flex flex-col gap-1.5'>
                           {section.links.map((link) => (
@@ -86,7 +86,7 @@ export function InfoSidebar({ ...props }: React.ComponentProps<typeof Infobar>) 
                 ))
               ) : (
                 <div className='text-muted-foreground px-2 py-4 text-center text-sm'>
-                  No content available
+                  Belum ada konten
                 </div>
               )}
             </div>

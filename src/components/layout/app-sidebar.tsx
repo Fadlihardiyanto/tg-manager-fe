@@ -75,13 +75,13 @@ export default function AppSidebar({ navGroups }: { navGroups: NavGroup[] }) {
     <Sidebar collapsible='icon'>
       <SidebarHeader>
         <div className='flex items-center gap-3 px-2 py-1 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0'>
-          <div className='flex size-8 items-center justify-center overflow-hidden rounded-lg'>
+          <div className='flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-lg'>
             <Image
               src='/assets/uration-blue-logo.png'
               alt='Urator'
               width={28}
               height={28}
-              className='size-7 object-contain'
+              className='h-7 w-7 object-contain'
               priority
             />
           </div>

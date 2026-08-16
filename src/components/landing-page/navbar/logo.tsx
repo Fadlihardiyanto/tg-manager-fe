@@ -6,8 +6,8 @@ export const Logo = () => (
     <Image
       src='/uration-landscape.png'
       alt='Urator Logo'
-      width={280}
-      height={80}
+      width={168}
+      height={56}
       className='object-contain w-auto h-12 sm:h-16'
       priority
     />

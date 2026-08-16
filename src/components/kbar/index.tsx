@@ -6,7 +6,13 @@ import { useMemo } from 'react';
 import RenderResults from './render-result';
 import useThemeSwitching from './use-theme-switching';
 
-export default function KBar({ navGroups, children }: { navGroups: NavGroup[]; children: React.ReactNode }) {
+export default function KBar({
+  navGroups,
+  children
+}: {
+  navGroups: NavGroup[];
+  children: React.ReactNode;
+}) {
   const router = useRouter();
 
   const actions = useMemo(() => {
@@ -25,7 +31,7 @@ export default function KBar({ navGroups, children }: { navGroups: NavGroup[]; c
               shortcut: navItem.shortcut,
               keywords: navItem.title.toLowerCase(),
               section: 'Navigation',
-              subtitle: `Go to ${navItem.title}`,
+              subtitle: `Buka ${navItem.title}`,
               perform: () => navigateTo(navItem.url)
             }
           : null;
@@ -37,7 +43,7 @@ export default function KBar({ navGroups, children }: { navGroups: NavGroup[]; c
           shortcut: childItem.shortcut,
           keywords: childItem.title.toLowerCase(),
           section: navItem.title,
-          subtitle: `Go to ${childItem.title}`,
+          subtitle: `Buka ${childItem.title}`,
           perform: () => navigateTo(childItem.url)
         })) ?? [];
 

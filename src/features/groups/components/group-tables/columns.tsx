@@ -115,9 +115,9 @@ export function getColumns(onEdit?: (group: TelegramGroup) => void): ColumnDef<T
             className={cn(
               'font-semibold tabular-nums gap-1',
               count >= 100
-                ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:text-emerald-400'
+                ? 'bg-violet-500/10 text-violet-600 border-violet-500/20 dark:text-violet-400'
                 : count >= 50
-                  ? 'bg-sky-500/10 text-sky-600 border-sky-500/20 dark:text-sky-400'
+                  ? 'bg-violet-500/10 text-violet-600 border-violet-500/20 dark:text-violet-400 opacity-70'
                   : ''
             )}
           >

@@ -91,7 +91,10 @@
     "yearly": "Yearly",
     "perYear": "per year",
     "error": "Failed to load pricing. Please try again.",
-    "retry": "Retry"
+    "retry": "Retry",
+    "showAllFeatures": "See all features ({count})",
+    "showLess": "Show fewer",
+    "allFeatures": "All Features"
   },
   "Footer": {
     "brandDescription": "Automated Telegram gatekeeper & monetization platform. Focus on building your community, let us handle the payments and access.",

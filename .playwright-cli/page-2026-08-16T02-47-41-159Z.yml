@@ -1,0 +1,431 @@
+- generic [active] [ref=e1]:
+  - link "Lewati ke konten utama" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - region "Notifications alt+T"
+  - navigation [ref=e3]:
+    - generic [ref=e4]:
+      - link [ref=e5] [cursor=pointer]:
+        - /url: /
+        - img "Urator Logo" [ref=e6]
+      - navigation "Main" [ref=e7]:
+        - list [ref=e9]:
+          - listitem [ref=e10]:
+            - link "Beranda" [ref=e11] [cursor=pointer]:
+              - /url: /
+          - listitem [ref=e12]:
+            - link "Fitur" [ref=e13] [cursor=pointer]:
+              - /url: "#features"
+          - listitem [ref=e14]:
+            - link "FAQ" [ref=e15] [cursor=pointer]:
+              - /url: "#faq"
+          - listitem [ref=e16]:
+            - link "Harga" [ref=e17] [cursor=pointer]:
+              - /url: "#pricing"
+      - link "Masuk" [ref=e19] [cursor=pointer]:
+        - /url: /login
+  - generic [ref=e23]:
+    - generic [ref=e24]:
+      - heading "Otomatisasi Keanggotaan Grup Telegram Anda" [level=1] [ref=e25]
+      - paragraph [ref=e26]: Otomatisasi pengelolaan anggota, amankan akses khusus undangan, dan terima pembayaran instan via VA & QRIS untuk grup Telegram Anda.
+      - generic [ref=e27]:
+        - link "Mulai Sekarang" [ref=e28] [cursor=pointer]:
+          - /url: /register-tenant
+        - button "Lihat Demo" [ref=e29] [cursor=pointer]
+    - generic [ref=e31]:
+      - generic [ref=e32]:
+        - generic [ref=e37]: urato.com/dashboard
+        - generic [ref=e42]: A
+      - generic [ref=e51]:
+        - generic [ref=e52]:
+          - generic [ref=e53]:
+            - heading "Overview" [level=3] [ref=e54]
+            - paragraph [ref=e55]: Pantau performa bisnis Anda
+          - generic [ref=e56]:
+            - generic [ref=e57]: Cari...
+            - generic [ref=e65]: A
+        - generic [ref=e67]:
+          - generic [ref=e68]:
+            - generic [ref=e69]: Bot
+            - generic [ref=e70]: "3"
+          - generic [ref=e72]:
+            - generic [ref=e73]: Aktif
+            - generic [ref=e74]: "2"
+          - generic [ref=e76]:
+            - generic [ref=e77]: Grup
+            - generic [ref=e78]: "5"
+          - generic [ref=e80]:
+            - generic [ref=e81]: Member
+            - generic [ref=e82]: "142"
+        - generic [ref=e84]:
+          - generic [ref=e85]:
+            - heading "Bot Telegram" [level=4] [ref=e86]
+            - generic [ref=e87]: Lihat Semua →
+          - generic [ref=e88]:
+            - generic [ref=e91]:
+              - generic [ref=e98]:
+                - paragraph [ref=e99]: "@paymentBot"
+                - paragraph [ref=e100]: "ID: 7123456789"
+              - generic [ref=e101]:
+                - generic [ref=e102]: Aktif
+                - generic [ref=e104]: All-in-one
+              - generic [ref=e105]:
+                - generic [ref=e111]: "3"
+                - text: grup
+            - generic [ref=e114]:
+              - generic [ref=e121]:
+                - paragraph [ref=e122]: "@welcomeBot"
+                - paragraph [ref=e123]: "ID: 7987654321"
+              - generic [ref=e124]:
+                - generic [ref=e125]: Nonaktif
+                - generic [ref=e127]: Gatekeeper
+              - generic [ref=e128]: Belum ada grup
+            - generic [ref=e136]:
+              - generic [ref=e143]:
+                - paragraph [ref=e144]: "@premiumBot"
+                - paragraph [ref=e145]: "ID: 7555666777"
+              - generic [ref=e146]:
+                - generic [ref=e147]: Aktif
+                - generic [ref=e149]: Penjualan
+              - generic [ref=e150]:
+                - generic [ref=e156]: "2"
+                - text: grup
+  - generic [ref=e157]:
+    - heading "Fitur Canggih, Bekerja Secara Otomatis." [level=2] [ref=e158]
+    - generic [ref=e159]:
+      - generic [ref=e160]:
+        - generic [ref=e161]:
+          - heading "Pembayaran Instan" [level=4] [ref=e164]
+          - paragraph [ref=e165]: Biarkan anggota Anda membayar dengan mudah melalui QRIS, Virtual Account, atau E-Wallet. Setelah pembayaran berhasil, mereka mendapatkan akses instan ke grup Anda tanpa konfirmasi manual.
+        - generic [ref=e168]:
+          - generic [ref=e169]:
+            - generic [ref=e170]:
+              - paragraph [ref=e171]: Paket Premium
+              - paragraph [ref=e172]: 1 bulan akses penuh
+            - generic [ref=e173]: Rp 199.000
+          - generic [ref=e174]:
+            - generic [ref=e175]: Q
+            - generic [ref=e176]: QRIS
+            - generic [ref=e177]: Cepat
+          - generic [ref=e178]:
+            - generic [ref=e179]: VA
+            - generic [ref=e180]: Virtual Account
+          - generic [ref=e181]: Bayar Sekarang
+      - generic [ref=e182]:
+        - generic [ref=e183]:
+          - heading "Penjaga Pintu Otomatis" [level=4] [ref=e187]
+          - paragraph [ref=e188]: Urator bertindak sebagai penjaga 24/7 Anda. Sistem kami menghasilkan tautan undangan aman yang unik untuk setiap pelanggan, sepenuhnya mencegah akses tidak sah dan kebocoran tautan.
+        - generic [ref=e191]:
+          - generic [ref=e192]:
+            - generic [ref=e198]:
+              - paragraph [ref=e199]: "@guardBot"
+              - paragraph [ref=e200]: Gatekeeper
+            - generic [ref=e201]: Terproteksi
+          - generic [ref=e202]:
+            - generic [ref=e203]:
+              - generic [ref=e209]: Grup Premium
+              - generic [ref=e210]: 128 member
+            - generic [ref=e211]:
+              - generic [ref=e217]: Grup VIP
+              - generic [ref=e218]: 45 member
+      - generic [ref=e219]:
+        - generic [ref=e220]:
+          - heading "Pendapatan Langsung ke Bank" [level=4] [ref=e224]
+          - paragraph [ref=e225]: Kami tidak menahan dana Anda. Hubungkan kunci API Midtrans Anda sendiri, dan 100% dari pendapatan komunitas mengalir langsung ke rekening bank pribadi Anda secara instan.
+        - generic [ref=e228]:
+          - generic [ref=e229]:
+            - generic [ref=e230]: Pendapatan Bulan Ini
+            - generic [ref=e231]: ↑ 18%
+          - paragraph [ref=e232]: Rp 12.500.000
+          - generic [ref=e233]:
+            - generic [ref=e234]: Jan
+            - generic [ref=e236]: Feb
+            - generic [ref=e238]: Mar
+            - generic [ref=e240]: Apr
+            - generic [ref=e242]: Mei
+            - generic [ref=e244]: Jun
+      - generic [ref=e246]:
+        - generic [ref=e247]:
+          - heading "Sistem Kick Otomatis Anti Gagal" [level=4] [ref=e250]
+          - paragraph [ref=e251]: Ditenagai oleh antrean pesan super cepat, sistem secara instan mendeteksi langganan yang sudah habis dan menghapus anggota tidak aktif dalam hitungan milidetik. Tidak akan ada keterlambatan.
+        - generic [ref=e254]:
+          - generic [ref=e255]:
+            - generic [ref=e256]: Status Member
+            - generic [ref=e257]: 12 member
+          - generic [ref=e258]:
+            - generic [ref=e259]:
+              - generic [ref=e261]: "@user_rizal"
+              - generic [ref=e262]: Aktif
+            - generic [ref=e263]:
+              - generic [ref=e265]: "@user_ayu"
+              - generic [ref=e266]: Aktif
+            - generic [ref=e267]:
+              - generic [ref=e269]: "@user_bagas"
+              - generic [ref=e270]: Kedaluwarsa
+            - generic [ref=e271]:
+              - generic [ref=e273]: "@user_dian"
+              - generic [ref=e274]: Kedaluwarsa
+          - paragraph [ref=e276]: Auto-kick dalam hitungan milidetik
+      - generic [ref=e277]:
+        - generic [ref=e278]:
+          - heading "Analitik Dashboard Lanjutan" [level=4] [ref=e283]
+          - paragraph [ref=e284]: Analisa Pendapatan & Anggota. Pantau MRR (Pendapatan Berulang Bulanan) harian Anda, pertumbuhan langganan, dan jumlah anggota aktif secara real-time. Buat keputusan berbasis data untuk memperbesar komunitas Anda hanya dengan sekilas pandang.
+        - generic [ref=e287]:
+          - generic [ref=e288]:
+            - generic [ref=e289]:
+              - paragraph [ref=e290]: MRR
+              - paragraph [ref=e291]: Rp 8.200.000
+            - generic [ref=e292]: ↑ 12%
+          - generic [ref=e297]:
+            - generic [ref=e298]: Jan
+            - generic [ref=e299]: Mar
+            - generic [ref=e300]: Mei
+      - generic [ref=e301]:
+        - generic [ref=e302]:
+          - heading "Bot & Perintah Kustom" [level=4] [ref=e306]
+          - paragraph [ref=e307]: Merek Anda, Aturan Anda. Hubungkan bot Telegram Anda sendiri melalui BotFather. Kustomisasi penuh perintahnya, pesan sambutan, dan respons dinamis agar sesuai dengan merek unik komunitas Anda.
+        - generic [ref=e310]:
+          - generic [ref=e311]:
+            - generic [ref=e315]:
+              - paragraph [ref=e316]: "@myBot"
+              - paragraph [ref=e317]: 4 perintah kustom
+            - generic [ref=e318]: Aktif
+          - generic [ref=e319]:
+            - generic [ref=e320]:
+              - code [ref=e321]: /signal
+              - generic [ref=e322]: Sinyal trading terbaru
+            - generic [ref=e323]:
+              - code [ref=e324]: /rules
+              - generic [ref=e325]: Aturan grup & sanksi
+            - generic [ref=e326]:
+              - code [ref=e327]: /info
+              - generic [ref=e328]: Info paket & harga
+            - generic [ref=e329]:
+              - code [ref=e330]: /payment
+              - generic [ref=e331]: Link pembayaran
+  - generic [ref=e332]:
+    - generic [ref=e333]:
+      - heading "Harga yang simpel dan transparan" [level=2] [ref=e334]
+      - paragraph [ref=e335]: Pilih paket yang sesuai dengan ukuran komunitas Anda. Mulai secara gratis dan tingkatkan seiring perkembangan Anda.
+      - generic [ref=e336]:
+        - button "Bulanan" [ref=e337] [cursor=pointer]
+        - button "Tahunan" [ref=e338] [cursor=pointer]
+    - generic [ref=e471]:
+      - generic [ref=e472]:
+        - generic [ref=e473]:
+          - heading "Free Plan" [level=3] [ref=e474]
+          - generic [ref=e475]: Rp 0
+          - generic [ref=e476]: per bulan
+        - list [ref=e477]:
+          - listitem [ref=e478]:
+            - generic [ref=e482]: 24/7 Automated Telegram Bot
+          - listitem [ref=e483]:
+            - generic [ref=e487]: Comprehensive Admin Dashboard & CRM
+          - listitem [ref=e488]:
+            - generic [ref=e492]: Automated In-Bot Payments (QRIS/VA)
+          - listitem [ref=e493]:
+            - generic [ref=e497]: Subscription Package Management
+          - listitem [ref=e498]:
+            - generic [ref=e502]: Premium Groups & Channels Integration
+          - listitem [ref=e503]:
+            - generic [ref=e507]: 0% Platform Fee & No Hidden Admin Fees
+          - listitem [ref=e508]:
+            - generic [ref=e512]: Unlimited Monthly Transaction Volume
+          - listitem [ref=e513]:
+            - generic [ref=e517]: Transaction Reports & Excel Export
+          - listitem [ref=e518]:
+            - generic [ref=e522]: Custom Bot Commands (/rules, /signal)
+          - listitem [ref=e523]:
+            - generic [ref=e527]: Private Bot Token Support (@BotFather)
+          - listitem [ref=e528]:
+            - generic [ref=e532]: Dynamic Voucher & Discount Coupon System
+          - listitem [ref=e533]:
+            - generic [ref=e537]: Mass Broadcast System
+          - listitem [ref=e538]:
+            - generic [ref=e542]: Media/Images on Broadcast & Commands
+          - listitem [ref=e543]:
+            - generic [ref=e547]: High-Priority Processing
+        - link "Mulai Sekarang" [ref=e548] [cursor=pointer]:
+          - /url: /register-tenant
+      - generic [ref=e549]:
+        - generic [ref=e550]:
+          - heading "Starter Plan" [level=3] [ref=e551]
+          - generic [ref=e552]: Rp 79.000
+          - generic [ref=e553]: per bulan
+        - list [ref=e554]:
+          - listitem [ref=e555]:
+            - generic [ref=e559]: 24/7 Automated Telegram Bot
+          - listitem [ref=e560]:
+            - generic [ref=e564]: Comprehensive Admin Dashboard & CRM
+          - listitem [ref=e565]:
+            - generic [ref=e569]: Automated In-Bot Payments (QRIS/VA)
+          - listitem [ref=e570]:
+            - generic [ref=e574]: Subscription Package Management
+          - listitem [ref=e575]:
+            - generic [ref=e579]: Premium Groups & Channels Integration
+          - listitem [ref=e580]:
+            - generic [ref=e584]: 0% Platform Fee & No Hidden Admin Fees
+          - listitem [ref=e585]:
+            - generic [ref=e589]: Unlimited Monthly Transaction Volume
+          - listitem [ref=e590]:
+            - generic [ref=e594]: Transaction Reports & Excel Export
+          - listitem [ref=e595]:
+            - generic [ref=e599]: Custom Bot Commands (/rules, /signal)
+          - listitem [ref=e600]:
+            - generic [ref=e604]: Private Bot Token Support (@BotFather)
+          - listitem [ref=e605]:
+            - generic [ref=e609]: Dynamic Voucher & Discount Coupon System
+          - listitem [ref=e610]:
+            - generic [ref=e614]: Mass Broadcast System
+          - listitem [ref=e615]:
+            - generic [ref=e619]: Media/Images on Broadcast & Commands
+          - listitem [ref=e620]:
+            - generic [ref=e624]: High-Priority Processing
+        - link "Mulai Sekarang" [ref=e625] [cursor=pointer]:
+          - /url: /register-tenant
+      - generic [ref=e626]:
+        - generic [ref=e627]: Paling Populer
+        - generic [ref=e628]:
+          - heading "Growth Plan" [level=3] [ref=e629]
+          - generic [ref=e630]: Rp 129.000
+          - generic [ref=e631]: per bulan
+        - list [ref=e632]:
+          - listitem [ref=e633]:
+            - generic [ref=e637]: 24/7 Automated Telegram Bot
+          - listitem [ref=e638]:
+            - generic [ref=e642]: Comprehensive Admin Dashboard & CRM
+          - listitem [ref=e643]:
+            - generic [ref=e647]: Automated In-Bot Payments (QRIS/VA)
+          - listitem [ref=e648]:
+            - generic [ref=e652]: Subscription Package Management
+          - listitem [ref=e653]:
+            - generic [ref=e657]: Premium Groups & Channels Integration
+          - listitem [ref=e658]:
+            - generic [ref=e662]: 0% Platform Fee & No Hidden Admin Fees
+          - listitem [ref=e663]:
+            - generic [ref=e667]: Unlimited Monthly Transaction Volume
+          - listitem [ref=e668]:
+            - generic [ref=e672]: Transaction Reports & Excel Export
+          - listitem [ref=e673]:
+            - generic [ref=e677]: Custom Bot Commands (/rules, /signal)
+          - listitem [ref=e678]:
+            - generic [ref=e682]: Private Bot Token Support (@BotFather)
+          - listitem [ref=e683]:
+            - generic [ref=e687]: Dynamic Voucher & Discount Coupon System
+          - listitem [ref=e688]:
+            - generic [ref=e692]: Mass Broadcast System
+          - listitem [ref=e693]:
+            - generic [ref=e697]: Media/Images on Broadcast & Commands
+          - listitem [ref=e698]:
+            - generic [ref=e702]: High-Priority Processing
+        - link "Mulai Sekarang" [ref=e703] [cursor=pointer]:
+          - /url: /register-tenant
+      - generic [ref=e704]:
+        - generic [ref=e705]:
+          - heading "Pro Plan" [level=3] [ref=e706]
+          - generic [ref=e707]: Rp 249.000
+          - generic [ref=e708]: per bulan
+        - list [ref=e709]:
+          - listitem [ref=e710]:
+            - generic [ref=e714]: 24/7 Automated Telegram Bot
+          - listitem [ref=e715]:
+            - generic [ref=e719]: Comprehensive Admin Dashboard & CRM
+          - listitem [ref=e720]:
+            - generic [ref=e724]: Automated In-Bot Payments (QRIS/VA)
+          - listitem [ref=e725]:
+            - generic [ref=e729]: Subscription Package Management
+          - listitem [ref=e730]:
+            - generic [ref=e734]: Premium Groups & Channels Integration
+          - listitem [ref=e735]:
+            - generic [ref=e739]: 0% Platform Fee & No Hidden Admin Fees
+          - listitem [ref=e740]:
+            - generic [ref=e744]: Unlimited Monthly Transaction Volume
+          - listitem [ref=e745]:
+            - generic [ref=e749]: Transaction Reports & Excel Export
+          - listitem [ref=e750]:
+            - generic [ref=e754]: Custom Bot Commands (/rules, /signal)
+          - listitem [ref=e755]:
+            - generic [ref=e759]: Private Bot Token Support (@BotFather)
+          - listitem [ref=e760]:
+            - generic [ref=e764]: Dynamic Voucher & Discount Coupon System
+          - listitem [ref=e765]:
+            - generic [ref=e769]: Mass Broadcast System
+          - listitem [ref=e770]:
+            - generic [ref=e774]: Media/Images on Broadcast & Commands
+          - listitem [ref=e775]:
+            - generic [ref=e779]: High-Priority Processing
+        - link "Mulai Sekarang" [ref=e780] [cursor=pointer]:
+          - /url: /register-tenant
+  - generic [ref=e388]:
+    - heading "Pertanyaan yang Sering Diajukan" [level=2] [ref=e389]
+    - paragraph [ref=e390]: Jawaban cepat untuk pertanyaan umum tentang produk dan layanan kami.
+    - generic [ref=e392]:
+      - heading [level=3] [ref=e394]:
+        - button "Bagaimana Urator mengotomatisasi proses orientasi anggota baru?" [ref=e395] [cursor=pointer]
+      - heading [level=3] [ref=e398]:
+        - button "Apakah Urator menahan atau memotong pendapatan komunitas saya?" [ref=e399] [cursor=pointer]
+      - heading [level=3] [ref=e402]:
+        - button "Apa yang terjadi jika anggota lupa memperbarui atau langganannya kedaluwarsa?" [ref=e403] [cursor=pointer]
+      - heading [level=3] [ref=e406]:
+        - button "Bolehkah saya menggunakan merek bot Telegram saya sendiri dan menyesuaikan perintahnya?" [ref=e407] [cursor=pointer]
+      - heading [level=3] [ref=e410]:
+        - button "Bagaimana cara Urator mencegah anggota membocorkan atau membagikan tautan undangan?" [ref=e411] [cursor=pointer]
+      - heading [level=3] [ref=e414]:
+        - button "Bolehkah saya menguji platform sebelum meluncurkannya ke audiens?" [ref=e415] [cursor=pointer]
+  - contentinfo [ref=e417]:
+    - generic [ref=e418]:
+      - generic [ref=e419]:
+        - link [ref=e420] [cursor=pointer]:
+          - /url: /
+          - img "Urator Logo" [ref=e421]
+        - paragraph [ref=e422]: Platform penjaga & monetisasi Telegram otomatis. Fokus pada membangun komunitas, biar kami yang menangani pembayaran dan akses.
+      - generic [ref=e423]:
+        - generic [ref=e424]:
+          - heading "Produk" [level=6] [ref=e425]
+          - list [ref=e426]:
+            - listitem [ref=e427]:
+              - link "Fitur" [ref=e428] [cursor=pointer]:
+                - /url: "#features"
+            - listitem [ref=e429]:
+              - link "Harga" [ref=e430] [cursor=pointer]:
+                - /url: "#pricing"
+            - listitem [ref=e431]:
+              - link "Masuk" [ref=e432] [cursor=pointer]:
+                - /url: /login
+            - listitem [ref=e433]:
+              - link "Daftar" [ref=e434] [cursor=pointer]:
+                - /url: /register-tenant
+        - generic [ref=e435]:
+          - heading "Sumber Daya" [level=6] [ref=e436]
+          - list [ref=e437]:
+            - listitem [ref=e438]:
+              - generic [ref=e439]:
+                - text: Dokumentasi
+                - generic [ref=e440]: Segera
+            - listitem [ref=e441]:
+              - link "FAQ" [ref=e442] [cursor=pointer]:
+                - /url: "#faq"
+            - listitem [ref=e443]:
+              - link "Hubungi Dukungan" [ref=e444] [cursor=pointer]:
+                - /url: https://t.me/UrationSupportBot
+        - generic [ref=e445]:
+          - heading "Hukum" [level=6] [ref=e446]
+          - list [ref=e447]:
+            - listitem [ref=e448]:
+              - link "Syarat Ketentuan" [ref=e449] [cursor=pointer]:
+                - /url: /terms-of-service
+            - listitem [ref=e450]:
+              - link "Kebijakan Privasi" [ref=e451] [cursor=pointer]:
+                - /url: /privacy-policy
+    - generic [ref=e452]:
+      - generic [ref=e453]:
+        - text: © 2026
+        - link "Urator" [ref=e454] [cursor=pointer]:
+          - /url: /
+        - text: . Hak cipta dilindungi.
+      - generic [ref=e455]:
+        - link [ref=e456] [cursor=pointer]:
+          - /url: https://t.me/urator
+        - link [ref=e459] [cursor=pointer]:
+          - /url: https://twitter.com/urator
+  - button "Open Next.js Dev Tools" [ref=e467] [cursor=pointer]
+  - alert [ref=e781]

@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { Icons } from '@/components/icons';
+import { Modal } from '@/components/ui/modal';
 
 export interface PlatformPlanFeature {
   name: string;
@@ -48,6 +49,15 @@ const formatRupiah = (amount: number | string) => {
     maximumFractionDigits: 0
   }).format(Number(amount));
 };
+
+const planNameMap: Record<string, string> = {
+  free: 'Gratis',
+  starter: 'Pemula',
+  growth: 'Berkembang',
+  scale: 'Skala'
+};
+
+const INCLUDED_PREVIEW_COUNT = 5;
 
 const fallbackPlans: PlatformPlan[] = [
   {
@@ -198,6 +208,7 @@ const PricingSkeleton = () => (
 const Pricing = () => {
   const t = useTranslations('Pricing');
   const [billing, setBilling] = useState<'monthly' | 'yearly'>('monthly');
+  const [detailPlan, setDetailPlan] = useState<PlatformPlan | null>(null);
 
   const {
     data: apiPlans,
@@ -225,14 +236,17 @@ const Pricing = () => {
   return (
     <div id='pricing' className='max-w-(--breakpoint-2xl) mx-auto py-20 lg:py-24 px-4 sm:px-6'>
       <div className='text-center max-w-2xl mx-auto'>
-        <h2 className='text-4xl xs:text-5xl font-semibold tracking-tight'>{t('header')}</h2>
+        <h2 className='text-4xl xs:text-5xl font-semibold tracking-tight text-balance'>
+          {t('header')}
+        </h2>
         <p className='mt-4 text-lg text-muted-foreground'>{t('subHeader')}</p>
 
         <div className='mt-8 inline-flex items-center gap-2 rounded-full border bg-accent/50 p-1'>
           <button
             onClick={() => setBilling('monthly')}
+            aria-pressed={billing === 'monthly'}
             className={cn(
-              'rounded-full px-4 py-1.5 text-sm font-medium transition-all',
+              'rounded-full px-4 py-1.5 text-sm font-medium transition-colors',
               billing === 'monthly'
                 ? 'bg-background shadow-sm text-foreground'
                 : 'text-muted-foreground'
@@ -242,8 +256,9 @@ const Pricing = () => {
           </button>
           <button
             onClick={() => setBilling('yearly')}
+            aria-pressed={billing === 'yearly'}
             className={cn(
-              'rounded-full px-4 py-1.5 text-sm font-medium transition-all',
+              'rounded-full px-4 py-1.5 text-sm font-medium transition-colors',
               billing === 'yearly'
                 ? 'bg-background shadow-sm text-foreground'
                 : 'text-muted-foreground'
@@ -268,85 +283,148 @@ const Pricing = () => {
         <PricingSkeleton />
       ) : (
         <div className='mt-12 xs:mt-16 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 items-start gap-4 lg:gap-6 justify-center w-full'>
-          {displayPlans.map((plan, index) => {
-            const isPopular = plan.name.toLowerCase().includes('growth') || index === 2;
-            const price =
-              billing === 'yearly' ? Number(plan.price_yearly) : Number(plan.price_monthly);
-
-            return (
-              <div
-                key={plan.id}
-                className={cn(
-                  'relative bg-accent/50 border p-6 rounded-2xl flex flex-col h-full transition-all duration-200',
-                  {
-                    'bg-background border-2 border-primary shadow-lg xl:-my-4 xl:py-10': isPopular
-                  }
-                )}
-              >
-                {isPopular && (
-                  <Badge className='absolute top-0 right-1/2 translate-x-1/2 -translate-y-1/2 px-3 py-0.5 text-xs bg-gradient-to-r from-primary to-primary/80'>
-                    {t('mostPopular')}
-                  </Badge>
-                )}
-
-                <div className='mb-4 h-24'>
-                  <h3 className='text-xl font-bold'>{plan.display_name}</h3>
-                  <div className='mt-3 flex items-baseline text-3xl font-extrabold tracking-tight whitespace-nowrap'>
-                    {price === 0 ? t('free') : formatRupiah(price)}
-                  </div>
-                  <span className='text-sm font-medium text-muted-foreground block mt-1'>
-                    {billing === 'yearly' ? t('perYear') : t('perMonth')}
-                  </span>
-                </div>
-
-                <Separator className='mb-5' />
-
-                <ul className='mb-6 flex-1 text-sm'>
-                  {(() => {
-                    const featuresList = Array.isArray(plan.features)
-                      ? plan.features
-                      : Object.entries(plan.features || {}).map(([name, included]) => ({
-                          name,
-                          included: Boolean(included)
-                        }));
-
-                    return featuresList.map((feature, idx) => (
-                      <li key={idx} className='flex items-start gap-2.5 min-h-[2.75rem]'>
-                        {feature.included ? (
-                          <Icons.circleCheck className='h-4 w-4 mt-0.5 text-green-500 shrink-0' />
-                        ) : (
-                          <Icons.close className='h-4 w-4 mt-0.5 text-red-500 shrink-0' />
-                        )}
-                        <span
-                          className={cn(
-                            'leading-tight',
-                            feature.included
-                              ? 'text-foreground font-medium'
-                              : 'text-muted-foreground/60 line-through'
-                          )}
-                        >
-                          {feature.name}
-                        </span>
-                      </li>
-                    ));
-                  })()}
-                </ul>
-
-                <Button
-                  variant={isPopular ? 'default' : 'outline'}
-                  size='sm'
-                  className='w-full rounded-xl h-10 mt-auto'
-                  asChild
-                >
-                  <Link href='/register-tenant'>{t('getStarted')}</Link>
-                </Button>
-              </div>
-            );
-          })}
+          {displayPlans.map((plan, index) => (
+            <PlanCard
+              key={plan.id}
+              plan={plan}
+              isPopular={index === 2}
+              billing={billing}
+              onShowAll={() => setDetailPlan(plan)}
+            />
+          ))}
         </div>
+      )}
+
+      {detailPlan && (
+        <Modal
+          title={planNameMap[detailPlan.name] ?? detailPlan.display_name}
+          description={t('allFeatures')}
+          isOpen
+          onClose={() => setDetailPlan(null)}
+        >
+          <ul className='grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 text-sm'>
+            {normalizeFeatures(detailPlan).map((feature, idx) => (
+              <li key={idx} className='flex items-start gap-2.5 py-1.5'>
+                {feature.included ? (
+                  <Icons.circleCheck className='h-4 w-4 mt-0.5 text-green-500 shrink-0' />
+                ) : (
+                  <Icons.close className='h-4 w-4 mt-0.5 text-muted-foreground/60 shrink-0' />
+                )}
+                <span
+                  className={cn(
+                    'leading-tight',
+                    feature.included ? 'text-foreground font-medium' : 'text-muted-foreground'
+                  )}
+                >
+                  {feature.name}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </Modal>
       )}
     </div>
   );
 };
+
+const PlanCard = ({
+  plan,
+  isPopular,
+  billing,
+  onShowAll
+}: {
+  plan: PlatformPlan;
+  isPopular: boolean;
+  billing: 'monthly' | 'yearly';
+  onShowAll: () => void;
+}) => {
+  const t = useTranslations('Pricing');
+
+  const price = billing === 'yearly' ? Number(plan.price_yearly) : Number(plan.price_monthly);
+  const planLabel = planNameMap[plan.name] ?? plan.display_name;
+
+  const featuresList = normalizeFeatures(plan);
+  const includedFeatures = featuresList.filter((f) => f.included);
+  const visibleFeatures = includedFeatures.slice(0, INCLUDED_PREVIEW_COUNT);
+  const hasMore = featuresList.length > INCLUDED_PREVIEW_COUNT;
+  const hiddenCount = featuresList.length - INCLUDED_PREVIEW_COUNT;
+
+  return (
+    <div
+      className={cn(
+        'relative bg-accent/50 border p-6 rounded-2xl flex flex-col h-full transition-colors',
+        {
+          'bg-background border-2 border-primary shadow-lg xl:-my-4 xl:py-10': isPopular
+        }
+      )}
+    >
+      {isPopular && (
+        <Badge className='absolute top-0 right-1/2 translate-x-1/2 -translate-y-1/2 px-3 py-0.5 text-xs bg-primary'>
+          {t('mostPopular')}
+        </Badge>
+      )}
+
+      <div className='mb-4 h-24'>
+        <h3 className='text-xl font-bold'>{planLabel}</h3>
+        <div className='mt-3 flex items-baseline text-3xl font-extrabold tracking-tight whitespace-nowrap tabular-nums'>
+          {price === 0 ? t('free') : formatRupiah(price)}
+        </div>
+        <span className='text-sm font-medium text-muted-foreground block mt-1'>
+          {billing === 'yearly' ? t('perYear') : t('perMonth')}
+        </span>
+      </div>
+
+      <Separator className='mb-5' />
+
+      <ul className='mb-4 flex-1 text-sm'>
+        {visibleFeatures.map((feature, idx) => (
+          <li key={idx} className='flex items-start gap-2.5 min-h-[2.75rem]'>
+            {feature.included ? (
+              <Icons.circleCheck className='h-4 w-4 mt-0.5 text-green-500 shrink-0' />
+            ) : (
+              <Icons.close className='h-4 w-4 mt-0.5 text-muted-foreground/60 shrink-0' />
+            )}
+            <span
+              className={cn(
+                'leading-tight',
+                feature.included ? 'text-foreground font-medium' : 'text-muted-foreground'
+              )}
+            >
+              {feature.name}
+            </span>
+          </li>
+        ))}
+      </ul>
+
+      {hasMore && (
+        <button
+          type='button'
+          onClick={onShowAll}
+          className='mb-5 flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline self-start'
+        >
+          {t('showAllFeatures', { count: hiddenCount })}
+          <Icons.eye className='h-4 w-4' aria-hidden='true' />
+        </button>
+      )}
+
+      <Button
+        variant={isPopular ? 'default' : 'outline'}
+        size='sm'
+        className='w-full rounded-xl h-10 mt-auto'
+        asChild
+      >
+        <Link href='/register-tenant'>{t('getStarted')}</Link>
+      </Button>
+    </div>
+  );
+};
+
+const normalizeFeatures = (plan: PlatformPlan): PlatformPlanFeature[] =>
+  Array.isArray(plan.features)
+    ? plan.features
+    : Object.entries(plan.features || {}).map(([name, included]) => ({
+        name,
+        included: Boolean(included)
+      }));
 
 export default Pricing;
