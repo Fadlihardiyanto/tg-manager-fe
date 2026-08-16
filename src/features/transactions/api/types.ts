@@ -17,6 +17,7 @@ export interface TransactionFilters {
   page?: number;
   limit?: number;
   status?: string;
+  search?: string;
 }
 
 export interface TransactionsMeta {

@@ -13,6 +13,7 @@ export async function getTransactions(
   if (filters.page) params.set('page', String(filters.page));
   if (filters.limit) params.set('limit', String(filters.limit));
   if (filters.status) params.set('status', filters.status);
+  if (filters.search) params.set('search', filters.search);
 
   const query = params.toString();
 

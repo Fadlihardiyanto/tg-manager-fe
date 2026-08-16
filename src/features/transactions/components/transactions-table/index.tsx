@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { parseAsInteger, useQueryState } from 'nuqs';
+import { parseAsInteger, parseAsString, useQueryState } from 'nuqs';
 import { DataTable } from '@/components/ui/table/data-table';
 import { DataTableToolbar } from '@/components/ui/table/data-table-toolbar';
 import {
@@ -11,9 +11,11 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Icons } from '@/components/icons';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useDataTable } from '@/hooks/use-data-table';
-import { Icons } from '@/components/icons';
+import { useDebouncedCallback } from '@/hooks/use-debounced-callback';
 import { transactionsQueryOptions } from '../../api/queries';
 import { columns } from './columns';
 
@@ -32,8 +34,18 @@ interface TransactionsTableProps {
 export function TransactionsTable({ status, onStatusChange }: TransactionsTableProps) {
   const [page] = useQueryState('page', parseAsInteger.withDefault(1));
   const [perPage] = useQueryState('perPage', parseAsInteger.withDefault(10));
+  const [search, setSearch] = useQueryState(
+    'search',
+    parseAsString.withOptions({ shallow: true, history: 'replace', clearOnDefault: true })
+  );
+  const debouncedSetSearch = useDebouncedCallback((value: string) => setSearch(value || null), 400);
 
-  const filters = { page, limit: perPage, status: status ?? undefined };
+  const filters = {
+    page,
+    limit: perPage,
+    status: status ?? undefined,
+    search: search ?? undefined
+  };
 
   const { data, isError, isLoading } = useQuery(transactionsQueryOptions(filters));
   const items = data?.data ?? [];
@@ -74,6 +86,12 @@ export function TransactionsTable({ status, onStatusChange }: TransactionsTableP
       }
     >
       <DataTableToolbar table={table}>
+        <Input
+          value={search ?? ''}
+          onChange={(e) => debouncedSetSearch(e.target.value)}
+          placeholder='Cari member atau ID transaksi...'
+          className='h-10 w-full rounded-full border-border bg-background px-4 text-sm font-semibold sm:w-60'
+        />
         <Select
           value={status ?? 'all'}
           onValueChange={(v) => onStatusChange(v === 'all' ? null : v)}
