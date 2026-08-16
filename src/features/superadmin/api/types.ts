@@ -282,7 +282,7 @@ export interface ClientSubscription {
   client_name: string;
   plan_id: string;
   plan_name: string;
-  status: 'active' | 'cancelled' | 'expired';
+  status: 'pending' | 'active' | 'past_due' | 'cancelled';
   start_date?: string;
   end_date?: string;
   created_at?: string;

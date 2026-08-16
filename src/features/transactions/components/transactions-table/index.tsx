@@ -19,8 +19,7 @@ import { columns } from './columns';
 
 const STATUS_OPTIONS = [
   { value: 'pending', label: 'Menunggu' },
-  { value: 'settled', label: 'Selesai' },
-  { value: 'success', label: 'Berhasil' },
+  { value: 'paid', label: 'Lunas' },
   { value: 'failed', label: 'Gagal' },
   { value: 'expired', label: 'Kedaluwarsa' }
 ];

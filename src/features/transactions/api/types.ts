@@ -1,6 +1,6 @@
 import type { ApiResponse } from '@/features/bots/api/types';
 
-export type TransactionStatus = 'pending' | 'settled' | 'success' | 'failed' | 'expired';
+export type TransactionStatus = 'pending' | 'paid' | 'expired' | 'failed';
 
 export interface Transaction {
   id: string;

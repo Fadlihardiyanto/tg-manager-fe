@@ -12,12 +12,8 @@ const statusConfig: Record<string, { label: string; className: string }> = {
     label: 'Menunggu',
     className: 'bg-amber-500/10 text-amber-600 border-amber-500/20 dark:text-amber-400'
   },
-  settled: {
-    label: 'Selesai',
-    className: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:text-emerald-400'
-  },
-  success: {
-    label: 'Berhasil',
+  paid: {
+    label: 'Lunas',
     className: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:text-emerald-400'
   },
   failed: {

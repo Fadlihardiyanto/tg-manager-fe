@@ -72,7 +72,7 @@ function formatStatus(status?: string) {
   if (!status) return '-';
   if (status === 'active') return 'Aktif';
   if (status === 'pending') return 'Menunggu Pembayaran';
-  if (status === 'expired') return 'Kedaluwarsa';
+  if (status === 'past_due') return 'Terlambat';
   return status;
 }
 

@@ -66,14 +66,16 @@ const FORMATTER = new Intl.NumberFormat('id-ID', {
 });
 
 const STATUS_STYLES: Record<string, string> = {
+  pending: 'bg-amber-500/10 text-amber-600 border-amber-500/20 dark:text-amber-400',
   active: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:text-emerald-400',
-  expired: 'bg-amber-500/10 text-amber-600 border-amber-500/20 dark:text-amber-400',
+  past_due: 'bg-orange-500/10 text-orange-600 border-orange-500/20 dark:text-orange-400',
   cancelled: 'bg-red-500/10 text-red-600 border-red-500/20 dark:text-red-400'
 };
 
 const STATUS_LABELS: Record<string, string> = {
+  pending: 'Menunggu',
   active: 'Aktif',
-  expired: 'Kedaluwarsa',
+  past_due: 'Terlambat',
   cancelled: 'Dibatalkan'
 };
 
@@ -595,8 +597,9 @@ function SubscriptionsTab() {
   const counts = useMemo(
     () => ({
       total: subs.length,
+      pending: subs.filter((s) => s.status === 'pending').length,
       active: subs.filter((s) => s.status === 'active').length,
-      expired: subs.filter((s) => s.status === 'expired').length,
+      past_due: subs.filter((s) => s.status === 'past_due').length,
       cancelled: subs.filter((s) => s.status === 'cancelled').length
     }),
     [subs]
@@ -640,10 +643,10 @@ function SubscriptionsTab() {
           accent='from-emerald-500/10 via-emerald-500/5 to-transparent'
         />
         <StatPill
-          label='Kedaluwarsa'
-          value={String(counts.expired)}
+          label='Terlambat'
+          value={String(counts.past_due)}
           icon={Icons.warning}
-          accent='from-amber-500/10 via-amber-500/5 to-transparent'
+          accent='from-orange-500/10 via-orange-500/5 to-transparent'
         />
         <StatPill
           label='Dibatalkan'
@@ -658,9 +661,10 @@ function SubscriptionsTab() {
         <div className='flex gap-1 rounded-lg border border-border/70 bg-muted/30 p-1'>
           {[
             ['all', 'Semua'],
-            ['active', 'Active'],
-            ['expired', 'Expired'],
-            ['cancelled', 'Cancelled']
+            ['pending', 'Menunggu'],
+            ['active', 'Aktif'],
+            ['past_due', 'Terlambat'],
+            ['cancelled', 'Dibatalkan']
           ].map(([key, label]) => (
             <button
               key={key}
