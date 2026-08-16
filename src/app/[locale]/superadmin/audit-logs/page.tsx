@@ -30,17 +30,23 @@ const actionLabels: Record<string, string> = {
   delete: 'Menghapus',
   login: 'Login',
   activate: 'Mengaktifkan',
-  deactivate: 'Menonaktifkan'
+  deactivate: 'Menonaktifkan',
+  extend_expiry: 'Perpanjang Akses',
+  kick_member: 'Keluarkan Member'
 };
 
 const resourceLabels: Record<string, string> = {
+  member: 'Member',
+  subscription: 'Langganan',
   role: 'Role',
   admin: 'Admin',
   client: 'Tenant',
   plan: 'Paket',
-  subscription: 'Langganan',
   permission: 'Permission'
 };
+
+const ACTION_OPTIONS = Object.entries(actionLabels).map(([value, label]) => ({ value, label }));
+const RESOURCE_OPTIONS = Object.entries(resourceLabels).map(([value, label]) => ({ value, label }));
 
 export default function AuditLogsPage() {
   const { page, setPage, limit, handleLimitChange, limitOptions } = usePagination();
@@ -50,47 +56,53 @@ export default function AuditLogsPage() {
     data: logsRes,
     isLoading,
     isPlaceholderData
-  } = useQuery(auditLogsQueryOptions(page, limit));
+  } = useQuery({
+    ...auditLogsQueryOptions(page, limit, {
+      ...(filterAction !== 'all' && { action: filterAction }),
+      ...(filterResource !== 'all' && { resource: filterResource })
+    }),
+    placeholderData: (previous) => previous
+  });
 
   const logs = logsRes?.success ? logsRes.data : [];
   const pagination = logsRes?.success ? logsRes.pagination : undefined;
   const totalPages = pagination?.total_pages ?? 1;
   const total = pagination?.total ?? logs.length;
 
-  // ponytail: BE /admin/v1/audit-logs belum dukung ?action=/&resource= —
-  // filter client-side per halaman; upgrade ke server-side saat param tersedia.
-  const filteredLogs = logs.filter(
-    (log) =>
-      (filterAction === 'all' || log.action === filterAction) &&
-      (filterResource === 'all' || log.resource === filterResource)
-  );
-  const knownResources = [...new Set(logs.map((l) => l.resource).filter(Boolean))].sort();
+  const applyAction = (v: string) => {
+    setFilterAction(v);
+    setPage(1);
+  };
+  const applyResource = (v: string) => {
+    setFilterResource(v);
+    setPage(1);
+  };
 
   return (
     <PageContainer pageTitle='Audit Logs' pageDescription='Log aktivitas seluruh platform'>
       <div className='mb-4 flex flex-wrap items-center gap-2'>
-        <Select value={filterAction} onValueChange={setFilterAction}>
+        <Select value={filterAction} onValueChange={applyAction}>
           <SelectTrigger className='h-10 w-40 rounded-full border-border font-semibold'>
             <SelectValue placeholder='Semua aksi' />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value='all'>Semua aksi</SelectItem>
-            {Object.entries(actionLabels).map(([value, label]) => (
+            {ACTION_OPTIONS.map(({ value, label }) => (
               <SelectItem key={value} value={value}>
                 {label}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
-        <Select value={filterResource} onValueChange={setFilterResource}>
+        <Select value={filterResource} onValueChange={applyResource}>
           <SelectTrigger className='h-10 w-44 rounded-full border-border font-semibold'>
             <SelectValue placeholder='Semua resource' />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value='all'>Semua resource</SelectItem>
-            {knownResources.map((r) => (
-              <SelectItem key={r} value={r}>
-                {resourceLabels[r] || r}
+            {RESOURCE_OPTIONS.map(({ value, label }) => (
+              <SelectItem key={value} value={value}>
+                {label}
               </SelectItem>
             ))}
           </SelectContent>
@@ -122,14 +134,16 @@ export default function AuditLogsPage() {
                   Memuat...
                 </TableCell>
               </TableRow>
-            ) : filteredLogs.length === 0 ? (
+            ) : logs.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className='text-muted-foreground py-8 text-center'>
-                  Tidak ada log yang cocok
+                  {filterAction !== 'all' || filterResource !== 'all'
+                    ? 'Tidak ada log yang cocok'
+                    : 'Belum ada log'}
                 </TableCell>
               </TableRow>
             ) : (
-              filteredLogs.map((log) => (
+              logs.map((log) => (
                 <TableRow key={log.id} className='transition-colors hover:bg-muted/35'>
                   <TableCell className='text-muted-foreground whitespace-nowrap text-xs'>
                     {log.created_at ? format(new Date(log.created_at), 'dd MMM HH:mm') : '-'}

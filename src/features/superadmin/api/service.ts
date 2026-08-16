@@ -299,12 +299,13 @@ export async function getPermissions(): Promise<ListResponse<Permission>> {
 
 export async function getAdmins(
   page = 1,
-  limit = 20
+  limit = 20,
+  search?: string
 ): Promise<PaginatedListResponse<AdminUserDetail>> {
   try {
-    return await adminFetch<PaginatedListResponse<AdminUserDetail>>(
-      `/admin/v1/admins?page=${page}&limit=${limit}`
-    );
+    const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+    if (search) params.set('search', search);
+    return await adminFetch<PaginatedListResponse<AdminUserDetail>>(`/admin/v1/admins?${params}`);
   } catch (e) {
     const m = e instanceof Error ? e.message : 'Failed';
     return { success: false, code: 400, message: m, data: [] };
@@ -609,11 +610,21 @@ export async function cancelSubscription(
 
 // ─── Audit Logs ─────────────────────────────────────────────────────
 
-export async function getAuditLogs(page = 1, limit = 20): Promise<PaginatedListResponse<AuditLog>> {
+export interface AuditLogFilters {
+  action?: string;
+  resource?: string;
+}
+
+export async function getAuditLogs(
+  page = 1,
+  limit = 20,
+  filters: AuditLogFilters = {}
+): Promise<PaginatedListResponse<AuditLog>> {
   try {
-    return await adminFetch<PaginatedListResponse<AuditLog>>(
-      `/admin/v1/audit-logs?page=${page}&limit=${limit}`
-    );
+    const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+    if (filters.action) params.set('action', filters.action);
+    if (filters.resource) params.set('resource', filters.resource);
+    return await adminFetch<PaginatedListResponse<AuditLog>>(`/admin/v1/audit-logs?${params}`);
   } catch (e) {
     const m = e instanceof Error ? e.message : 'Failed';
     return { success: false, code: 400, message: m, data: [] };

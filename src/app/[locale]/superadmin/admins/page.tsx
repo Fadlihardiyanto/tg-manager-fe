@@ -36,6 +36,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { PaginationBar } from '@/components/layout/pagination-bar';
 import { usePagination } from '@/hooks/use-pagination';
+import { useDebouncedCallback } from '@/hooks/use-debounced-callback';
 import {
   adminsQueryOptions,
   rolesQueryOptions,
@@ -49,7 +50,16 @@ import {
 
 export default function AdminsPage() {
   const { page, setPage, limit, handleLimitChange, limitOptions } = usePagination();
-  const { data: adminsRes, isPlaceholderData } = useQuery(adminsQueryOptions(page, limit));
+  const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const setSearchDebounced = useDebouncedCallback((value: string) => {
+    setDebouncedSearch(value);
+    setPage(1);
+  }, 400);
+  const { data: adminsRes, isPlaceholderData } = useQuery({
+    ...adminsQueryOptions(page, limit, debouncedSearch || undefined),
+    placeholderData: (previous) => previous
+  });
   const { data: rolesRes } = useQuery(rolesQueryOptions(1, 999));
   const createMut = useCreateAdmin();
   const updateMut = useUpdateAdmin();
@@ -63,19 +73,6 @@ export default function AdminsPage() {
   const totalPages = pagination?.total_pages ?? 1;
   const total = pagination?.total ?? admins.length;
   const roles = rolesRes?.success ? rolesRes.data : [];
-
-  // ponytail: BE /admin/v1/admins belum dukung ?search= — filter client-side
-  // per halaman; upgrade ke server-side saat param tersedia.
-  const [search, setSearch] = useState('');
-  const query = search.trim().toLowerCase();
-  const filteredAdmins = query
-    ? admins.filter(
-        (a) =>
-          a.name.toLowerCase().includes(query) ||
-          a.email.toLowerCase().includes(query) ||
-          (a.roles?.[0]?.name ?? '').toLowerCase().includes(query)
-      )
-    : admins;
 
   // Form state
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -163,7 +160,10 @@ export default function AdminsPage() {
       <div className='mb-4 flex flex-wrap items-center justify-between gap-3'>
         <Input
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setSearchDebounced(e.target.value);
+          }}
           placeholder='Cari nama, email, atau role...'
           className='h-10 w-full rounded-full border-border bg-background px-4 text-sm font-semibold sm:w-60'
         />
@@ -184,14 +184,14 @@ export default function AdminsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredAdmins.length === 0 ? (
+            {admins.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className='text-center text-muted-foreground py-8'>
-                  {query ? 'Tidak ada admin yang cocok' : 'Belum ada admin'}
+                  {debouncedSearch ? 'Tidak ada admin yang cocok' : 'Belum ada admin'}
                 </TableCell>
               </TableRow>
             ) : (
-              filteredAdmins.map((admin) => (
+              admins.map((admin) => (
                 <TableRow key={admin.id}>
                   <TableCell className='font-medium'>{admin.name}</TableCell>
                   <TableCell>{admin.email}</TableCell>

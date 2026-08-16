@@ -34,7 +34,7 @@ import {
   cancelSubscription,
   getAuditLogs
 } from './service';
-import type { ClientFilters } from './service';
+import type { AuditLogFilters, ClientFilters } from './service';
 import type {
   CreateRoleRequest,
   UpdateRoleRequest,
@@ -66,8 +66,8 @@ export const superadminKeys = {
   },
   admins: {
     all: () => [...superadminKeys.all, 'admins'] as const,
-    list: (page: number, limit: number) =>
-      [...superadminKeys.admins.all(), 'list', { page, limit }] as const,
+    list: (page: number, limit: number, search?: string) =>
+      [...superadminKeys.admins.all(), 'list', { page, limit, search }] as const,
     detail: (id: string) => [...superadminKeys.admins.all(), 'detail', id] as const
   },
   clients: {
@@ -91,8 +91,8 @@ export const superadminKeys = {
   },
   auditLogs: {
     all: () => [...superadminKeys.all, 'audit-logs'] as const,
-    list: (page: number, limit: number) =>
-      [...superadminKeys.auditLogs.all(), 'list', { page, limit }] as const
+    list: (page: number, limit: number, filters?: AuditLogFilters) =>
+      [...superadminKeys.auditLogs.all(), 'list', { page, limit, filters }] as const
   }
 };
 
@@ -107,10 +107,10 @@ export const roleByIdQueryOptions = (id: string) =>
   queryOptions({ queryKey: superadminKeys.roles.detail(id), queryFn: () => getRole(id) });
 export const permissionsQueryOptions = () =>
   queryOptions({ queryKey: superadminKeys.permissions.list(), queryFn: getPermissions });
-export const adminsQueryOptions = (page: number, limit: number) =>
+export const adminsQueryOptions = (page: number, limit: number, search?: string) =>
   queryOptions({
-    queryKey: superadminKeys.admins.list(page, limit),
-    queryFn: () => getAdmins(page, limit)
+    queryKey: superadminKeys.admins.list(page, limit, search),
+    queryFn: () => getAdmins(page, limit, search)
   });
 export const adminByIdQueryOptions = (id: string) =>
   queryOptions({ queryKey: superadminKeys.admins.detail(id), queryFn: () => getAdmin(id) });
@@ -132,10 +132,10 @@ export const planByIdQueryOptions = (id: string) =>
   queryOptions({ queryKey: superadminKeys.plans.detail(id), queryFn: () => getPlan(id) });
 export const subscriptionsQueryOptions = () =>
   queryOptions({ queryKey: superadminKeys.subscriptions.list(), queryFn: getClientSubscriptions });
-export const auditLogsQueryOptions = (page: number, limit: number) =>
+export const auditLogsQueryOptions = (page: number, limit: number, filters?: AuditLogFilters) =>
   queryOptions({
-    queryKey: superadminKeys.auditLogs.list(page, limit),
-    queryFn: () => getAuditLogs(page, limit)
+    queryKey: superadminKeys.auditLogs.list(page, limit, filters),
+    queryFn: () => getAuditLogs(page, limit, filters)
   });
 
 // ─── useMutation shortcuts ──────────────────────────────────────────
