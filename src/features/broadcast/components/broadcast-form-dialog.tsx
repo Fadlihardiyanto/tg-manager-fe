@@ -28,6 +28,7 @@ import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { getPresignedUrl, createBroadcast } from '../api/service';
 import { broadcastKeys, broadcastReachQueryOptions } from '../api/queries';
 import { groupsQueryOptions } from '@/features/groups/api/queries';
+import { useTenantPath } from '@/lib/tenant-path';
 import { useActivePlan } from '@/features/billing/components/active-plan-provider';
 import { toast } from 'sonner';
 import * as z from 'zod';
@@ -82,6 +83,7 @@ interface BroadcastFormDialogProps {
 export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastFormDialogProps) {
   const queryClient = useQueryClient();
   const { canUseFeature, hasQuota } = useActivePlan();
+  const { getTenantHref } = useTenantPath();
   const [showQuotaAlert, setShowQuotaAlert] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [groupScope, setGroupScope] = useState<'all' | 'selected'>('all');
@@ -618,7 +620,9 @@ export function BroadcastFormDialog({ botId, open, onOpenChange }: BroadcastForm
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Tutup</AlertDialogCancel>
-            <AlertDialogAction onClick={() => setShowQuotaAlert(false)}>Tutup</AlertDialogAction>
+            <AlertDialogAction asChild onClick={() => setShowQuotaAlert(false)}>
+              <a href={getTenantHref('/dashboard/billing')}>Tingkatkan Paket</a>
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
