@@ -12,6 +12,7 @@ import { CellAction } from './cell-action';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { RowSelectionBar } from '@/components/ui/table/row-selection-bar';
 import type { ReactNode } from 'react';
 
 interface PackageTableProps {
@@ -232,30 +233,12 @@ export function PackageTable({ onEdit, onBulkDelete, toolbarActions, notice }: P
         </div>
         <div className='shrink-0'>
           {selectedIds.length > 0 && onBulkDelete ? (
-            <div className='flex items-center gap-3'>
-              <span className='text-sm font-medium text-primary'>
-                {selectedIds.length} paket dipilih
-              </span>
-              <div className='flex gap-2'>
-                <Button
-                  variant='outline'
-                  size='sm'
-                  className='rounded-full'
-                  onClick={clearSelection}
-                >
-                  Batal Pilih
-                </Button>
-                <Button
-                  variant='destructive'
-                  size='sm'
-                  className='rounded-full'
-                  onClick={() => onBulkDelete(selectedIds)}
-                >
-                  <Icons.trash className='mr-2 h-4 w-4' />
-                  Hapus {selectedIds.length} Paket
-                </Button>
-              </div>
-            </div>
+            <RowSelectionBar
+              selectedCount={selectedIds.length}
+              noun='paket'
+              onClearSelection={clearSelection}
+              onDelete={() => onBulkDelete(selectedIds)}
+            />
           ) : (
             toolbarActions
           )}

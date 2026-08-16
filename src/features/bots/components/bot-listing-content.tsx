@@ -4,7 +4,6 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import { BotCardGrid } from './bot-card-grid';
 import { BotStats } from './bot-stats';
 import { BotFormDialog } from './bot-form-dialog';
@@ -17,18 +16,19 @@ import { useActivePlan } from '@/features/billing/components/active-plan-provide
 import type { TelegramBot } from '../api/types';
 import { bulkDeleteBots } from '../api/service';
 import { botKeys } from '../api/queries';
-import { toast } from 'sonner';
+import { useBulkDelete } from '@/hooks/use-bulk-delete';
 
 export function BotListingContent() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingBot, setEditingBot] = useState<TelegramBot | null>(null);
-  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
-  const [bulkDeleteIds, setBulkDeleteIds] = useState<string[]>([]);
-  const [bulkDeleting, setBulkDeleting] = useState(false);
   const [search, setSearch] = useState('');
   const { hasQuota } = useActivePlan();
   const canCreateBot = hasQuota('bots');
-  const queryClient = useQueryClient();
+  const bulkDelete = useBulkDelete({
+    deleteFn: bulkDeleteBots,
+    noun: 'bot',
+    queryKeys: [botKeys.all]
+  });
 
   const handleEdit = useCallback((bot: TelegramBot) => {
     setEditingBot(bot);
@@ -47,51 +47,15 @@ export function BotListingContent() {
     setDialogOpen(true);
   }, []);
 
-  const handleBulkDelete = useCallback((ids: string[]) => {
-    setBulkDeleteIds(ids);
-    setBulkDeleteOpen(true);
-  }, []);
-
-  const handleBulkDeleteConfirm = useCallback(async () => {
-    setBulkDeleting(true);
-    try {
-      const res = await bulkDeleteBots(bulkDeleteIds);
-      const deleted = res.data?.deleted ?? 0;
-      const failed = res.data?.failed ?? [];
-
-      if (res.success && deleted > 0) {
-        if (failed.length > 0) {
-          toast.error(`${deleted} bot dihapus, ${failed.length} gagal`);
-        } else {
-          toast.success(`${deleted} bot berhasil dihapus`);
-        }
-      } else if (failed.length > 0) {
-        toast.error(`${failed.length} bot gagal dihapus`);
-      } else {
-        toast.error(res.message || 'Gagal menghapus bot');
-      }
-    } catch {
-      toast.error('Gagal menghapus bot');
-    }
-
-    setBulkDeleting(false);
-    setBulkDeleteOpen(false);
-    setBulkDeleteIds([]);
-    void queryClient.invalidateQueries({ queryKey: botKeys.all });
-  }, [bulkDeleteIds, queryClient]);
-
   return (
     <div className='flex min-h-0 flex-1 flex-col gap-4'>
       <AlertModal
-        isOpen={bulkDeleteOpen}
-        onClose={() => {
-          setBulkDeleteOpen(false);
-          setBulkDeleteIds([]);
-        }}
-        onConfirm={handleBulkDeleteConfirm}
-        loading={bulkDeleting}
-        title={`Hapus ${bulkDeleteIds.length} bot?`}
-        description={`${bulkDeleteIds.length} bot akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.`}
+        isOpen={bulkDelete.confirmOpen}
+        onClose={bulkDelete.closeConfirm}
+        onConfirm={bulkDelete.confirmDelete}
+        loading={bulkDelete.isDeleting}
+        title={`Hapus ${bulkDelete.ids.length} bot?`}
+        description={`${bulkDelete.ids.length} bot akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.`}
       />
 
       <BotStats />
@@ -130,7 +94,7 @@ export function BotListingContent() {
       <div className='animate-fade-up-delay-3 flex min-h-0 flex-1 flex-col'>
         <BotCardGrid
           onEdit={handleEdit}
-          onBulkDelete={handleBulkDelete}
+          onBulkDelete={bulkDelete.requestDelete}
           onAdd={handleAdd}
           canCreate={canCreateBot}
           search={search}

@@ -4,7 +4,7 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { useSuspenseQuery, useQueryClient } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { PackageTable } from './package-tables';
 import { PackageFormDialog } from './package-form-dialog';
 import { Button } from '@/components/ui/button';
@@ -18,18 +18,19 @@ import Link from 'next/link';
 import type { Package } from '../api/types';
 import { bulkDeletePackages } from '../api/service';
 import { packageKeys } from '../api/queries';
-import { toast } from 'sonner';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { useBulkDelete } from '@/hooks/use-bulk-delete';
 
 export function PackageListingContent() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPackage, setEditingPackage] = useState<Package | null>(null);
-  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
-  const [bulkDeleteIds, setBulkDeleteIds] = useState<string[]>([]);
-  const [bulkDeleting, setBulkDeleting] = useState(false);
   const { hasQuota } = useActivePlan();
   const { getTenantHref } = useTenantPath();
-  const queryClient = useQueryClient();
+  const bulkDelete = useBulkDelete({
+    deleteFn: bulkDeletePackages,
+    noun: 'paket',
+    queryKeys: [packageKeys.all]
+  });
 
   const { data: groupsData } = useSuspenseQuery(groupsQueryOptions());
   const hasActiveGroups = (groupsData?.data ?? []).some((g) => g.is_active);
@@ -52,51 +53,15 @@ export function PackageListingContent() {
     setDialogOpen(true);
   }, []);
 
-  const handleBulkDelete = useCallback((ids: string[]) => {
-    setBulkDeleteIds(ids);
-    setBulkDeleteOpen(true);
-  }, []);
-
-  const handleBulkDeleteConfirm = useCallback(async () => {
-    setBulkDeleting(true);
-    try {
-      const res = await bulkDeletePackages(bulkDeleteIds);
-      const deleted = res.data?.deleted ?? 0;
-      const failed = res.data?.failed ?? [];
-
-      if (res.success && deleted > 0) {
-        if (failed.length > 0) {
-          toast.error(`${deleted} paket dihapus, ${failed.length} gagal`);
-        } else {
-          toast.success(`${deleted} paket berhasil dihapus`);
-        }
-      } else if (failed.length > 0) {
-        toast.error(`${failed.length} paket gagal dihapus`);
-      } else {
-        toast.error(res.message || 'Gagal menghapus paket');
-      }
-    } catch {
-      toast.error('Gagal menghapus paket');
-    }
-
-    setBulkDeleting(false);
-    setBulkDeleteOpen(false);
-    setBulkDeleteIds([]);
-    void queryClient.invalidateQueries({ queryKey: packageKeys.all });
-  }, [bulkDeleteIds, queryClient]);
-
   return (
     <div className='flex min-h-0 flex-1 flex-col gap-4'>
       <AlertModal
-        isOpen={bulkDeleteOpen}
-        onClose={() => {
-          setBulkDeleteOpen(false);
-          setBulkDeleteIds([]);
-        }}
-        onConfirm={handleBulkDeleteConfirm}
-        loading={bulkDeleting}
-        title={`Hapus ${bulkDeleteIds.length} paket?`}
-        description={`${bulkDeleteIds.length} paket akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.`}
+        isOpen={bulkDelete.confirmOpen}
+        onClose={bulkDelete.closeConfirm}
+        onConfirm={bulkDelete.confirmDelete}
+        loading={bulkDelete.isDeleting}
+        title={`Hapus ${bulkDelete.ids.length} paket?`}
+        description={`${bulkDelete.ids.length} paket akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.`}
       />
 
       {!hasActiveGroups && (
@@ -113,7 +78,7 @@ export function PackageListingContent() {
 
       <PackageTable
         onEdit={handleEdit}
-        onBulkDelete={handleBulkDelete}
+        onBulkDelete={bulkDelete.requestDelete}
         notice={<QuotaCard resource='packages' title='Kuota paket' />}
         toolbarActions={
           <>

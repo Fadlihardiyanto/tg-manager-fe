@@ -12,6 +12,7 @@ import { useTenantPath } from '@/lib/tenant-path';
 import { AlertModal } from '@/components/modal/alert-modal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { RowSelectionBar } from '@/components/ui/table/row-selection-bar';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Icons } from '@/components/icons';
@@ -127,23 +128,12 @@ export function BotCardGrid({
   return (
     <div className='flex flex-col gap-4'>
       {selectedIds.length > 0 && onBulkDelete && (
-        <div className='flex items-center gap-3'>
-          <span className='text-sm font-medium text-primary'>{selectedIds.length} bot dipilih</span>
-          <div className='flex gap-2'>
-            <Button variant='outline' size='sm' className='rounded-full' onClick={clearSelection}>
-              Batal Pilih
-            </Button>
-            <Button
-              variant='destructive'
-              size='sm'
-              className='rounded-full'
-              onClick={() => onBulkDelete(selectedIds)}
-            >
-              <Icons.trash className='mr-2 h-4 w-4' />
-              Hapus {selectedIds.length} Bot
-            </Button>
-          </div>
-        </div>
+        <RowSelectionBar
+          selectedCount={selectedIds.length}
+          noun='bot'
+          onClearSelection={clearSelection}
+          onDelete={() => onBulkDelete(selectedIds)}
+        />
       )}
 
       <div className='grid gap-5 sm:grid-cols-2 xl:grid-cols-3'>
