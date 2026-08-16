@@ -156,17 +156,81 @@ Dokumen ini merangkum pekerjaan yang dilakukan pada sesi pengembangan ini, kenda
 - Tenant: `fadli.hardiyanto04@gmail.com` / `Fadlikee12` (tenant `crypto-bro`)
 - Superadmin: `fadlihardiyanto@uhamka.ac.id` / `superadmin123`
 
+---
+
+# Sesi 3 — Superadmin P2, Members Filter, Dead Code & QA E2E (16 Agu 2026)
+
+## Konfirmasi API (langsung ke backend, bukan tebak)
+- **`GET /api/v1/tenant/transactions?search=` → DIDUKUNG** (case-insensitive ILIKE di
+  username/first/last_name/external_id; **tidak** mencakup package_name — info untuk BE).
+  `status=paid` juga didukung. Frontend tidak perlu berubah.
+- `GET /api/v1/tenant/members` search/status/package_id → didukung.
+- `GET /admin/v1/clients` → dukung `name` (ILIKE), `slug`, `active`, `subscription_tier`
+  (bukan `search` — frontend pakai `name`).
+- `GET /admin/v1/admins` → **tanpa filter**; `GET /admin/v1/audit-logs` → **tanpa filter**.
+
+## Yang Sudah Dikerjakan (commit terpisah, 8 commit)
+
+### 1. Superadmin P2 (dari critique 18/40)
+- **Tenants**: search `?name=` (debounce 400ms, reset page) + filter status `?active=`
+  server-side + loading state + empty state "Tidak ada tenant yang cocok"
+- **Admins**: search client-side (nama/email/role) — BE belum dukung param (catatan
+  ponytail di kode; upgrade saat BE siap)
+- **Audit-logs**: filter client-side aksi + resource — BE belum dukung param
+- **Permission picker** (roles): badge click-only → **checkbox groups + select-all
+  per group** (indeterminate state, label htmlFor + id, a11y)
+- **PaginationBar**: prop opsional `labelPlural` (total===1 ? label : labelPlural)
+- **Brand unify**: superadmin layout "Admin Panel - TG-Manager" → "Panel Admin - Urator";
+  tenant dashboard "Dashboard TG-Manager" → "Dashboard - Urator"
+
+### 2. Members — status filter
+- Select status di toolbar (pola transaksi): Aktif/Kedaluwarsa/Dikeluarkan/Menunggu →
+  `?status=` server-side + reset page; fix bug halus: ganti paket juga reset page sekarang
+
+### 3. Bulk delete
+- `bulkDelete*Mutation` (5 file, 0 pemakai) dihapus — `useBulkDelete` + service langsung
+  adalah satu-satunya jalur
+
+### 4. Dead code
+- Hapus: `react-query-demo` feature + route `/dashboard/react-query`,
+  `src/config/infoconfig.ts`, `src/lib/auth-axios.ts` (0 pemakai)
+- Hapus 15 unused deps: axios, motion, simplebar-react, react-resizable-panels,
+  react-responsive, sharp, vaul, react-query-devtools, tailwindcss-animate,
+  zod-form-adapter + 5 radix orphan (aspect-ratio, context-menu, hover-card, menubar, toast)
+
+## QA E2E Loop (metodologi systematic-debugging)
+- **Catatan lengkap: `QA_TESTING_NOTES.md`** (24 surfaces, hasil + bug + observasi)
+- Tenant: semua halaman PASS (login, overview, transactions, members, bots, groups,
+  packages, commands, broadcast, billing, midtrans, register, forgot-password,
+  landing+pricing, checkout). Badge "Lunas" terverifikasi live.
+- Superadmin: overview/audit-logs/login PASS; tenants/admins/roles/plans BLOCKED
+  (bug backend, lihat BUG-BE-001)
+- Tidak ada bug frontend baru. False-positive yang sudah dianalisis: CSP error
+  Midtrans (third-party sandbox), 409 order duplikat (sudah settlement), /register 404
+  (route asli = /register-tenant).
+
+## BUG-BE-001 (BLOCKER superadmin, untuk tim backend — detail lengkap di QA_TESTING_NOTES.md)
+- Semua `/admin/v1/*` (clients/admins/roles/billing) 403 "Anda memerlukan izin X.read"
+  untuk superadmin.
+- Root cause: RBAC 2 lapis tidak konsisten — `middleware.Authorize` bypass superadmin,
+  tapi usecase `requirePermission(CallerPermissions)` tidak; JWT superadmin sengaja
+  tanpa `permissions` claim (role superadmin tidak di-seed admin_role_permissions).
+- Fix saran: `requirePermission` terima `callerRoles` + bypass IsSuperAdmin; controller
+  isi `req.CallerRoles` (pola sudah ada di admin_permission_controller.go:33).
+
 ## Yang Belum Selesai / Pending
-1. **Backend localhost:8080 SEMPAT MATI** saat akhir sesi — verifikasi live transactions/superadmin butuh backend nyala
-2. **`search` param transaksi belum tentu didukung backend** (`api.yml` tidak mendokumentasikan `/transactions`) — konfirmasi ke BE
-3. Superadmin P2 (dari critique 18/40): search/filter tenants+admins+audit-logs, permission picker (badge click-only → checkbox), plural handling PaginationBar, brand name ganda ("Admin Panel - TG-Manager" vs "Panel Admin - Urator")
-4. `members` `status` filter: param didukung API tapi tidak ada kontrol UI-nya
-5. Bulk-delete: `bulkDeleteXMutation` di `api/mutations.ts` masih bypass (handler pakai service langsung)
-6. Dari audit arsitektur: 12 unused deps, `react-query-demo` dead feature, `infoconfig.ts` dead — belum dihapus
-7. SSE untuk overview — ditolak (overengineering), revisit saat kebutuhan realtime nyata
-8. Graphify: jalankan `graphify update .` setelah sesi
+1. **BUG-BE-001**: fix di backend oleh tim BE (repo `telegram-management-be`) —
+   setelah fix, re-verify superadmin tenants/admins/roles/plans live
+2. **BUG-BE-002**: `/admin/v1/admins` (`?search=`) & `/audit-logs` (`?action=&resource=`)
+   belum dukung filter — setelah BE siap, frontend pindah ke server-side
+3. Transaksi search tidak mencakup package_name (BE) — konfirmasi apakah perlu
+4. Observasi: tenant crypto-bro punya order paid tapi billing "Belum ada penagihan
+   aktif" — verifikasi alur payment callback → create subscription (BE)
+5. Mobile viewport E2E belum diuji (playwright-cli tanpa command viewport)
+6. SSE untuk overview — ditolak (overengineering), revisit saat kebutuhan realtime nyata
 
 ## Catatan Teknis
 - Workflow verifikasi: `playwright-cli` (login manual via headed browser; `snapshot`/`eval`/`console`/`requests`)
 - Commit style: conventional commits, 1 commit per logical change
 - `.playwright-cli/` dan `.claude/` di-gitignore
+- `QA_TESTING_NOTES.md` baru — berisi hasil E2E + bug backend untuk tim BE
