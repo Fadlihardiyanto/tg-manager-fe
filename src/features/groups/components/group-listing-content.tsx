@@ -71,39 +71,41 @@ export function GroupListingContent() {
         </div>
       }
     >
-      <AlertModal
-        isOpen={bulkDelete.confirmOpen}
-        onClose={bulkDelete.closeConfirm}
-        onConfirm={bulkDelete.confirmDelete}
-        loading={bulkDelete.isDeleting}
-        title={`Hapus ${bulkDelete.ids.length} grup?`}
-        description={`${bulkDelete.ids.length} grup akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.`}
-      />
+      <div className='flex min-h-0 flex-1 flex-col gap-4'>
+        <AlertModal
+          isOpen={bulkDelete.confirmOpen}
+          onClose={bulkDelete.closeConfirm}
+          onConfirm={bulkDelete.confirmDelete}
+          loading={bulkDelete.isDeleting}
+          title={`Hapus ${bulkDelete.ids.length} grup?`}
+          description={`${bulkDelete.ids.length} grup akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.`}
+        />
 
-      <GroupTable
-        onEdit={handleEdit}
-        onBulkDelete={bulkDelete.requestDelete}
-        emptyState={
-          <div className='flex flex-col items-center gap-3 py-6'>
-            <div className='flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary'>
-              <Icons.teams className='size-7' />
+        <GroupTable
+          onEdit={handleEdit}
+          onBulkDelete={bulkDelete.requestDelete}
+          emptyState={
+            <div className='flex flex-col items-center gap-3 py-6'>
+              <div className='flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary'>
+                <Icons.teams className='size-7' />
+              </div>
+              <div className='text-center'>
+                <p className='font-semibold text-foreground'>Belum ada grup Telegram terhubung</p>
+                <p className='mt-1 text-sm text-muted-foreground'>
+                  Hubungkan grup pertama Anda untuk mulai mengelola member dan bot.
+                </p>
+              </div>
+              <Button onClick={handleAdd} size='sm' className='rounded-full'>
+                <Icons.add className='mr-2 h-4 w-4' /> Hubungkan Grup Pertama
+              </Button>
             </div>
-            <div className='text-center'>
-              <p className='font-semibold text-foreground'>Belum ada grup Telegram terhubung</p>
-              <p className='mt-1 text-sm text-muted-foreground'>
-                Hubungkan grup pertama Anda untuk mulai mengelola member dan bot.
-              </p>
-            </div>
-            <Button onClick={handleAdd} size='sm' className='rounded-full'>
-              <Icons.add className='mr-2 h-4 w-4' /> Hubungkan Grup Pertama
-            </Button>
-          </div>
-        }
-      />
+          }
+        />
 
-      <GroupFormDialog group={editingGroup} open={dialogOpen} onOpenChange={handleDialogChange} />
+        <GroupFormDialog group={editingGroup} open={dialogOpen} onOpenChange={handleDialogChange} />
 
-      <ConnectGroupModal open={connectOpen} onOpenChange={setConnectOpen} />
+        <ConnectGroupModal open={connectOpen} onOpenChange={setConnectOpen} />
+      </div>
     </PageContainer>
   );
 }

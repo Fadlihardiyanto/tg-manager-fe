@@ -57,42 +57,44 @@ export function CommandListingContent() {
         </Button>
       }
     >
-      <AlertModal
-        isOpen={bulkDelete.confirmOpen}
-        onClose={bulkDelete.closeConfirm}
-        onConfirm={bulkDelete.confirmDelete}
-        loading={bulkDelete.isDeleting}
-        title={`Hapus ${bulkDelete.ids.length} perintah?`}
-        description={`${bulkDelete.ids.length} perintah akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.`}
-      />
+      <div className='flex min-h-0 flex-1 flex-col gap-4'>
+        <AlertModal
+          isOpen={bulkDelete.confirmOpen}
+          onClose={bulkDelete.closeConfirm}
+          onConfirm={bulkDelete.confirmDelete}
+          loading={bulkDelete.isDeleting}
+          title={`Hapus ${bulkDelete.ids.length} perintah?`}
+          description={`${bulkDelete.ids.length} perintah akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.`}
+        />
 
-      <CommandTable
-        onEdit={handleEdit}
-        onBulkDelete={bulkDelete.requestDelete}
-        notice={<QuotaCard resource='custom_commands' title='Kuota perintah kustom' />}
-        emptyState={
-          <div className='flex flex-col items-center gap-3 py-6'>
-            <div className='flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary'>
-              <Icons.command className='size-7' />
+        <CommandTable
+          onEdit={handleEdit}
+          onBulkDelete={bulkDelete.requestDelete}
+          notice={<QuotaCard resource='custom_commands' title='Kuota perintah kustom' />}
+          emptyState={
+            <div className='flex flex-col items-center gap-3 py-6'>
+              <div className='flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary'>
+                <Icons.command className='size-7' />
+              </div>
+              <div className='text-center'>
+                <p className='font-semibold text-foreground'>Belum ada perintah</p>
+                <p className='mt-1 text-sm text-muted-foreground'>
+                  Buat perintah kustom pertama untuk bot Anda agar bisa merespons otomatis.
+                </p>
+              </div>
+              <Button onClick={handleAdd} size='sm' className='rounded-full'>
+                <Icons.add className='mr-2 h-4 w-4' /> Buat Perintah Pertama
+              </Button>
             </div>
-            <div className='text-center'>
-              <p className='font-semibold text-foreground'>Belum ada perintah</p>
-              <p className='mt-1 text-sm text-muted-foreground'>
-                Buat perintah kustom pertama untuk bot Anda agar bisa merespons otomatis.
-              </p>
-            </div>
-            <Button onClick={handleAdd} size='sm' className='rounded-full'>
-              <Icons.add className='mr-2 h-4 w-4' /> Buat Perintah Pertama
-            </Button>
-          </div>
-        }
-      />
+          }
+        />
 
-      <CommandFormDialog
-        command={editingCommand}
-        open={dialogOpen}
-        onOpenChange={handleDialogChange}
-      />
+        <CommandFormDialog
+          command={editingCommand}
+          open={dialogOpen}
+          onOpenChange={handleDialogChange}
+        />
+      </div>
     </PageContainer>
   );
 }

@@ -88,38 +88,40 @@ export function PackageListingContent() {
         )
       }
     >
-      <AlertModal
-        isOpen={bulkDelete.confirmOpen}
-        onClose={bulkDelete.closeConfirm}
-        onConfirm={bulkDelete.confirmDelete}
-        loading={bulkDelete.isDeleting}
-        title={`Hapus ${bulkDelete.ids.length} paket?`}
-        description={`${bulkDelete.ids.length} paket akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.`}
-      />
+      <div className='flex min-h-0 flex-1 flex-col gap-4'>
+        <AlertModal
+          isOpen={bulkDelete.confirmOpen}
+          onClose={bulkDelete.closeConfirm}
+          onConfirm={bulkDelete.confirmDelete}
+          loading={bulkDelete.isDeleting}
+          title={`Hapus ${bulkDelete.ids.length} paket?`}
+          description={`${bulkDelete.ids.length} paket akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.`}
+        />
 
-      {!hasActiveGroups && (
-        <div className='rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm shadow-sm dark:border-amber-500/30 dark:bg-amber-500/10'>
-          <p className='font-medium text-amber-800'>Anda belum memiliki grup terdaftar.</p>
-          <p className='mt-1 text-amber-700'>
-            Silakan hubungkan grup Telegram Anda terlebih dahulu sebelum membuat paket jualan.
-          </p>
-          <Button asChild size='sm' className='mt-3'>
-            <Link href={getTenantHref('/dashboard/groups')}>Hubungkan Grup</Link>
-          </Button>
-        </div>
-      )}
+        {!hasActiveGroups && (
+          <div className='rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm shadow-sm dark:border-amber-500/30 dark:bg-amber-500/10'>
+            <p className='font-medium text-amber-800'>Anda belum memiliki grup terdaftar.</p>
+            <p className='mt-1 text-amber-700'>
+              Silakan hubungkan grup Telegram Anda terlebih dahulu sebelum membuat paket jualan.
+            </p>
+            <Button asChild size='sm' className='mt-3'>
+              <Link href={getTenantHref('/dashboard/groups')}>Hubungkan Grup</Link>
+            </Button>
+          </div>
+        )}
 
-      <PackageTable
-        onEdit={handleEdit}
-        onBulkDelete={bulkDelete.requestDelete}
-        notice={<QuotaCard resource='packages' title='Kuota paket' />}
-      />
+        <PackageTable
+          onEdit={handleEdit}
+          onBulkDelete={bulkDelete.requestDelete}
+          notice={<QuotaCard resource='packages' title='Kuota paket' />}
+        />
 
-      <PackageFormDialog
-        package_={editingPackage}
-        open={dialogOpen}
-        onOpenChange={handleDialogChange}
-      />
+        <PackageFormDialog
+          package_={editingPackage}
+          open={dialogOpen}
+          onOpenChange={handleDialogChange}
+        />
+      </div>
     </PageContainer>
   );
 }
