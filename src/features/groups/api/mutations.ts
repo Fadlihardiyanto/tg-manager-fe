@@ -4,7 +4,7 @@
 
 import { mutationOptions } from '@tanstack/react-query';
 import { getQueryClient } from '@/lib/query-client';
-import { updateGroup, deleteGroup, bulkDeleteGroups, syncGroups, disconnectGroup } from './service';
+import { updateGroup, deleteGroup, syncGroups, disconnectGroup } from './service';
 import { groupKeys } from './queries';
 import type { UpdateGroupRequest } from './types';
 
@@ -18,13 +18,6 @@ export const updateGroupMutation = mutationOptions({
 
 export const deleteGroupMutation = mutationOptions({
   mutationFn: (id: string) => deleteGroup(id),
-  onSuccess: () => {
-    getQueryClient().invalidateQueries({ queryKey: groupKeys.all });
-  }
-});
-
-export const bulkDeleteGroupsMutation = mutationOptions({
-  mutationFn: (ids: string[]) => bulkDeleteGroups(ids),
   onSuccess: () => {
     getQueryClient().invalidateQueries({ queryKey: groupKeys.all });
   }

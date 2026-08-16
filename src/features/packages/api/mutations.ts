@@ -8,7 +8,6 @@ import {
   createPackage,
   updatePackage,
   deletePackage,
-  bulkDeletePackages,
   togglePackageStatus,
   associateGroupsToPackage
 } from './service';
@@ -38,13 +37,6 @@ export const updatePackageMutation = mutationOptions({
 
 export const deletePackageMutation = mutationOptions({
   mutationFn: (id: string) => deletePackage(id),
-  onSuccess: () => {
-    getQueryClient().invalidateQueries({ queryKey: packageKeys.all });
-  }
-});
-
-export const bulkDeletePackagesMutation = mutationOptions({
-  mutationFn: (ids: string[]) => bulkDeletePackages(ids),
   onSuccess: () => {
     getQueryClient().invalidateQueries({ queryKey: packageKeys.all });
   }

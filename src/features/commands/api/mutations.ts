@@ -1,6 +1,6 @@
 import { mutationOptions } from '@tanstack/react-query';
 import { getQueryClient } from '@/lib/query-client';
-import { createCommand, updateCommand, deleteCommand, bulkDeleteCommands } from './service';
+import { createCommand, updateCommand, deleteCommand } from './service';
 import { commandKeys } from './queries';
 import type { CreateCommandRequest, UpdateCommandRequest } from './types';
 
@@ -21,13 +21,6 @@ export const updateCommandMutation = mutationOptions({
 
 export const deleteCommandMutation = mutationOptions({
   mutationFn: (id: string) => deleteCommand(id),
-  onSuccess: () => {
-    getQueryClient().invalidateQueries({ queryKey: commandKeys.all });
-  }
-});
-
-export const bulkDeleteCommandsMutation = mutationOptions({
-  mutationFn: (ids: string[]) => bulkDeleteCommands(ids),
   onSuccess: () => {
     getQueryClient().invalidateQueries({ queryKey: commandKeys.all });
   }
