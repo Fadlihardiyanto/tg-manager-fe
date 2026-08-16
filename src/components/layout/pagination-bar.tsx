@@ -17,6 +17,8 @@ interface PaginationBarProps {
   limit: number;
   limitOptions: number[];
   label: string;
+  /** Bentuk jamak label; default = label (Bahasa Indonesia umumnya tidak berubah). */
+  labelPlural?: string;
   onPageChange: (fn: (p: number) => number) => void;
   onLimitChange: (v: string) => void;
   nextDisabled: boolean;
@@ -29,6 +31,7 @@ export function PaginationBar({
   limit,
   limitOptions,
   label,
+  labelPlural,
   onPageChange,
   onLimitChange,
   nextDisabled
@@ -56,7 +59,7 @@ export function PaginationBar({
 
       <div className='flex items-center gap-1'>
         <p className='text-muted-foreground mr-2 text-xs tabular-nums'>
-          {total} {label} &middot; {page} / {totalPages || 1}
+          {total} {total === 1 ? label : (labelPlural ?? label)} &middot; {page} / {totalPages || 1}
         </p>
         <Button
           variant='outline'
