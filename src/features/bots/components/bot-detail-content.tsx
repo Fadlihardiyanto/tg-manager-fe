@@ -188,6 +188,14 @@ export default function BotDetailContent({ botId }: { botId: string }) {
         onClose={() => setDeleteOpen(false)}
         onConfirm={() => deleteMutation.mutate(bot.id)}
         loading={deleteMutation.isPending}
+        confirmVariant={connectedGroups.length > 0 ? 'default' : 'destructive'}
+        confirmText={connectedGroups.length > 0 ? 'Tutup' : 'Hapus'}
+        title={connectedGroups.length > 0 ? 'Bot masih terhubung ke grup' : 'Hapus Bot?'}
+        description={
+          connectedGroups.length > 0
+            ? `Bot @${bot?.username} masih terhubung ke ${connectedGroups.length} grup. Bot tidak bisa dihapus sebelum semua grup diputuskan — putuskan grup satu per satu dari daftar di bawah, lalu coba hapus lagi.`
+            : `Bot @${bot?.username} akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.`
+        }
       />
       <AlertModal
         isOpen={toggleOpen}

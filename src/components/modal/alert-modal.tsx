@@ -12,6 +12,7 @@ interface AlertModalProps {
   onConfirm: () => void;
   loading: boolean;
   confirmVariant?: VariantProps<typeof buttonVariants>['variant'];
+  confirmText?: string;
   title?: string;
   description?: string;
 }
@@ -22,6 +23,7 @@ export function AlertModal({
   onConfirm,
   loading,
   confirmVariant = 'destructive',
+  confirmText = 'Lanjutkan',
   title = 'Apakah Anda yakin?',
   description = 'Tindakan ini tidak dapat dibatalkan.'
 }: AlertModalProps) {
@@ -42,7 +44,7 @@ export function AlertModal({
           Batal
         </Button>
         <Button disabled={loading} variant={confirmVariant} onClick={onConfirm}>
-          Lanjutkan
+          {confirmText}
         </Button>
       </div>
     </Modal>

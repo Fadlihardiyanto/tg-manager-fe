@@ -215,8 +215,23 @@ function BotCard({ bot, groupCount, onEdit, index, isSelected, onToggleSelect }:
       <AlertModal
         isOpen={deleteOpen}
         onClose={() => setDeleteOpen(false)}
-        onConfirm={() => deleteMutation.mutate(bot.id)}
+        onConfirm={() => {
+          if (groupCount > 0) {
+            setDeleteOpen(false);
+            router.push(getTenantHref(`/dashboard/bots/${bot.id}`));
+            return;
+          }
+          deleteMutation.mutate(bot.id);
+        }}
         loading={deleteMutation.isPending}
+        confirmVariant={groupCount > 0 ? 'default' : 'destructive'}
+        confirmText={groupCount > 0 ? 'Putuskan Grup' : 'Hapus'}
+        title={groupCount > 0 ? 'Bot masih terhubung ke grup' : 'Hapus Bot?'}
+        description={
+          groupCount > 0
+            ? `Bot @${bot.username} masih terhubung ke ${groupCount} grup. Bot tidak bisa dihapus sebelum semua grup diputuskan — lanjutkan untuk membuka detail bot.`
+            : `Bot @${bot.username} akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.`
+        }
       />
       <AlertModal
         isOpen={toggleOpen}
