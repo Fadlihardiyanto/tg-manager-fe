@@ -161,3 +161,16 @@ Midtrans, 409 order duplikat, 404 /register) semuanya false-positive/third-party
   groups, packages. Form dialogs (create/update) sudah cek sejak refactor.
 - **Tersisa:** broadcast-form-dialog + migration members belum dicek res.success
   di onSuccess (scan berikutnya kalau muncul gejala serupa).
+
+## Fitur: Transfer grup saat hapus bot (16 Agu 2026) — commit 406ecd2
+- BE SUDAH punya /transfer (telegram_webhook_usecase.go:659 handleTransferCommand,
+  transfer_ok callback): admin grup jalankan /transfer@botBaru KODE → konfirmasi
+  inline → grup.BotUUID diganti bot baru + is_active true + status redis success.
+- FE: use-connect-flow mode 'transfer' (command /transfer@), GroupTransferRow
+  (pilih bot tujuan → Buat Kode → salin → poll status) di modal hapus bot.
+- Dibatalkan: pindah via PUT groups bot_id (palsu — bot baru belum di grup).
+- Catatan BE: disconnect (telegram_group_usecase.go) hanya set is_active=false,
+  TIDAK melepas bot_id → disconnect tidak cukup untuk hapus bot; /transfer adalah
+  jalur yang benar. Saran: disconnect set bot_id=NULL agar konsisten.
+- E2E penuh belum diverifikasi (butuh backend + bot/grup Telegram nyata untuk
+  menjalankan /transfer).
