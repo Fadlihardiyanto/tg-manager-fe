@@ -22,8 +22,15 @@ import { formatDate } from '@/lib/format';
 import { deleteBotMutation, updateBotMutation } from '../api/mutations';
 import { botKeys, botsQueryOptions } from '../api/queries';
 import { groupsQueryOptions, groupKeys } from '@/features/groups/api/queries';
-import { disconnectGroupMutation } from '@/features/groups/api/mutations';
+import { updateGroupMutation, deleteGroupMutation } from '@/features/groups/api/mutations';
 import { Modal } from '@/components/ui/modal';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
 import type { BotRole, TelegramBot } from '../api/types';
 import type { TelegramGroup } from '@/features/groups/api/types';
 import { BOT_ROLE_LABELS } from '../api/types';
@@ -150,6 +157,7 @@ export function BotCardGrid({
             bot={bot}
             groupCount={groupCountByBotId.get(bot.id) ?? 0}
             connectedGroups={groupsByBotId.get(bot.id) ?? []}
+            allBots={bots}
             onEdit={onEdit}
             index={i}
             isSelected={selectedIds.includes(bot.id)}
@@ -165,6 +173,7 @@ interface BotCardProps {
   bot: TelegramBot;
   groupCount: number;
   connectedGroups: TelegramGroup[];
+  allBots: TelegramBot[];
   onEdit: (bot: TelegramBot) => void;
   index: number;
   isSelected: boolean;
@@ -175,6 +184,7 @@ function BotCard({
   bot,
   groupCount,
   connectedGroups,
+  allBots,
   onEdit,
   index,
   isSelected,
@@ -203,43 +213,50 @@ function BotCard({
     }
   });
 
-  const disconnectMutation = useMutation({
-    ...disconnectGroupMutation,
+  const moveGroupMutation = useMutation({
+    ...updateGroupMutation,
     onSuccess: (res) => {
       if (!res.success) {
-        toast.error(res.message || 'Gagal memutuskan grup');
+        toast.error(res.message || 'Gagal memindahkan grup');
         return;
       }
+      toast.success('Grup dipindahkan ke bot lain');
       void queryClient.invalidateQueries({ queryKey: groupKeys.all });
       void queryClient.invalidateQueries({ queryKey: botKeys.all });
     }
   });
 
-  const [disconnectingId, setDisconnectingId] = useState<string | null>(null);
-  const [disconnectingAll, setDisconnectingAll] = useState(false);
-
-  const handleDisconnect = async (groupId: string) => {
-    setDisconnectingId(groupId);
-    const res = await disconnectMutation.mutateAsync(groupId);
-    setDisconnectingId(null);
-    if (!res.success) toast.error(res.message || 'Gagal memutuskan grup');
-  };
-
-  const handleDisconnectAllAndDelete = async () => {
-    setDisconnectingAll(true);
-    try {
-      for (const group of connectedGroups) {
-        const res = await disconnectMutation.mutateAsync(group.id);
-        if (!res.success) {
-          toast.error(res.message || `Gagal memutuskan ${group.name}`);
-          setDisconnectingAll(false);
-          return;
-        }
+  const removeGroupMutation = useMutation({
+    ...deleteGroupMutation,
+    onSuccess: (res) => {
+      if (!res.success) {
+        toast.error(res.message || 'Gagal menghapus grup');
+        return;
       }
-      await deleteMutation.mutateAsync(bot.id);
-    } finally {
-      setDisconnectingAll(false);
+      toast.success('Grup dihapus');
+      void queryClient.invalidateQueries({ queryKey: groupKeys.all });
+      void queryClient.invalidateQueries({ queryKey: botKeys.all });
     }
+  });
+
+  const [movingGroupId, setMovingGroupId] = useState<string | null>(null);
+  const [moveTargets, setMoveTargets] = useState<Record<string, string>>({});
+  const [confirmDeleteGroup, setConfirmDeleteGroup] = useState<TelegramGroup | null>(null);
+  const otherBots = allBots.filter((b) => b.id !== bot.id && b.is_active);
+
+  const handleMoveGroup = async (groupId: string) => {
+    const targetBotId = moveTargets[groupId];
+    if (!targetBotId) {
+      toast.error('Pilih bot tujuan terlebih dahulu');
+      return;
+    }
+    setMovingGroupId(groupId);
+    const res = await moveGroupMutation.mutateAsync({
+      id: groupId,
+      values: { bot_id: targetBotId }
+    });
+    setMovingGroupId(null);
+    if (!res.success) toast.error(res.message || 'Gagal memindahkan grup');
   };
 
   const toggleActiveMutation = useMutation({
@@ -271,7 +288,7 @@ function BotCard({
       {connectedGroups.length > 0 ? (
         <Modal
           title='Hapus Bot?'
-          description={`Bot @${bot.username} masih terhubung ke ${connectedGroups.length} grup. Putuskan grup yang menghalangi, atau putuskan semua sekaligus lalu hapus bot.`}
+          description={`Bot @${bot.username} masih digunakan oleh ${connectedGroups.length} grup. Pindahkan ke bot lain atau hapus grup tersebut sebelum menghapus bot.`}
           isOpen={deleteOpen}
           onClose={() => setDeleteOpen(false)}
         >
@@ -279,42 +296,61 @@ function BotCard({
             {connectedGroups.map((group) => (
               <div
                 key={group.id}
-                className='flex items-center justify-between gap-3 rounded-lg border border-border/70 px-3 py-2'
+                className='space-y-2 rounded-lg border border-border/70 px-3 py-2'
               >
-                <div className='min-w-0'>
-                  <p className='truncate text-sm font-medium'>{group.name}</p>
-                  <p className='text-xs text-muted-foreground'>{group.member_count} member</p>
+                <div className='flex items-center justify-between gap-3'>
+                  <div className='min-w-0'>
+                    <p className='truncate text-sm font-medium'>{group.name}</p>
+                    <p className='text-xs text-muted-foreground'>{group.member_count} member</p>
+                  </div>
+                  <Button
+                    size='sm'
+                    variant='ghost'
+                    className='shrink-0 text-destructive hover:bg-destructive/10 hover:text-destructive'
+                    onClick={() => setConfirmDeleteGroup(group)}
+                  >
+                    <Icons.trash className='mr-1.5 size-3.5' />
+                    Hapus Grup
+                  </Button>
                 </div>
-                <Button
-                  size='sm'
-                  variant='outline'
-                  className='shrink-0 rounded-full'
-                  onClick={() => void handleDisconnect(group.id)}
-                  disabled={
-                    disconnectingAll || (disconnectingId !== null && disconnectingId !== group.id)
-                  }
-                  isLoading={disconnectingId === group.id}
-                >
-                  Putuskan
-                </Button>
+                {otherBots.length > 0 && (
+                  <div className='flex items-center gap-2'>
+                    <Select
+                      value={moveTargets[group.id] ?? ''}
+                      onValueChange={(v) => setMoveTargets((prev) => ({ ...prev, [group.id]: v }))}
+                    >
+                      <SelectTrigger className='h-8 flex-1 rounded-full text-xs'>
+                        <SelectValue placeholder='Pindahkan ke bot...' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {otherBots.map((b) => (
+                          <SelectItem key={b.id} value={b.id}>
+                            @{b.username}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      size='sm'
+                      variant='outline'
+                      className='shrink-0 rounded-full'
+                      onClick={() => void handleMoveGroup(group.id)}
+                      disabled={movingGroupId === group.id}
+                      isLoading={movingGroupId === group.id}
+                    >
+                      Pindahkan
+                    </Button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
           <div className='flex w-full items-center justify-end gap-2 pt-4'>
-            <Button
-              variant='outline'
-              onClick={() => setDeleteOpen(false)}
-              disabled={disconnectingAll}
-            >
+            <Button variant='outline' onClick={() => setDeleteOpen(false)}>
               Batal
             </Button>
-            <Button
-              variant='destructive'
-              onClick={() => void handleDisconnectAllAndDelete()}
-              isLoading={disconnectingAll}
-              disabled={disconnectingAll}
-            >
-              Putuskan Semua & Hapus
+            <Button variant='destructive' onClick={() => deleteMutation.mutate(bot.id)}>
+              Hapus Bot
             </Button>
           </div>
         </Modal>
@@ -329,6 +365,19 @@ function BotCard({
           description={`Bot @${bot.username} akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.`}
         />
       )}
+      <AlertModal
+        isOpen={!!confirmDeleteGroup}
+        onClose={() => setConfirmDeleteGroup(null)}
+        onConfirm={() => {
+          if (confirmDeleteGroup) {
+            removeGroupMutation.mutate(confirmDeleteGroup.id);
+            setConfirmDeleteGroup(null);
+          }
+        }}
+        loading={removeGroupMutation.isPending}
+        title='Hapus Grup?'
+        description={`Grup "${confirmDeleteGroup?.name}" akan dihapus permanen beserta riwayatnya. Bot di grup ini tidak lagi mengelola grup tersebut.`}
+      />
       <AlertModal
         isOpen={toggleOpen}
         onClose={() => setToggleOpen(false)}
