@@ -180,10 +180,18 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
 
         // Associate groups if any selected (create mode only)
         if (!isAllAccess && res.data?.id) {
-          await associateMutation.mutateAsync({
+          const assocRes = await associateMutation.mutateAsync({
             packageId: res.data.id,
             data: { group_ids: selectedGroupIds }
           });
+          if (!assocRes.success) {
+            toast.error(assocRes.message || 'Gagal menghubungkan grup ke paket');
+            onOpenChange(false);
+            form.reset();
+            setSelectedGroupIds([]);
+            void queryClient.invalidateQueries({ queryKey: packageKeys.all });
+            return;
+          }
         }
         toast.success('Paket berhasil dibuat');
         onOpenChange(false);
@@ -207,10 +215,18 @@ export function PackageFormDialog({ package_, open, onOpenChange }: PackageFormD
 
         // Associate groups if any selected
         if (!isAllAccess && res.data?.id) {
-          await associateMutation.mutateAsync({
+          const assocRes = await associateMutation.mutateAsync({
             packageId: res.data.id,
             data: { group_ids: selectedGroupIds }
           });
+          if (!assocRes.success) {
+            toast.error(assocRes.message || 'Gagal menghubungkan grup ke paket');
+            onOpenChange(false);
+            form.reset();
+            setSelectedGroupIds([]);
+            void queryClient.invalidateQueries({ queryKey: packageKeys.all });
+            return;
+          }
         }
         toast.success('Paket berhasil diperbarui');
         onOpenChange(false);

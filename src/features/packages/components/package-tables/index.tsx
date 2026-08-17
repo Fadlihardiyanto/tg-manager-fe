@@ -140,10 +140,19 @@ function PackageCard({
               </span>
             ))}
             {overflowCount > 0 && (
-              <span className='inline-flex items-center rounded-md bg-muted/40 px-2 py-1 text-xs text-muted-foreground'>
-                +{overflowCount}
-              </span>
+              <span className='text-xs text-muted-foreground'>+{overflowCount} lainnya</span>
             )}
+          </div>
+        )}
+        {groups.length === 0 && (
+          <div className='mt-3 flex items-center gap-1.5'>
+            <span className='inline-flex items-center gap-1 rounded-full border border-red-500/20 bg-red-500/10 px-2.5 py-0.5 text-xs font-medium text-red-600 dark:text-red-400'>
+              <Icons.warning className='size-3' />
+              Tanpa Grup
+            </span>
+            <span className='text-xs text-muted-foreground'>
+              Paket belum bisa diaktifkan sampai grup dihubungkan.
+            </span>
           </div>
         )}
 

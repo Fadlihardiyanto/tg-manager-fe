@@ -28,6 +28,7 @@ import { formatDate, formatRupiah } from '@/lib/format';
 export function StatusCell({ pkg }: { pkg: Package }) {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const queryClient = useQueryClient();
+  const hasGroups = (pkg.groups?.length ?? 0) > 0;
 
   const activateMutation = useMutation({
     ...togglePackageStatusMutation(true),
@@ -40,10 +41,12 @@ export function StatusCell({ pkg }: { pkg: Package }) {
             data: old.data.map((p) => (p.id === res.data!.id ? res.data! : p))
           };
         });
+        toast.success('Paket diaktifkan');
+      } else {
+        toast.error(res.message || 'Gagal mengaktifkan paket');
       }
-      toast.success('Paket diaktifkan');
     },
-    onError: () => toast.error('Gagal mengaktifkan paket')
+    onError: (err) => toast.error(err instanceof Error ? err.message : 'Gagal mengaktifkan paket')
   });
 
   const deactivateMutation = useMutation({
@@ -57,10 +60,12 @@ export function StatusCell({ pkg }: { pkg: Package }) {
             data: old.data.map((p) => (p.id === res.data!.id ? res.data! : p))
           };
         });
+        toast.success('Paket dinonaktifkan');
+      } else {
+        toast.error(res.message || 'Gagal menonaktifkan paket');
       }
-      toast.success('Paket dinonaktifkan');
     },
-    onError: () => toast.error('Gagal menonaktifkan paket')
+    onError: (err) => toast.error(err instanceof Error ? err.message : 'Gagal menonaktifkan paket')
   });
 
   const handleToggle = (checked: boolean) => {
@@ -96,7 +101,11 @@ export function StatusCell({ pkg }: { pkg: Package }) {
       <Switch
         checked={pkg.is_active}
         onCheckedChange={handleToggle}
-        disabled={activateMutation.isPending || deactivateMutation.isPending}
+        disabled={
+          activateMutation.isPending ||
+          deactivateMutation.isPending ||
+          (!hasGroups && !pkg.is_active)
+        }
         aria-label={pkg.is_active ? 'Nonaktifkan paket' : 'Aktifkan paket'}
       />
     </>
