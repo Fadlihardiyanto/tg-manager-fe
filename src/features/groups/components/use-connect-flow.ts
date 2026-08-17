@@ -18,6 +18,7 @@ export function useConnectFlow(
   const [secondsLeft, setSecondsLeft] = useState(0);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
   const [connectStatus, setConnectStatus] = useState<ConnectStatus | null>(null);
 
   // transfer = pindahkan grup yang sudah terdaftar ke bot lain (BE: /transfer command)
@@ -96,10 +97,17 @@ export function useConnectFlow(
     setTimeout(() => setCopied(false), 2000);
   }, [command]);
 
+  const handleCopyLink = useCallback(async () => {
+    await navigator.clipboard.writeText(inviteLink);
+    setCopiedLink(true);
+    setTimeout(() => setCopiedLink(false), 2000);
+  }, [inviteLink]);
+
   const reset = useCallback(() => {
     setToken('');
     setSecondsLeft(0);
     setCopied(false);
+    setCopiedLink(false);
     setConnectStatus(null);
     setLoading(false);
   }, []);
@@ -109,12 +117,14 @@ export function useConnectFlow(
     secondsLeft,
     loading,
     copied,
+    copiedLink,
     connectStatus,
     command,
     inviteLink,
     timeString,
     handleGenerate,
     handleCopy,
+    handleCopyLink,
     reset
   };
 }

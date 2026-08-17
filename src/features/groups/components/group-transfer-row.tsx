@@ -62,38 +62,74 @@ export function GroupTransferRow({ allBots }: GroupTransferRowProps) {
       </div>
 
       {flow.token && (
-        <div className='space-y-2 rounded-lg border border-primary/20 bg-primary/5 p-3'>
-          <div className='flex items-center justify-between gap-2'>
-            <code className='min-w-0 truncate font-mono text-xs'>{flow.command || '…'}</code>
-            <Button
-              size='sm'
-              variant='ghost'
-              className='shrink-0 rounded-full'
-              onClick={() => void flow.handleCopy()}
-            >
-              <Icons.clipboardCopy
-                className={flow.copied ? 'mr-1.5 size-3.5 text-emerald-600' : 'mr-1.5 size-3.5'}
-              />
-              {flow.copied ? 'Tersalin' : 'Salin'}
-            </Button>
+        <div className='space-y-3 rounded-lg border border-primary/20 bg-primary/5 p-3'>
+          <div className='space-y-1.5'>
+            <p className='text-xs font-semibold text-foreground'>
+              Langkah 1 — Tambahkan bot ke grup
+            </p>
+            <div className='flex items-center justify-between gap-2'>
+              <code className='min-w-0 truncate font-mono text-xs'>{flow.inviteLink}</code>
+              <div className='flex shrink-0 items-center gap-1'>
+                <Button
+                  size='sm'
+                  variant='ghost'
+                  className='rounded-full'
+                  onClick={() => void flow.handleCopyLink()}
+                >
+                  <Icons.clipboardCopy
+                    className={flow.copiedLink ? 'mr-1 size-3.5 text-emerald-600' : 'mr-1 size-3.5'}
+                  />
+                  {flow.copiedLink ? 'Tersalin' : 'Salin'}
+                </Button>
+                <Button size='sm' variant='outline' className='rounded-full' asChild>
+                  <a href={flow.inviteLink} target='_blank' rel='noreferrer'>
+                    Buka di Telegram
+                  </a>
+                </Button>
+              </div>
+            </div>
+            <p className='text-xs text-muted-foreground'>
+              Buka link ini di grup agar bot masuk, lalu jadikan bot sebagai administrator.
+            </p>
           </div>
-          <p className='flex items-center gap-1.5 text-xs text-muted-foreground'>
-            {flow.connectStatus === 'pending' ? (
-              <Icons.spinner className='size-3 animate-spin' />
-            ) : flow.connectStatus === 'success' ? (
-              <Icons.circleCheck className='size-3 text-emerald-600' />
-            ) : (
-              <Icons.clock className='size-3' />
-            )}
-            {flow.connectStatus
-              ? STATUS_TEXT[flow.connectStatus]
-              : 'Jalankan perintah di grup Telegram.'}
-            {flow.connectStatus !== 'success' && flow.secondsLeft > 0 && (
-              <span className='ml-auto tabular-nums'>
-                {Math.floor(flow.secondsLeft / 60)}:{String(flow.secondsLeft % 60).padStart(2, '0')}
-              </span>
-            )}
-          </p>
+
+          <div className='space-y-1.5'>
+            <p className='text-xs font-semibold text-foreground'>
+              Langkah 2 — Pindahkan pengelolaan
+            </p>
+            <div className='flex items-center justify-between gap-2'>
+              <code className='min-w-0 truncate font-mono text-xs'>{flow.command || '…'}</code>
+              <Button
+                size='sm'
+                variant='ghost'
+                className='shrink-0 rounded-full'
+                onClick={() => void flow.handleCopy()}
+              >
+                <Icons.clipboardCopy
+                  className={flow.copied ? 'mr-1.5 size-3.5 text-emerald-600' : 'mr-1.5 size-3.5'}
+                />
+                {flow.copied ? 'Tersalin' : 'Salin'}
+              </Button>
+            </div>
+            <p className='flex items-center gap-1.5 text-xs text-muted-foreground'>
+              {flow.connectStatus === 'pending' ? (
+                <Icons.spinner className='size-3 animate-spin' />
+              ) : flow.connectStatus === 'success' ? (
+                <Icons.circleCheck className='size-3 text-emerald-600' />
+              ) : (
+                <Icons.clock className='size-3' />
+              )}
+              {flow.connectStatus
+                ? STATUS_TEXT[flow.connectStatus]
+                : 'Kirim perintah ini di grup (tempat bot tadi masuk).'}
+              {flow.connectStatus !== 'success' && flow.secondsLeft > 0 && (
+                <span className='ml-auto tabular-nums'>
+                  {Math.floor(flow.secondsLeft / 60)}:
+                  {String(flow.secondsLeft % 60).padStart(2, '0')}
+                </span>
+              )}
+            </p>
+          </div>
         </div>
       )}
     </div>
