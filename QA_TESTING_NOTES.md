@@ -138,3 +138,14 @@ Midtrans, 409 order duplikat, 404 /register) semuanya false-positive/third-party
 - **Pelajaran:** setelah restart backend BE, restart juga dev server frontend;
   kalau sering, pasang undici dispatcher dengan keepAliveTimeout pendek di
   api-client (belum dilakukan — YAGNI sampai sering terjadi).
+
+## Fitur Baru: Laporan (16 Agu 2026) — verified live
+- Menu sidebar+kbar "Laporan" (/dashboard/reports), 2 tab: Pengaturan & Kegagalan
+- GET/PUT /report-settings: default {enabled:false, target 0, bot zero-uuid, 08:00};
+  PUT tersimpan konsisten (verified target 555666777 → GET sama)
+- GET /report-failures: empty state "Tidak ada kegagalan" (DB dev belum ada
+  job_events); list + dialog detail BELUM diverifikasi dengan data nyata —
+  perlu seed/kejadian gagal untuk verifikasi visual
+- Catatan: tab Kegagalan tidak berpindah saat eval .click() — Radix Tabs butuh
+  click penuh (playwright native click bekerja); bukan bug
+- Backend: restart perlu agar endpoint report aktif (source BE af5e73d sudah ada)
