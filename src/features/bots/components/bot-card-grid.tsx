@@ -255,6 +255,7 @@ function BotCard({
           description={`Bot @${bot.username} masih digunakan oleh ${connectedGroups.length} grup. Pindahkan ke bot lain atau hapus grup tersebut sebelum menghapus bot.`}
           isOpen={deleteOpen}
           onClose={() => setDeleteOpen(false)}
+          className='sm:max-w-xl'
         >
           <div className='space-y-2 pt-2'>
             {connectedGroups.map((group) => (

@@ -68,7 +68,9 @@ export function GroupTransferRow({ allBots }: GroupTransferRowProps) {
               Langkah 1 — Tambahkan bot ke grup
             </p>
             <div className='flex items-center justify-between gap-2'>
-              <code className='min-w-0 truncate font-mono text-xs'>{flow.inviteLink}</code>
+              <div className='min-w-0 flex-1 rounded-md bg-background/60 px-2 py-1.5'>
+                <code className='block truncate font-mono text-xs'>{flow.inviteLink}</code>
+              </div>
               <div className='flex shrink-0 items-center gap-1'>
                 <Button
                   size='sm'
@@ -83,7 +85,7 @@ export function GroupTransferRow({ allBots }: GroupTransferRowProps) {
                 </Button>
                 <Button size='sm' variant='outline' className='rounded-full' asChild>
                   <a href={flow.inviteLink} target='_blank' rel='noreferrer'>
-                    Buka di Telegram
+                    Buka
                   </a>
                 </Button>
               </div>
@@ -98,7 +100,9 @@ export function GroupTransferRow({ allBots }: GroupTransferRowProps) {
               Langkah 2 — Pindahkan pengelolaan
             </p>
             <div className='flex items-center justify-between gap-2'>
-              <code className='min-w-0 truncate font-mono text-xs'>{flow.command || '…'}</code>
+              <div className='min-w-0 flex-1 rounded-md bg-background/60 px-2 py-1.5'>
+                <code className='block truncate font-mono text-xs'>{flow.command || '…'}</code>
+              </div>
               <Button
                 size='sm'
                 variant='ghost'
