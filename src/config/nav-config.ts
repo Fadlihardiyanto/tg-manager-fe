@@ -104,6 +104,14 @@ export const navGroups: NavGroup[] = [
         shortcut: ['b', 'r'],
         isActive: false,
         items: []
+      },
+      {
+        title: 'Laporan',
+        url: '/dashboard/reports',
+        icon: 'post',
+        shortcut: ['l', 'p'],
+        isActive: false,
+        items: []
       }
     ]
   }
