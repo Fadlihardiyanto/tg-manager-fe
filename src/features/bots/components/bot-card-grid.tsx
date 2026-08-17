@@ -21,8 +21,11 @@ import { formatDate } from '@/lib/format';
 
 import { deleteBotMutation, updateBotMutation } from '../api/mutations';
 import { botKeys, botsQueryOptions } from '../api/queries';
-import { groupsQueryOptions } from '@/features/groups/api/queries';
+import { groupsQueryOptions, groupKeys } from '@/features/groups/api/queries';
+import { disconnectGroupMutation } from '@/features/groups/api/mutations';
+import { Modal } from '@/components/ui/modal';
 import type { BotRole, TelegramBot } from '../api/types';
+import type { TelegramGroup } from '@/features/groups/api/types';
 import { BOT_ROLE_LABELS } from '../api/types';
 
 const BOT_ROLE_STYLES: Record<BotRole, string> = {
@@ -74,9 +77,13 @@ export function BotCardGrid({
 
   // Compute group counts per bot
   const groupCountByBotId = new Map<string, number>();
+  const groupsByBotId = new Map<string, TelegramGroup[]>();
   for (const group of groups) {
     if (!group.is_active) continue;
     groupCountByBotId.set(group.bot_id, (groupCountByBotId.get(group.bot_id) ?? 0) + 1);
+    const list = groupsByBotId.get(group.bot_id) ?? [];
+    list.push(group);
+    groupsByBotId.set(group.bot_id, list);
   }
 
   const toggleSelect = (id: string) => {
@@ -142,6 +149,7 @@ export function BotCardGrid({
             key={bot.id}
             bot={bot}
             groupCount={groupCountByBotId.get(bot.id) ?? 0}
+            connectedGroups={groupsByBotId.get(bot.id) ?? []}
             onEdit={onEdit}
             index={i}
             isSelected={selectedIds.includes(bot.id)}
@@ -156,13 +164,22 @@ export function BotCardGrid({
 interface BotCardProps {
   bot: TelegramBot;
   groupCount: number;
+  connectedGroups: TelegramGroup[];
   onEdit: (bot: TelegramBot) => void;
   index: number;
   isSelected: boolean;
   onToggleSelect?: () => void;
 }
 
-function BotCard({ bot, groupCount, onEdit, index, isSelected, onToggleSelect }: BotCardProps) {
+function BotCard({
+  bot,
+  groupCount,
+  connectedGroups,
+  onEdit,
+  index,
+  isSelected,
+  onToggleSelect
+}: BotCardProps) {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [toggleOpen, setToggleOpen] = useState(false);
   const queryClient = useQueryClient();
@@ -185,6 +202,45 @@ function BotCard({ bot, groupCount, onEdit, index, isSelected, onToggleSelect }:
       toast.error('Gagal menghapus bot');
     }
   });
+
+  const disconnectMutation = useMutation({
+    ...disconnectGroupMutation,
+    onSuccess: (res) => {
+      if (!res.success) {
+        toast.error(res.message || 'Gagal memutuskan grup');
+        return;
+      }
+      void queryClient.invalidateQueries({ queryKey: groupKeys.all });
+      void queryClient.invalidateQueries({ queryKey: botKeys.all });
+    }
+  });
+
+  const [disconnectingId, setDisconnectingId] = useState<string | null>(null);
+  const [disconnectingAll, setDisconnectingAll] = useState(false);
+
+  const handleDisconnect = async (groupId: string) => {
+    setDisconnectingId(groupId);
+    const res = await disconnectMutation.mutateAsync(groupId);
+    setDisconnectingId(null);
+    if (!res.success) toast.error(res.message || 'Gagal memutuskan grup');
+  };
+
+  const handleDisconnectAllAndDelete = async () => {
+    setDisconnectingAll(true);
+    try {
+      for (const group of connectedGroups) {
+        const res = await disconnectMutation.mutateAsync(group.id);
+        if (!res.success) {
+          toast.error(res.message || `Gagal memutuskan ${group.name}`);
+          setDisconnectingAll(false);
+          return;
+        }
+      }
+      await deleteMutation.mutateAsync(bot.id);
+    } finally {
+      setDisconnectingAll(false);
+    }
+  };
 
   const toggleActiveMutation = useMutation({
     ...updateBotMutation,
@@ -212,27 +268,67 @@ function BotCard({ bot, groupCount, onEdit, index, isSelected, onToggleSelect }:
 
   return (
     <>
-      <AlertModal
-        isOpen={deleteOpen}
-        onClose={() => setDeleteOpen(false)}
-        onConfirm={() => {
-          if (groupCount > 0) {
-            setDeleteOpen(false);
-            router.push(getTenantHref(`/dashboard/bots/${bot.id}`));
-            return;
-          }
-          deleteMutation.mutate(bot.id);
-        }}
-        loading={deleteMutation.isPending}
-        confirmVariant={groupCount > 0 ? 'default' : 'destructive'}
-        confirmText={groupCount > 0 ? 'Putuskan Grup' : 'Hapus'}
-        title={groupCount > 0 ? 'Bot masih terhubung ke grup' : 'Hapus Bot?'}
-        description={
-          groupCount > 0
-            ? `Bot @${bot.username} masih terhubung ke ${groupCount} grup. Bot tidak bisa dihapus sebelum semua grup diputuskan — lanjutkan untuk membuka detail bot.`
-            : `Bot @${bot.username} akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.`
-        }
-      />
+      {connectedGroups.length > 0 ? (
+        <Modal
+          title='Hapus Bot?'
+          description={`Bot @${bot.username} masih terhubung ke ${connectedGroups.length} grup. Putuskan grup yang menghalangi, atau putuskan semua sekaligus lalu hapus bot.`}
+          isOpen={deleteOpen}
+          onClose={() => setDeleteOpen(false)}
+        >
+          <div className='space-y-2 pt-2'>
+            {connectedGroups.map((group) => (
+              <div
+                key={group.id}
+                className='flex items-center justify-between gap-3 rounded-lg border border-border/70 px-3 py-2'
+              >
+                <div className='min-w-0'>
+                  <p className='truncate text-sm font-medium'>{group.name}</p>
+                  <p className='text-xs text-muted-foreground'>{group.member_count} member</p>
+                </div>
+                <Button
+                  size='sm'
+                  variant='outline'
+                  className='shrink-0 rounded-full'
+                  onClick={() => void handleDisconnect(group.id)}
+                  disabled={
+                    disconnectingAll || (disconnectingId !== null && disconnectingId !== group.id)
+                  }
+                  isLoading={disconnectingId === group.id}
+                >
+                  Putuskan
+                </Button>
+              </div>
+            ))}
+          </div>
+          <div className='flex w-full items-center justify-end gap-2 pt-4'>
+            <Button
+              variant='outline'
+              onClick={() => setDeleteOpen(false)}
+              disabled={disconnectingAll}
+            >
+              Batal
+            </Button>
+            <Button
+              variant='destructive'
+              onClick={() => void handleDisconnectAllAndDelete()}
+              isLoading={disconnectingAll}
+              disabled={disconnectingAll}
+            >
+              Putuskan Semua & Hapus
+            </Button>
+          </div>
+        </Modal>
+      ) : (
+        <AlertModal
+          isOpen={deleteOpen}
+          onClose={() => setDeleteOpen(false)}
+          onConfirm={() => deleteMutation.mutate(bot.id)}
+          loading={deleteMutation.isPending}
+          confirmText='Hapus'
+          title='Hapus Bot?'
+          description={`Bot @${bot.username} akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.`}
+        />
+      )}
       <AlertModal
         isOpen={toggleOpen}
         onClose={() => setToggleOpen(false)}
