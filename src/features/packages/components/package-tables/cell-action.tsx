@@ -22,7 +22,12 @@ export function CellAction({ data, onEdit }: CellActionProps) {
 
   const deleteMutation = useMutation({
     ...deletePackageMutation,
-    onSuccess: () => {
+    onSuccess: (res) => {
+      if (!res.success) {
+        toast.error(res.message || 'Gagal menghapus paket');
+        setDeleteOpen(false);
+        return;
+      }
       toast.success('Paket berhasil dihapus');
       setDeleteOpen(false);
       void queryClient.invalidateQueries({ queryKey: packageKeys.all });

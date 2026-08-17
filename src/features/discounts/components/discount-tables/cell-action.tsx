@@ -22,7 +22,12 @@ export function CellAction({ data, onEdit }: CellActionProps) {
 
   const deleteMutation = useMutation({
     ...deleteDiscountMutation,
-    onSuccess: () => {
+    onSuccess: (res) => {
+      if (!res.success) {
+        toast.error(res.message || 'Gagal menghapus diskon');
+        setDeleteOpen(false);
+        return;
+      }
       toast.success('Diskon berhasil dihapus');
       setDeleteOpen(false);
       void queryClient.invalidateQueries({ queryKey: discountKeys.all });
@@ -34,7 +39,11 @@ export function CellAction({ data, onEdit }: CellActionProps) {
 
   const toggleActiveMutation = useMutation({
     ...updateDiscountMutation,
-    onSuccess: () => {
+    onSuccess: (res) => {
+      if (!res.success) {
+        toast.error(res.message || 'Gagal memperbarui status diskon');
+        return;
+      }
       toast.success(
         data.is_active ? 'Diskon berhasil dinonaktifkan' : 'Diskon berhasil diaktifkan'
       );

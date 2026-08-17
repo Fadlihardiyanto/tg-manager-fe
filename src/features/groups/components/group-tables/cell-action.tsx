@@ -22,7 +22,12 @@ export function CellAction({ data, onEdit }: CellActionProps) {
 
   const deleteMutation = useMutation({
     ...deleteGroupMutation,
-    onSuccess: () => {
+    onSuccess: (res) => {
+      if (!res.success) {
+        toast.error(res.message || 'Gagal menghapus grup');
+        setDeleteOpen(false);
+        return;
+      }
       toast.success('Grup berhasil dihapus');
       setDeleteOpen(false);
       void queryClient.invalidateQueries({ queryKey: groupKeys.all });

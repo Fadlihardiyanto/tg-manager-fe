@@ -24,7 +24,12 @@ export function CellAction({ data, onEdit }: CellActionProps) {
 
   const deleteMutation = useMutation({
     ...deleteBotMutation,
-    onSuccess: () => {
+    onSuccess: (res) => {
+      if (!res.success) {
+        toast.error(res.message || 'Gagal menghapus bot');
+        setDeleteOpen(false);
+        return;
+      }
       toast.success('Bot berhasil dihapus');
       setDeleteOpen(false);
       void queryClient.invalidateQueries({ queryKey: botKeys.all });
@@ -36,7 +41,12 @@ export function CellAction({ data, onEdit }: CellActionProps) {
 
   const toggleActiveMutation = useMutation({
     ...updateBotMutation,
-    onSuccess: () => {
+    onSuccess: (res) => {
+      if (!res.success) {
+        toast.error(res.message || 'Gagal memperbarui status bot');
+        setToggleOpen(false);
+        return;
+      }
       toast.success(data.is_active ? 'Bot berhasil dinonaktifkan' : 'Bot berhasil diaktifkan');
       setToggleOpen(false);
       void queryClient.invalidateQueries({ queryKey: botKeys.all });

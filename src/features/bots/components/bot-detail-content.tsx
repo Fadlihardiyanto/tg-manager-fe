@@ -62,7 +62,12 @@ export default function BotDetailContent({ botId }: { botId: string }) {
 
   const deleteMutation = useMutation({
     ...deleteBotMutation,
-    onSuccess: () => {
+    onSuccess: (res) => {
+      if (!res.success) {
+        toast.error(res.message || 'Gagal menghapus bot');
+        setDeleteOpen(false);
+        return;
+      }
       toast.success('Bot berhasil dihapus');
       void queryClient.invalidateQueries({ queryKey: botKeys.all });
       router.push(getTenantHref('/dashboard/bots'));
@@ -73,7 +78,12 @@ export default function BotDetailContent({ botId }: { botId: string }) {
 
   const toggleMutation = useMutation({
     ...updateBotMutation,
-    onSuccess: () => {
+    onSuccess: (res) => {
+      if (!res.success) {
+        toast.error(res.message || 'Gagal memperbarui status bot');
+        setToggleOpen(false);
+        return;
+      }
       toast.success(bot?.is_active ? 'Bot berhasil dinonaktifkan' : 'Bot berhasil diaktifkan');
       setToggleOpen(false);
       void queryClient.invalidateQueries({ queryKey: botKeys.all });
@@ -83,7 +93,11 @@ export default function BotDetailContent({ botId }: { botId: string }) {
 
   const disconnectMutation = useMutation({
     ...disconnectGroupMutation,
-    onSuccess: () => {
+    onSuccess: (res) => {
+      if (!res.success) {
+        toast.error(res.message || 'Gagal memutuskan grup');
+        return;
+      }
       toast.success('Grup berhasil diputuskan dari bot');
       setSelectedGroup(null);
       setDisconnectGroupId(null);
@@ -94,7 +108,11 @@ export default function BotDetailContent({ botId }: { botId: string }) {
 
   const syncMutation = useMutation({
     ...syncGroupsMutation,
-    onSuccess: () => {
+    onSuccess: (res) => {
+      if (!res.success) {
+        toast.error(res.message || 'Gagal sinkronisasi grup');
+        return;
+      }
       toast.success('Data grup berhasil disinkronkan');
       void queryClient.invalidateQueries({ queryKey: groupKeys.all });
     },
