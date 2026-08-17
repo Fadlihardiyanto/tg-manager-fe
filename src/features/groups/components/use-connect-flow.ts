@@ -7,7 +7,11 @@ import { generateConnectToken } from '../api/service';
 import { groupKeys } from '../api/queries';
 import type { ConnectStatus } from '../api/types';
 
-export function useConnectFlow(botId: string, botUsername: string) {
+export function useConnectFlow(
+  botId: string,
+  botUsername: string,
+  mode: 'connect' | 'transfer' = 'connect'
+) {
   const queryClient = useQueryClient();
 
   const [token, setToken] = useState('');
@@ -16,7 +20,9 @@ export function useConnectFlow(botId: string, botUsername: string) {
   const [copied, setCopied] = useState(false);
   const [connectStatus, setConnectStatus] = useState<ConnectStatus | null>(null);
 
-  const command = `/connect@${botUsername} ${token}`;
+  // transfer = pindahkan grup yang sudah terdaftar ke bot lain (BE: /transfer command)
+  const command =
+    mode === 'transfer' ? `/transfer@${botUsername} ${token}` : `/connect@${botUsername} ${token}`;
   const inviteLink = `https://t.me/${botUsername}?startgroup=connect_${token}`;
   const timeString = `${String(Math.floor(secondsLeft / 60)).padStart(2, '0')}:${String(secondsLeft % 60).padStart(2, '0')}`;
 

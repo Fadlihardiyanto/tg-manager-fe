@@ -22,15 +22,9 @@ import { formatDate } from '@/lib/format';
 import { deleteBotMutation, updateBotMutation } from '../api/mutations';
 import { botKeys, botsQueryOptions } from '../api/queries';
 import { groupsQueryOptions, groupKeys } from '@/features/groups/api/queries';
-import { updateGroupMutation, deleteGroupMutation } from '@/features/groups/api/mutations';
+import { deleteGroupMutation } from '@/features/groups/api/mutations';
+import { GroupTransferRow } from '@/features/groups/components/group-transfer-row';
 import { Modal } from '@/components/ui/modal';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select';
 import type { BotRole, TelegramBot } from '../api/types';
 import type { TelegramGroup } from '@/features/groups/api/types';
 import { BOT_ROLE_LABELS } from '../api/types';
@@ -213,19 +207,6 @@ function BotCard({
     }
   });
 
-  const moveGroupMutation = useMutation({
-    ...updateGroupMutation,
-    onSuccess: (res) => {
-      if (!res.success) {
-        toast.error(res.message || 'Gagal memindahkan grup');
-        return;
-      }
-      toast.success('Grup dipindahkan ke bot lain');
-      void queryClient.invalidateQueries({ queryKey: groupKeys.all });
-      void queryClient.invalidateQueries({ queryKey: botKeys.all });
-    }
-  });
-
   const removeGroupMutation = useMutation({
     ...deleteGroupMutation,
     onSuccess: (res) => {
@@ -239,25 +220,8 @@ function BotCard({
     }
   });
 
-  const [movingGroupId, setMovingGroupId] = useState<string | null>(null);
-  const [moveTargets, setMoveTargets] = useState<Record<string, string>>({});
   const [confirmDeleteGroup, setConfirmDeleteGroup] = useState<TelegramGroup | null>(null);
   const otherBots = allBots.filter((b) => b.id !== bot.id && b.is_active);
-
-  const handleMoveGroup = async (groupId: string) => {
-    const targetBotId = moveTargets[groupId];
-    if (!targetBotId) {
-      toast.error('Pilih bot tujuan terlebih dahulu');
-      return;
-    }
-    setMovingGroupId(groupId);
-    const res = await moveGroupMutation.mutateAsync({
-      id: groupId,
-      values: { bot_id: targetBotId }
-    });
-    setMovingGroupId(null);
-    if (!res.success) toast.error(res.message || 'Gagal memindahkan grup');
-  };
 
   const toggleActiveMutation = useMutation({
     ...updateBotMutation,
@@ -313,35 +277,7 @@ function BotCard({
                     Hapus Grup
                   </Button>
                 </div>
-                {otherBots.length > 0 && (
-                  <div className='flex items-center gap-2'>
-                    <Select
-                      value={moveTargets[group.id] ?? ''}
-                      onValueChange={(v) => setMoveTargets((prev) => ({ ...prev, [group.id]: v }))}
-                    >
-                      <SelectTrigger className='h-8 flex-1 rounded-full text-xs'>
-                        <SelectValue placeholder='Pindahkan ke bot...' />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {otherBots.map((b) => (
-                          <SelectItem key={b.id} value={b.id}>
-                            @{b.username}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Button
-                      size='sm'
-                      variant='outline'
-                      className='shrink-0 rounded-full'
-                      onClick={() => void handleMoveGroup(group.id)}
-                      disabled={movingGroupId === group.id}
-                      isLoading={movingGroupId === group.id}
-                    >
-                      Pindahkan
-                    </Button>
-                  </div>
-                )}
+                {otherBots.length > 0 && <GroupTransferRow allBots={otherBots} />}
               </div>
             ))}
           </div>
