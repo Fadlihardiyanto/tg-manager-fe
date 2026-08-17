@@ -149,3 +149,15 @@ Midtrans, 409 order duplikat, 404 /register) semuanya false-positive/third-party
 - Catatan: tab Kegagalan tidak berpindah saat eval .click() — Radix Tabs butuh
   click penuh (playwright native click bekerja); bukan bug
 - Backend: restart perlu agar endpoint report aktif (source BE af5e73d sudah ada)
+
+## Bug: Delete bot gagal tapi toast sukses (16 Agu 2026)
+- **Gejala:** DELETE /api/v1/tenant/bots/:id kena FK groups_bot_id_fkey (bot masih
+  terhubung grup) → BE error 500, tapi UI toast "Bot berhasil dihapus".
+- **Root cause (frontend):** service meng-catch error BE dan me-resolve
+  `{success:false}` (bukan throw) → `useMutation.onSuccess` tetap dipanggil
+  → toast sukses palsu. Pola ini sistemik di semua fitur CRUD tenant.
+- **Fix (4259c83):** onSuccess cek `res.success`, tampilkan `res.message` (ID)
+  saat gagal — bots (delete/toggle/disconnect/sync), commands, discounts,
+  groups, packages. Form dialogs (create/update) sudah cek sejak refactor.
+- **Tersisa:** broadcast-form-dialog + migration members belum dicek res.success
+  di onSuccess (scan berikutnya kalau muncul gejala serupa).
