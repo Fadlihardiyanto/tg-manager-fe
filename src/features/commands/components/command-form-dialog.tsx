@@ -130,104 +130,110 @@ export function CommandFormDialog({ command, open, onOpenChange }: CommandFormDi
       onSubmit: commandFormSchema
     },
     onSubmit: async ({ value }) => {
-      if (!isEdit && !hasQuota('custom_commands')) {
-        toast.error('Quota custom command penuh. Upgrade plan untuk menambahkan command baru.');
-        return;
-      }
-
-      let trigger = value.command_trigger.trim().toLowerCase();
-      if (!trigger.startsWith('/')) trigger = '/' + trigger;
-
-      const triggerRegex = /^\/[a-z0-9_]{1,49}$/;
-      if (!triggerRegex.test(trigger)) {
-        toast.error(
-          'Format perintah salah! Hanya gunakan huruf kecil, angka, dan underscore (maks 50 karakter termasuk /).'
-        );
-        return;
-      }
-
-      if (BLACKLIST.includes(trigger)) {
-        toast.error(
-          `Perintah "${trigger}" adalah perintah bawaan sistem dan tidak bisa digunakan.`
-        );
-        return;
-      }
-
-      const maxText = value.response_type === 'text' ? 4096 : 1024;
-      if (Array.from(value.response_text).length > maxText) {
-        toast.error(`Isi pesan terlalu panjang! Maksimal ${maxText} karakter.`);
-        return;
-      }
-
-      const needsUpload = value.response_type === 'photo' || value.response_type === 'document';
-      let file_url: string | null = null;
-      if (needsUpload) {
-        if (value.file.length > 0) {
-          const file = value.file[0];
-          const maxSize = value.response_type === 'document' ? 5 * 1024 * 1024 : 2 * 1024 * 1024;
-          if (file.size > maxSize) {
-            toast.error(
-              `Ukuran berkas terlalu besar! Maksimal ${value.response_type === 'document' ? '5' : '2'} MB.`
-            );
-            return;
-          }
-
-          const presignRes = await getPresignedUrl({
-            file_name: file.name,
-            content_type: file.type
-          });
-          if (!presignRes.success) {
-            toast.error(presignRes.message || 'Gagal mendapatkan link upload');
-            return;
-          }
-          const { upload_url, public_url } = presignRes.data;
-
-          let s3Res: Response;
-          try {
-            s3Res = await fetch(upload_url, {
-              method: 'PUT',
-              headers: { 'Content-Type': file.type },
-              body: file
-            });
-          } catch {
-            toast.error(
-              `Gagal mengunggah file ke ${upload_url.slice(0, 60)}... — periksa konfigurasi CORS bucket S3`
-            );
-            return;
-          }
-          if (!s3Res.ok) {
-            toast.error('Gagal mengunggah file');
-            return;
-          }
-          file_url = public_url;
-        } else if (isEdit && command?.file_url) {
-          file_url = command.file_url;
-        } else {
-          toast.error(value.response_type === 'photo' ? 'Pilih file gambar' : 'Pilih file PDF');
+      try {
+        if (!isEdit && !hasQuota('custom_commands')) {
+          toast.error('Quota custom command penuh. Upgrade plan untuk menambahkan command baru.');
           return;
         }
-      }
 
-      const scopePayload = {
-        command_trigger: trigger,
-        response_type: value.response_type as 'text' | 'photo' | 'document',
-        response_text: value.response_text,
-        access_scope: value.access_scope,
-        chat_type_scope: value.chat_type_scope,
-        package_ids: value.access_scope === 'member' ? value.package_ids : [],
-        group_ids: value.chat_type_scope === 'dm_only' ? [] : value.group_ids,
-        ...(needsUpload && file_url ? { file_url } : {})
-      };
+        let trigger = value.command_trigger.trim().toLowerCase();
+        if (!trigger.startsWith('/')) trigger = '/' + trigger;
 
-      if (isEdit && command) {
-        const payload: UpdateCommandRequest = scopePayload;
-        await updateMutation.mutateAsync({ id: command.id, values: payload });
-      } else {
-        const payload: CreateCommandRequest = {
-          bot_id: value.bot_id,
-          ...scopePayload
+        const triggerRegex = /^\/[a-z0-9_]{1,49}$/;
+        if (!triggerRegex.test(trigger)) {
+          toast.error(
+            'Format perintah salah! Hanya gunakan huruf kecil, angka, dan underscore (maks 50 karakter termasuk /).'
+          );
+          return;
+        }
+
+        if (BLACKLIST.includes(trigger)) {
+          toast.error(
+            `Perintah "${trigger}" adalah perintah bawaan sistem dan tidak bisa digunakan.`
+          );
+          return;
+        }
+
+        const maxText = value.response_type === 'text' ? 4096 : 1024;
+        if (Array.from(value.response_text).length > maxText) {
+          toast.error(`Isi pesan terlalu panjang! Maksimal ${maxText} karakter.`);
+          return;
+        }
+
+        const needsUpload = value.response_type === 'photo' || value.response_type === 'document';
+        let file_url: string | null = null;
+        if (needsUpload) {
+          if (value.file.length > 0) {
+            const file = value.file[0];
+            const maxSize = value.response_type === 'document' ? 5 * 1024 * 1024 : 2 * 1024 * 1024;
+            if (file.size > maxSize) {
+              toast.error(
+                `Ukuran berkas terlalu besar! Maksimal ${value.response_type === 'document' ? '5' : '2'} MB.`
+              );
+              return;
+            }
+
+            const presignRes = await getPresignedUrl({
+              file_name: file.name,
+              content_type: file.type
+            });
+            if (!presignRes.success) {
+              toast.error(presignRes.message || 'Gagal mendapatkan link upload');
+              return;
+            }
+            const { upload_url, public_url } = presignRes.data;
+
+            let s3Res: Response;
+            try {
+              s3Res = await fetch(upload_url, {
+                method: 'PUT',
+                headers: { 'Content-Type': file.type },
+                body: file
+              });
+            } catch {
+              toast.error(
+                `Gagal mengunggah file ke ${upload_url.slice(0, 60)}... — periksa konfigurasi CORS bucket S3`
+              );
+              return;
+            }
+            if (!s3Res.ok) {
+              toast.error('Gagal mengunggah file');
+              return;
+            }
+            file_url = public_url;
+          } else if (isEdit && command?.file_url) {
+            file_url = command.file_url;
+          } else {
+            toast.error(value.response_type === 'photo' ? 'Pilih file gambar' : 'Pilih file PDF');
+            return;
+          }
+        }
+
+        const scopePayload = {
+          command_trigger: trigger,
+          response_type: value.response_type as 'text' | 'photo' | 'document',
+          response_text: value.response_text,
+          access_scope: value.access_scope,
+          chat_type_scope: value.chat_type_scope,
+          package_ids: value.access_scope === 'member' ? value.package_ids : [],
+          group_ids: value.chat_type_scope === 'dm_only' ? [] : value.group_ids,
+          ...(needsUpload && file_url ? { file_url } : {})
         };
-        await createMutation.mutateAsync(payload);
+
+        if (isEdit && command) {
+          const payload: UpdateCommandRequest = scopePayload;
+          await updateMutation.mutateAsync({ id: command.id, values: payload });
+        } else {
+          const payload: CreateCommandRequest = {
+            bot_id: value.bot_id,
+            ...scopePayload
+          };
+          await createMutation.mutateAsync(payload);
+        }
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : 'Terjadi kesalahan saat menyimpan perintah';
+        toast.error(message);
       }
     }
   });
@@ -240,6 +246,9 @@ export function CommandFormDialog({ command, open, onOpenChange }: CommandFormDi
   const chatTypeScope = useStore(form.store, (state) => state.values.chat_type_scope);
   const selectedPackageIds = useStore(form.store, (state) => state.values.package_ids);
   const selectedGroupIds = useStore(form.store, (state) => state.values.group_ids);
+  const selectedBotId = useStore(form.store, (state) => state.values.bot_id);
+  const groupsForBot = groups.filter((g) => g.bot_id === selectedBotId);
+  const hiddenGroupCount = groups.length - groupsForBot.length;
   const isPending = createMutation.isPending || updateMutation.isPending;
   const canCreateCommand = isEdit || isBillingLoading || hasQuota('custom_commands');
   const maxChars = responseType === 'text' ? 4096 : 1024;
@@ -261,6 +270,15 @@ export function CommandFormDialog({ command, open, onOpenChange }: CommandFormDi
       form.setFieldValue('group_ids', []);
     }
   }, [chatTypeScope, form, selectedGroupIds]);
+
+  // Buang grup milik bot lain dari pilihan saat bot berubah
+  useEffect(() => {
+    const validIds = new Set(groupsForBot.map((g) => g.id));
+    const pruned = selectedGroupIds.filter((id) => validIds.has(id));
+    if (pruned.length !== selectedGroupIds.length) {
+      form.setFieldValue('group_ids', pruned);
+    }
+  }, [selectedBotId, isEdit, form, groupsForBot, selectedGroupIds]);
 
   // Auto-scroll to first validation error whenever user attempts a submit
   useEffect(() => {
@@ -435,16 +453,18 @@ export function CommandFormDialog({ command, open, onOpenChange }: CommandFormDi
                         <FieldLabel>Grup yang Diizinkan</FieldLabel>
                         <FieldDescription>
                           Opsional. Kosongkan jika semua grup boleh memakai command ini.
+                          {hiddenGroupCount > 0 &&
+                            ` ${hiddenGroupCount} grup milik bot lain disembunyikan.`}
                         </FieldDescription>
                         <div className='flex max-h-[180px] flex-col gap-2 overflow-y-auto rounded-xl border bg-muted/30 p-4'>
                           {isGroupsLoading ? (
                             <p className='text-muted-foreground text-sm'>Memuat grup...</p>
-                          ) : groups.length === 0 ? (
+                          ) : groupsForBot.length === 0 ? (
                             <p className='text-muted-foreground text-sm'>
-                              Belum ada grup tersedia.
+                              Bot ini belum terhubung ke grup mana pun.
                             </p>
                           ) : (
-                            groups.map((group) => {
+                            groupsForBot.map((group) => {
                               const checked = value.includes(group.id);
 
                               return (
