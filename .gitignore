@@ -31,6 +31,7 @@ yarn-error.log*
 # local env files
 .env*
 .env*.local
+!.env.example
 
 # vercel
 .vercel
@@ -66,4 +67,21 @@ next-env.d.ts
 
 # Playwright CLI test artifacts
 .playwright-cli/
+.playwright/
 .claude/
+
+# agent tooling & vendored skill packs (machine-local)
+/.agents/
+/skills/
+/skills-lock.json
+
+# local notes, specs & scratch artifacts (not for the public repo)
+/IDEA.md
+/SESSION_SUMMARY.md
+/QA_TESTING_NOTES.md
+/bulk_delete_frontend_integration_guide.md
+/anti-slop.md
+/docs/superpowers/
+/good-ui/
+/dashboard-*.png
+/public/assets/urator.png
