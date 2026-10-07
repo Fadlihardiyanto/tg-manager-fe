@@ -148,4 +148,3 @@ export interface MeResponse {
     needs_onboarding: boolean;
   };
 }
-

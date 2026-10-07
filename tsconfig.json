@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -18,9 +14,7 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     },
     "incremental": true,
     "plugins": [
@@ -35,23 +29,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    ".next-build-verify-1730/types/**/*.ts",
-    ".next-build-verify-1730/dev/types/**/*.ts",
-    ".next-build-verify-1500/types/**/*.ts",
-    ".next-build-verify-1500/dev/types/**/*.ts",
-    ".next-build-verify-929/types/**/*.ts",
-    ".next-build-verify-929/dev/types/**/*.ts",
-    ".next-build-verify-2522/types/**/*.ts",
-    ".next-build-verify-2522/dev/types/**/*.ts",
-    ".next-build-verify-2565/types/**/*.ts",
-    ".next-build-verify-2565/dev/types/**/*.ts",
-    ".next-build-verify-2709/types/**/*.ts",
-    ".next-build-verify-2709/dev/types/**/*.ts",
-    ".next-build-verify-2127/types/**/*.ts",
-    ".next-build-verify-2127/dev/types/**/*.ts"
+    ".next-build-verify/types/**/*.ts",
+    ".next-build-verify/dev/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules",
-    ".next/dev"
-  ]
+  "exclude": ["node_modules", ".next/dev"]
 }

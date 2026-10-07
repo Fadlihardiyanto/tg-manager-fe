@@ -21,9 +21,7 @@ export default function DashboardError({
         <Icons.warning className='size-8 text-destructive' />
       </div>
       <div className='flex flex-col gap-2'>
-        <h2 className='text-xl font-bold tracking-tight'>
-          Something went wrong
-        </h2>
+        <h2 className='text-xl font-bold tracking-tight'>Something went wrong</h2>
         <p className='max-w-md text-sm text-muted-foreground'>
           {error.message || 'An unexpected error occurred. Please try again.'}
         </p>

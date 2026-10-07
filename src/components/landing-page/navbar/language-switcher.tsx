@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useLocale } from "next-intl";
-import { useRouter, usePathname } from "@/i18n/routing";
+import { useLocale } from 'next-intl';
+import { useRouter, usePathname } from '@/i18n/routing';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { Languages } from "lucide-react";
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { Languages } from 'lucide-react';
 
 export function LanguageSwitcher() {
   const locale = useLocale();
@@ -23,21 +23,21 @@ export function LanguageSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-9 w-9">
-          <Languages className="h-4 w-4" />
-          <span className="sr-only">Toggle language</span>
+        <Button variant='ghost' size='icon' className='h-9 w-9'>
+          <Languages className='h-4 w-4' />
+          <span className='sr-only'>Toggle language</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align='end'>
         <DropdownMenuItem
-          onClick={() => handleLanguageChange("en")}
-          className={locale === "en" ? "bg-accent" : ""}
+          onClick={() => handleLanguageChange('en')}
+          className={locale === 'en' ? 'bg-accent' : ''}
         >
           English
         </DropdownMenuItem>
         <DropdownMenuItem
-          onClick={() => handleLanguageChange("id")}
-          className={locale === "id" ? "bg-accent" : ""}
+          onClick={() => handleLanguageChange('id')}
+          className={locale === 'id' ? 'bg-accent' : ''}
         >
           Indonesia
         </DropdownMenuItem>

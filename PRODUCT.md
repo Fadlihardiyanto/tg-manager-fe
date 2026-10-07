@@ -37,6 +37,7 @@ TG Manager adalah platform SaaS all-in-one untuk mengelola komunitas Telegram be
 ## Capabilities and Constraints
 
 ### Fitur Utama
+
 - **Bot Management:** CRUD bot, toggle aktif/nonaktif, assign role (sales, gatekeeper, all-in-one), connect/disconnect grup
 - **Group Management:** CRUD grup, sync data dari Telegram, lihat member count, deep link ke Telegram
 - **Commands:** Custom command per bot, upload presigned, scope akses (grup tertentu/semua)
@@ -48,6 +49,7 @@ TG Manager adalah platform SaaS all-in-one untuk mengelola komunitas Telegram be
 - **Billing:** Tenant lihat billing aktif, history, cancel pending — integrasi dengan Midtrans
 
 ### Constraints
+
 - **Target:** Indonesia — Bahasa Indonesia, mobile-first responsive
 - **Platform:** Next.js 16 App Router, React Server Components + Client Components
 - **Stack:** shadcn/ui, TanStack Query, Tailwind CSS, @tabler/icons-react, lucide-react
@@ -57,6 +59,7 @@ TG Manager adalah platform SaaS all-in-one untuk mengelola komunitas Telegram be
 - **Empty states & loading:** Semua halaman punya skeleton loading state yang sesuai
 
 ### Open Decisions
+
 - Backend belum support asset/branding custom per tenant (logo, warna)
 - Belum ada fitur analytics/insight per tenant (engagement, revenue)
 - Internationalization: hanya `id` (Indonesia) saat ini, `en` fallback

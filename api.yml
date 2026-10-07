@@ -48,7 +48,7 @@ paths:
       summary: Get Public Plans
       description: Returns a list of active platform plans intended for the public landing page. No authentication required.
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -56,11 +56,11 @@ paths:
                 type: object
                 properties:
                   meta:
-                    $ref: "#/components/schemas/Meta"
+                    $ref: '#/components/schemas/Meta'
                   data:
                     type: array
                     items:
-                      $ref: "#/components/schemas/PlatformPlanResponse"
+                      $ref: '#/components/schemas/PlatformPlanResponse'
 
   /api/v1/member/checkout:
     post:
@@ -69,12 +69,12 @@ paths:
       summary: Member Checkout
       description: Public endpoint for member checkout process
       responses:
-        "200":
+        '200':
           description: Successful checkout
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SuccessResponse"
+                $ref: '#/components/schemas/SuccessResponse'
 
   /webhooks/telegram/{bot_id}:
     post:
@@ -89,7 +89,7 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        '200':
           description: OK
 
   /webhooks/midtrans/billing:
@@ -99,7 +99,7 @@ paths:
       summary: Midtrans Billing Webhook
       description: Webhook for tenant billing payment status updates
       responses:
-        "200":
+        '200':
           description: OK
 
   /webhooks/midtrans/member:
@@ -109,7 +109,7 @@ paths:
       summary: Midtrans Member Webhook
       description: Webhook for member payment status updates
       responses:
-        "200":
+        '200':
           description: OK
 
   # ==========================================
@@ -133,12 +133,12 @@ paths:
                 password:
                   type: string
       responses:
-        "200":
+        '200':
           description: Login successful
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TokenResponse"
+                $ref: '#/components/schemas/TokenResponse'
 
   /admin/v1/roles:
     get:
@@ -148,7 +148,7 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        "200":
+        '200':
           description: List of roles
     post:
       tags:
@@ -157,7 +157,7 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        "201":
+        '201':
           description: Role created
 
   /admin/v1/admins:
@@ -168,7 +168,7 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        "200":
+        '200':
           description: List of admins
     post:
       tags:
@@ -177,7 +177,7 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        "201":
+        '201':
           description: Admin created
 
   /admin/v1/clients:
@@ -188,7 +188,7 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        "200":
+        '200':
           description: List of clients
     post:
       tags:
@@ -197,7 +197,7 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        "201":
+        '201':
           description: Client created
 
   /admin/v1/billing/plans:
@@ -208,7 +208,7 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        "200":
+        '200':
           description: List of platform plans
     post:
       tags:
@@ -221,19 +221,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreatePlatformPlanRequest"
+              $ref: '#/components/schemas/CreatePlatformPlanRequest'
       responses:
-        "201":
+        '201':
           description: Platform plan created
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       data:
-                        $ref: "#/components/schemas/PlatformPlanResponse"
+                        $ref: '#/components/schemas/PlatformPlanResponse'
 
   /admin/v1/billing/plans/{id}:
     get:
@@ -250,17 +250,17 @@ paths:
             type: string
             format: uuid
       responses:
-        "200":
+        '200':
           description: Platform plan details
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       data:
-                        $ref: "#/components/schemas/PlatformPlanResponse"
+                        $ref: '#/components/schemas/PlatformPlanResponse'
     put:
       tags:
         - Admin - Billing & Plans
@@ -279,19 +279,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdatePlatformPlanRequest"
+              $ref: '#/components/schemas/UpdatePlatformPlanRequest'
       responses:
-        "200":
+        '200':
           description: Platform plan updated
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       data:
-                        $ref: "#/components/schemas/PlatformPlanResponse"
+                        $ref: '#/components/schemas/PlatformPlanResponse'
     delete:
       tags:
         - Admin - Billing & Plans
@@ -306,7 +306,7 @@ paths:
             type: string
             format: uuid
       responses:
-        "200":
+        '200':
           description: Platform plan deleted
 
   # ==========================================
@@ -323,40 +323,40 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TenantRegisterRequest"
+              $ref: '#/components/schemas/TenantRegisterRequest'
       responses:
-        "201":
+        '201':
           description: Registration successful, please check email for verification
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       data:
-                        $ref: "#/components/schemas/TenantRegisterResponse"
-        "400":
+                        $ref: '#/components/schemas/TenantRegisterResponse'
+        '400':
           description: Invalid request format
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "409":
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
           description: Conflict - Email already registered
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
               example:
                 success: false
-                message: "Email sudah terdaftar"
-        "422":
+                message: 'Email sudah terdaftar'
+        '422':
           description: Validation Error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
 
   /api/v1/auth/me:
     get:
@@ -367,17 +367,17 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       data:
-                        $ref: "#/components/schemas/TenantMeResponse"
+                        $ref: '#/components/schemas/TenantMeResponse'
 
   /api/v1/auth/login:
     post:
@@ -390,31 +390,31 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TenantLoginRequest"
+              $ref: '#/components/schemas/TenantLoginRequest'
       responses:
-        "200":
+        '200':
           description: Login successful
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       data:
-                        $ref: "#/components/schemas/TenantLoginResponse"
-        "400":
+                        $ref: '#/components/schemas/TenantLoginResponse'
+        '400':
           description: Invalid request format
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "422":
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
           description: Validation Error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
 
   /api/v1/auth/verify-email:
     get:
@@ -430,29 +430,29 @@ paths:
             type: string
           description: The verification token
       responses:
-        "200":
+        '200':
           description: Email verified successfully
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       data:
-                        $ref: "#/components/schemas/TenantLoginResponse"
-        "400":
+                        $ref: '#/components/schemas/TenantLoginResponse'
+        '400':
           description: Token missing or invalid
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "422":
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
           description: Validation Error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
 
   /api/v1/auth/resend-verification:
     post:
@@ -465,35 +465,35 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TenantResendVerificationRequest"
+              $ref: '#/components/schemas/TenantResendVerificationRequest'
       responses:
-        "200":
+        '200':
           description: Verification email sent (or email not found - returns same response)
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       message:
                         type: string
-                        example: "Link verifikasi telah dikirim ulang ke email Anda"
-        "400":
+                        example: 'Link verifikasi telah dikirim ulang ke email Anda'
+        '400':
           description: Email already verified
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
               example:
                 success: false
-                message: "Email sudah diverifikasi"
-        "422":
+                message: 'Email sudah diverifikasi'
+        '422':
           description: Validation Error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
 
   /api/v1/clients/onboarding:
     post:
@@ -508,31 +508,31 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TenantOnboardingRequest"
+              $ref: '#/components/schemas/TenantOnboardingRequest'
       responses:
-        "200":
+        '200':
           description: Onboarding complete, returns new tokens
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       data:
-                        $ref: "#/components/schemas/TenantOnboardingResponse"
-        "400":
+                        $ref: '#/components/schemas/TenantOnboardingResponse'
+        '400':
           description: Invalid request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "422":
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
           description: Validation Error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
 
   /api/v1/tenant/bots:
     get:
@@ -543,22 +543,22 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        "200":
+        '200':
           description: List of bots
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       data:
                         type: array
                         items:
-                          $ref: "#/components/schemas/TelegramBotResponse"
-        "401":
+                          $ref: '#/components/schemas/TelegramBotResponse'
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden - Requires bots.read permission
 
     post:
@@ -573,24 +573,24 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TelegramBotCreateRequest"
+              $ref: '#/components/schemas/TelegramBotCreateRequest'
       responses:
-        "201":
+        '201':
           description: Bot created successfully
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       data:
-                        $ref: "#/components/schemas/TelegramBotResponse"
-        "400":
+                        $ref: '#/components/schemas/TelegramBotResponse'
+        '400':
           description: Invalid request or bot token
-        "401":
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden - Requires bots.create permission
 
   /api/v1/tenant/bots/{id}:
@@ -609,22 +609,22 @@ paths:
             type: string
             format: uuid
       responses:
-        "200":
+        '200':
           description: Bot details
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       data:
-                        $ref: "#/components/schemas/TelegramBotResponse"
-        "401":
+                        $ref: '#/components/schemas/TelegramBotResponse'
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden - Requires bots.read permission
-        "404":
+        '404':
           description: Bot not found
 
     put:
@@ -646,26 +646,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TelegramBotUpdateRequest"
+              $ref: '#/components/schemas/TelegramBotUpdateRequest'
       responses:
-        "200":
+        '200':
           description: Bot updated successfully
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       data:
-                        $ref: "#/components/schemas/TelegramBotResponse"
-        "400":
+                        $ref: '#/components/schemas/TelegramBotResponse'
+        '400':
           description: Invalid request
-        "401":
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden - Requires bots.update permission
-        "404":
+        '404':
           description: Bot not found
 
     delete:
@@ -683,17 +683,17 @@ paths:
             type: string
             format: uuid
       responses:
-        "200":
+        '200':
           description: Bot deleted successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SuccessResponse"
-        "401":
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden - Requires bots.delete permission
-        "404":
+        '404':
           description: Bot not found
 
   /api/v1/tenant/commands:
@@ -729,22 +729,22 @@ paths:
             type: integer
             default: 10
       responses:
-        "200":
+        '200':
           description: List of custom commands
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       data:
                         type: array
                         items:
-                          $ref: "#/components/schemas/CustomCommandResponse"
-        "401":
+                          $ref: '#/components/schemas/CustomCommandResponse'
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden - Requires bots.read permission
 
     post:
@@ -759,24 +759,24 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateCustomCommandRequest"
+              $ref: '#/components/schemas/CreateCustomCommandRequest'
       responses:
-        "201":
+        '201':
           description: Command created successfully
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       data:
-                        $ref: "#/components/schemas/CustomCommandResponse"
-        "400":
+                        $ref: '#/components/schemas/CustomCommandResponse'
+        '400':
           description: Invalid request
-        "401":
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden - Requires bots.create permission
 
   /api/v1/tenant/commands/{id}:
@@ -795,22 +795,22 @@ paths:
             type: string
             format: uuid
       responses:
-        "200":
+        '200':
           description: Custom command details
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       data:
-                        $ref: "#/components/schemas/CustomCommandResponse"
-        "401":
+                        $ref: '#/components/schemas/CustomCommandResponse'
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden - Requires bots.read permission
-        "404":
+        '404':
           description: Command not found
 
     put:
@@ -832,26 +832,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateCustomCommandRequest"
+              $ref: '#/components/schemas/UpdateCustomCommandRequest'
       responses:
-        "200":
+        '200':
           description: Command updated successfully
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       data:
-                        $ref: "#/components/schemas/CustomCommandResponse"
-        "400":
+                        $ref: '#/components/schemas/CustomCommandResponse'
+        '400':
           description: Invalid request
-        "401":
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden - Requires bots.update permission
-        "404":
+        '404':
           description: Command not found
 
     delete:
@@ -869,17 +869,17 @@ paths:
             type: string
             format: uuid
       responses:
-        "200":
+        '200':
           description: Command deleted successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SuccessResponse"
-        "401":
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden - Requires bots.delete permission
-        "404":
+        '404':
           description: Command not found
 
   /api/v1/tenant/groups:
@@ -891,22 +891,22 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        "200":
+        '200':
           description: List of groups
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       data:
                         type: array
                         items:
-                          $ref: "#/components/schemas/GroupResponse"
-        "401":
+                          $ref: '#/components/schemas/GroupResponse'
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden - Requires groups.read permission
 
     post:
@@ -921,24 +921,24 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/GroupCreateRequest"
+              $ref: '#/components/schemas/GroupCreateRequest'
       responses:
-        "201":
+        '201':
           description: Group created successfully
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       data:
-                        $ref: "#/components/schemas/GroupResponse"
-        "400":
+                        $ref: '#/components/schemas/GroupResponse'
+        '400':
           description: Invalid request
-        "401":
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden - Requires groups.create permission
 
   /api/v1/tenant/groups/{id}:
@@ -957,22 +957,22 @@ paths:
             type: string
             format: uuid
       responses:
-        "200":
+        '200':
           description: Group details
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       data:
-                        $ref: "#/components/schemas/GroupResponse"
-        "401":
+                        $ref: '#/components/schemas/GroupResponse'
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden - Requires groups.read permission
-        "404":
+        '404':
           description: Group not found
 
     put:
@@ -994,26 +994,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/GroupUpdateRequest"
+              $ref: '#/components/schemas/GroupUpdateRequest'
       responses:
-        "200":
+        '200':
           description: Group updated successfully
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       data:
-                        $ref: "#/components/schemas/GroupResponse"
-        "400":
+                        $ref: '#/components/schemas/GroupResponse'
+        '400':
           description: Invalid request
-        "401":
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden - Requires groups.update permission
-        "404":
+        '404':
           description: Group not found
 
     delete:
@@ -1031,17 +1031,17 @@ paths:
             type: string
             format: uuid
       responses:
-        "200":
+        '200':
           description: Group deleted successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SuccessResponse"
-        "401":
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden - Requires groups.delete permission
-        "404":
+        '404':
           description: Group not found
 
   /api/v1/tenant/packages:
@@ -1053,22 +1053,22 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        "200":
+        '200':
           description: List of packages
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       data:
                         type: array
                         items:
-                          $ref: "#/components/schemas/PackageResponse"
-        "401":
+                          $ref: '#/components/schemas/PackageResponse'
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden - Requires packages.read permission
 
     post:
@@ -1083,24 +1083,24 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PackageCreateRequest"
+              $ref: '#/components/schemas/PackageCreateRequest'
       responses:
-        "201":
+        '201':
           description: Package created successfully
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       data:
-                        $ref: "#/components/schemas/PackageResponse"
-        "400":
+                        $ref: '#/components/schemas/PackageResponse'
+        '400':
           description: Invalid request
-        "401":
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden - Requires packages.create permission
 
   /api/v1/tenant/packages/{id}:
@@ -1119,22 +1119,22 @@ paths:
             type: string
             format: uuid
       responses:
-        "200":
+        '200':
           description: Package details
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       data:
-                        $ref: "#/components/schemas/PackageResponse"
-        "401":
+                        $ref: '#/components/schemas/PackageResponse'
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden - Requires packages.read permission
-        "404":
+        '404':
           description: Package not found
 
     put:
@@ -1156,26 +1156,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PackageUpdateRequest"
+              $ref: '#/components/schemas/PackageUpdateRequest'
       responses:
-        "200":
+        '200':
           description: Package updated successfully
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       data:
-                        $ref: "#/components/schemas/PackageResponse"
-        "400":
+                        $ref: '#/components/schemas/PackageResponse'
+        '400':
           description: Invalid request
-        "401":
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden - Requires packages.update permission
-        "404":
+        '404':
           description: Package not found
 
     delete:
@@ -1193,17 +1193,17 @@ paths:
             type: string
             format: uuid
       responses:
-        "200":
+        '200':
           description: Package deleted successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SuccessResponse"
-        "401":
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden - Requires packages.delete permission
-        "404":
+        '404':
           description: Package not found
 
   /api/v1/tenant/packages/{id}/groups:
@@ -1226,21 +1226,21 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PackageGroupAssociateRequest"
+              $ref: '#/components/schemas/PackageGroupAssociateRequest'
       responses:
-        "200":
+        '200':
           description: Groups associated successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SuccessResponse"
-        "400":
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
           description: Invalid request
-        "401":
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden - Requires packages.update permission
-        "404":
+        '404':
           description: Package not found
 
   /api/v1/tenant/discounts:
@@ -1252,22 +1252,22 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        "200":
+        '200':
           description: List of discounts
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       data:
                         type: array
                         items:
-                          $ref: "#/components/schemas/MemberDiscountResponse"
-        "401":
+                          $ref: '#/components/schemas/MemberDiscountResponse'
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden - Requires packages.read permission
 
     post:
@@ -1282,24 +1282,24 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateMemberDiscountRequest"
+              $ref: '#/components/schemas/CreateMemberDiscountRequest'
       responses:
-        "201":
+        '201':
           description: Discount created successfully
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       data:
-                        $ref: "#/components/schemas/MemberDiscountResponse"
-        "400":
+                        $ref: '#/components/schemas/MemberDiscountResponse'
+        '400':
           description: Invalid request
-        "401":
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden - Requires packages.create permission
 
   /api/v1/tenant/discounts/{id}:
@@ -1322,26 +1322,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateMemberDiscountRequest"
+              $ref: '#/components/schemas/UpdateMemberDiscountRequest'
       responses:
-        "200":
+        '200':
           description: Discount updated successfully
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       data:
-                        $ref: "#/components/schemas/MemberDiscountResponse"
-        "400":
+                        $ref: '#/components/schemas/MemberDiscountResponse'
+        '400':
           description: Invalid request
-        "401":
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden - Requires packages.update permission
-        "404":
+        '404':
           description: Discount not found
 
     delete:
@@ -1359,17 +1359,17 @@ paths:
             type: string
             format: uuid
       responses:
-        "200":
+        '200':
           description: Discount deleted successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SuccessResponse"
-        "401":
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden - Requires packages.delete permission
-        "404":
+        '404':
           description: Discount not found
 
   /api/v1/tenant/settings/profile:
@@ -1385,24 +1385,24 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ClientUpdateRequest"
+              $ref: '#/components/schemas/ClientUpdateRequest'
       responses:
-        "200":
+        '200':
           description: Profile updated successfully
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       data:
-                        $ref: "#/components/schemas/ClientResponse"
-        "400":
+                        $ref: '#/components/schemas/ClientResponse'
+        '400':
           description: Invalid request
-        "401":
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden - Requires owner/admin role
 
   /api/v1/tenant/settings/payment:
@@ -1418,24 +1418,24 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PaymentSettingsUpdateRequest"
+              $ref: '#/components/schemas/PaymentSettingsUpdateRequest'
       responses:
-        "200":
+        '200':
           description: Payment settings updated successfully
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       data:
-                        $ref: "#/components/schemas/PaymentSettingsResponse"
-        "400":
+                        $ref: '#/components/schemas/PaymentSettingsResponse'
+        '400':
           description: Invalid request
-        "401":
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden - Requires owner/admin role
 
   /api/v1/tenant/billing/active:
@@ -1447,18 +1447,18 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        "200":
+        '200':
           description: Active billing information
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       data:
-                        $ref: "#/components/schemas/ClientBillingResponse"
-        "401":
+                        $ref: '#/components/schemas/ClientBillingResponse'
+        '401':
           description: Unauthorized
 
   /api/v1/tenant/members:
@@ -1513,22 +1513,22 @@ paths:
             format: uuid
           description: Filter by package UUID
       responses:
-        "200":
+        '200':
           description: Paginated member list
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       meta:
-                        $ref: "#/components/schemas/Meta"
+                        $ref: '#/components/schemas/Meta'
                       data:
                         type: array
                         items:
-                          $ref: "#/components/schemas/MemberResponse"
-        "401":
+                          $ref: '#/components/schemas/MemberResponse'
+        '401':
           description: Unauthorized
 
   /api/v1/tenant/members/{id}:
@@ -1550,20 +1550,20 @@ paths:
             format: uuid
           description: Telegram user UUID (internal ID, not Telegram numeric ID)
       responses:
-        "200":
+        '200':
           description: Member detail
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/SuccessResponse"
+                  - $ref: '#/components/schemas/SuccessResponse'
                   - type: object
                     properties:
                       data:
-                        $ref: "#/components/schemas/MemberDetailResponse"
-        "401":
+                        $ref: '#/components/schemas/MemberDetailResponse'
+        '401':
           description: Unauthorized
-        "404":
+        '404':
           description: Member not found
 
   /api/v1/tenant/members/{id}/kick:
@@ -1582,17 +1582,17 @@ paths:
             type: string
             format: uuid
       responses:
-        "200":
+        '200':
           description: Member kicked successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SuccessResponse"
-        "401":
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden - Requires members.update permission
-        "404":
+        '404':
           description: Member or active subscription not found
 
   /api/v1/tenant/members/{id}/extend:
@@ -1623,17 +1623,17 @@ paths:
               required:
                 - new_expiry_at
       responses:
-        "200":
+        '200':
           description: Member expiry extended successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SuccessResponse"
-        "401":
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden - Requires members.update permission
-        "404":
+        '404':
           description: Member or active subscription not found
 
   /api/v1/tenant/members/{id}/sync:
@@ -1652,17 +1652,17 @@ paths:
             type: string
             format: uuid
       responses:
-        "200":
+        '200':
           description: Sync requested successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SuccessResponse"
-        "401":
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden - Requires members.update permission
-        "404":
+        '404':
           description: Member or active subscription not found
 
   /api/v1/tenant/members/{id}/resend-link:
@@ -1681,17 +1681,17 @@ paths:
             type: string
             format: uuid
       responses:
-        "200":
+        '200':
           description: Resend link requested successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SuccessResponse"
-        "401":
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden - Requires members.update permission
-        "404":
+        '404':
           description: Member or active subscription not found
 
 components:
@@ -1719,7 +1719,7 @@ components:
           type: object
         request_id:
           type: string
-          example: "req-12345"
+          example: 'req-12345'
 
     ErrorResponse:
       type: object
@@ -1738,7 +1738,7 @@ components:
           description: Detailed validation errors if any
         request_id:
           type: string
-          example: "req-12345"
+          example: 'req-12345'
 
     TokenResponse:
       type: object
@@ -1760,21 +1760,21 @@ components:
       properties:
         name:
           type: string
-          example: "John Doe"
+          example: 'John Doe'
           minLength: 3
         email:
           type: string
           format: email
-          example: "john@example.com"
+          example: 'john@example.com'
         password:
           type: string
           format: password
-          example: "SecretPassword123"
+          example: 'SecretPassword123'
           minLength: 8
         confirm_password:
           type: string
           format: password
-          example: "SecretPassword123"
+          example: 'SecretPassword123'
 
     TenantRegisterResponse:
       type: object
@@ -1802,11 +1802,11 @@ components:
         email:
           type: string
           format: email
-          example: "john@example.com"
+          example: 'john@example.com'
         password:
           type: string
           format: password
-          example: "SecretPassword123"
+          example: 'SecretPassword123'
 
     TenantResendVerificationRequest:
       type: object
@@ -1816,23 +1816,23 @@ components:
         email:
           type: string
           format: email
-          example: "john@example.com"
+          example: 'john@example.com'
 
     TenantMeResponse:
       type: object
       properties:
         user:
-          $ref: "#/components/schemas/UserResponse"
+          $ref: '#/components/schemas/UserResponse'
         client:
-          $ref: "#/components/schemas/ClientResponse"
+          $ref: '#/components/schemas/ClientResponse'
         role:
           type: string
-          example: "owner"
+          example: 'owner'
         permissions:
           type: array
           items:
             type: string
-          example: ["billing.view", "billing.manage", "bot.manage"]
+          example: ['billing.view', 'billing.manage', 'bot.manage']
         needs_onboarding:
           type: boolean
           example: false
@@ -1870,10 +1870,10 @@ components:
       properties:
         access_token:
           type: string
-          example: "eyJhbGci..."
+          example: 'eyJhbGci...'
         refresh_token:
           type: string
-          example: "eyJhbGci..."
+          example: 'eyJhbGci...'
         expires_in:
           type: integer
           example: 3600
@@ -1902,7 +1902,7 @@ components:
               type: string
         role:
           type: string
-          example: "owner"
+          example: 'owner'
         needs_onboarding:
           type: boolean
           example: false
@@ -1916,13 +1916,13 @@ components:
       properties:
         business_name:
           type: string
-          example: "My Telegram Store"
+          example: 'My Telegram Store'
         business_slug:
           type: string
-          example: "my-store"
+          example: 'my-store'
         category:
           type: string
-          example: "Retail"
+          example: 'Retail'
 
     TenantOnboardingResponse:
       type: object
@@ -1951,7 +1951,7 @@ components:
               type: string
         role:
           type: string
-          example: "owner"
+          example: 'owner'
 
     TelegramBotCreateRequest:
       type: object
@@ -1960,12 +1960,12 @@ components:
       properties:
         token:
           type: string
-          description: "Telegram Bot Token from BotFather"
-          example: "123456789:ABCdefGHIjklMNOpqrSTUvwxYZ"
+          description: 'Telegram Bot Token from BotFather'
+          example: '123456789:ABCdefGHIjklMNOpqrSTUvwxYZ'
         bot_role:
           type: string
           enum: [sales_only, gatekeeper_only, all_in_one]
-          example: "all_in_one"
+          example: 'all_in_one'
 
     TelegramBotUpdateRequest:
       type: object
@@ -1973,7 +1973,7 @@ components:
         bot_role:
           type: string
           enum: [sales_only, gatekeeper_only, all_in_one]
-          example: "sales_only"
+          example: 'sales_only'
         is_active:
           type: boolean
           example: true
@@ -1992,10 +1992,10 @@ components:
           example: 123456789
         username:
           type: string
-          example: "MySuperBot"
+          example: 'MySuperBot'
         bot_role:
           type: string
-          example: "all_in_one"
+          example: 'all_in_one'
         is_active:
           type: boolean
           example: true
@@ -2019,40 +2019,40 @@ components:
           format: uuid
         command_trigger:
           type: string
-          example: "/hello"
+          example: '/hello'
           minLength: 2
           maxLength: 50
         response_type:
           type: string
           enum: [text, photo]
-          example: "text"
+          example: 'text'
         response_text:
           type: string
-          example: "Hello there! How can I help you?"
+          example: 'Hello there! How can I help you?'
         file_url:
           type: string
           format: url
-          example: "https://example.com/image.jpg"
+          example: 'https://example.com/image.jpg'
 
     UpdateCustomCommandRequest:
       type: object
       properties:
         command_trigger:
           type: string
-          example: "/hello"
+          example: '/hello'
           minLength: 2
           maxLength: 50
         response_type:
           type: string
           enum: [text, photo]
-          example: "text"
+          example: 'text'
         response_text:
           type: string
-          example: "Hello there! How can I help you?"
+          example: 'Hello there! How can I help you?'
         file_url:
           type: string
           format: url
-          example: "https://example.com/image.jpg"
+          example: 'https://example.com/image.jpg'
         is_active:
           type: boolean
           example: true
@@ -2068,13 +2068,13 @@ components:
           format: uuid
         command_trigger:
           type: string
-          example: "/hello"
+          example: '/hello'
         response_type:
           type: string
-          example: "text"
+          example: 'text'
         response_text:
           type: string
-          example: "Hello there! How can I help you?"
+          example: 'Hello there! How can I help you?'
         file_url:
           type: string
           nullable: true
@@ -2104,7 +2104,7 @@ components:
           example: -1001234567890
         name:
           type: string
-          example: "VIP Trading Group"
+          example: 'VIP Trading Group'
           minLength: 3
 
     GroupUpdateRequest:
@@ -2115,7 +2115,7 @@ components:
           format: uuid
         name:
           type: string
-          example: "VIP Trading Group Updated"
+          example: 'VIP Trading Group Updated'
           minLength: 3
 
     GroupResponse:
@@ -2135,10 +2135,10 @@ components:
           example: -1001234567890
         name:
           type: string
-          example: "VIP Trading Group"
+          example: 'VIP Trading Group'
         description:
           type: string
-          example: "Exclusive group for premium members"
+          example: 'Exclusive group for premium members'
         member_count:
           type: integer
           example: 150
@@ -2164,7 +2164,7 @@ components:
       properties:
         name:
           type: string
-          example: "1 Month VIP"
+          example: '1 Month VIP'
           minLength: 3
         price:
           type: number
@@ -2183,7 +2183,7 @@ components:
       properties:
         name:
           type: string
-          example: "1 Month VIP"
+          example: '1 Month VIP'
           minLength: 3
         price:
           type: number
@@ -2207,11 +2207,7 @@ components:
           items:
             type: string
             format: uuid
-          example:
-            [
-              "123e4567-e89b-12d3-a456-426614174000",
-              "987e6543-e21b-12d3-a456-426614174000",
-            ]
+          example: ['123e4567-e89b-12d3-a456-426614174000', '987e6543-e21b-12d3-a456-426614174000']
 
     PackageResponse:
       type: object
@@ -2224,10 +2220,10 @@ components:
           format: uuid
         name:
           type: string
-          example: "1 Month VIP"
+          example: '1 Month VIP'
         description:
           type: string
-          example: ""
+          example: ''
         price:
           type: number
           format: double
@@ -2257,16 +2253,16 @@ components:
       properties:
         name:
           type: string
-          example: "Promo Akhir Tahun"
+          example: 'Promo Akhir Tahun'
           maxLength: 255
         code:
           type: string
-          example: "PROMO2026"
+          example: 'PROMO2026'
           maxLength: 100
         type:
           type: string
           enum: [percentage, fixed]
-          example: "percentage"
+          example: 'percentage'
         value:
           type: number
           format: double
@@ -2282,7 +2278,7 @@ components:
         max_usage:
           type: integer
           example: 100
-          description: "-1 for unlimited"
+          description: '-1 for unlimited'
         max_usage_per_user:
           type: integer
           example: 1
@@ -2303,7 +2299,7 @@ components:
       properties:
         name:
           type: string
-          example: "Promo Akhir Tahun Updated"
+          example: 'Promo Akhir Tahun Updated'
           maxLength: 255
         value:
           type: number
@@ -2338,13 +2334,13 @@ components:
           format: uuid
         name:
           type: string
-          example: "Promo Akhir Tahun"
+          example: 'Promo Akhir Tahun'
         code:
           type: string
-          example: "PROMO2026"
+          example: 'PROMO2026'
         type:
           type: string
-          example: "percentage"
+          example: 'percentage'
         value:
           type: number
           format: double
@@ -2389,25 +2385,25 @@ components:
       properties:
         name:
           type: string
-          example: "My Business Updated"
+          example: 'My Business Updated'
           minLength: 3
         slug:
           type: string
-          example: "my-business-updated"
+          example: 'my-business-updated'
           minLength: 3
           maxLength: 50
         category:
           type: string
-          example: "E-Commerce"
+          example: 'E-Commerce'
           minLength: 3
           maxLength: 100
         description:
           type: string
-          example: "We sell amazing stuff"
+          example: 'We sell amazing stuff'
         logo_url:
           type: string
           format: url
-          example: "https://example.com/logo.png"
+          example: 'https://example.com/logo.png'
 
     ClientResponse:
       type: object
@@ -2417,16 +2413,16 @@ components:
           format: uuid
         name:
           type: string
-          example: "My Business"
+          example: 'My Business'
         slug:
           type: string
-          example: "my-business"
+          example: 'my-business'
         category:
           type: string
-          example: "E-Commerce"
+          example: 'E-Commerce'
         description:
           type: string
-          example: "We sell amazing stuff"
+          example: 'We sell amazing stuff'
         logo_url:
           type: string
           format: url
@@ -2438,7 +2434,7 @@ components:
           example: true
         subscription_tier:
           type: string
-          example: "pro"
+          example: 'pro'
         created_at:
           type: string
           format: date-time
@@ -2494,10 +2490,10 @@ components:
           format: uuid
         name:
           type: string
-          example: "My Business"
+          example: 'My Business'
         slug:
           type: string
-          example: "my-business"
+          example: 'my-business'
 
     AdminBriefResponse:
       type: object
@@ -2507,7 +2503,7 @@ components:
           format: uuid
         name:
           type: string
-          example: "Admin User"
+          example: 'Admin User'
 
     PlatformPlanResponse:
       type: object
@@ -2517,10 +2513,10 @@ components:
           format: uuid
         name:
           type: string
-          example: "pro_plan"
+          example: 'pro_plan'
         display_name:
           type: string
-          example: "Pro Plan"
+          example: 'Pro Plan'
         price_monthly:
           type: number
           format: double
@@ -2574,10 +2570,10 @@ components:
       properties:
         name:
           type: string
-          example: "growth"
+          example: 'growth'
         display_name:
           type: string
-          example: "Growth Plan"
+          example: 'Growth Plan'
         price_monthly:
           type: number
           format: double
@@ -2622,7 +2618,7 @@ components:
       properties:
         display_name:
           type: string
-          example: "Growth Plan Updated"
+          example: 'Growth Plan Updated'
         price_monthly:
           type: number
           format: double
@@ -2660,15 +2656,15 @@ components:
           type: string
           format: uuid
         client:
-          $ref: "#/components/schemas/ClientBriefResponse"
+          $ref: '#/components/schemas/ClientBriefResponse'
         plan:
-          $ref: "#/components/schemas/PlatformPlanResponse"
+          $ref: '#/components/schemas/PlatformPlanResponse'
         status:
           type: string
-          example: "active"
+          example: 'active'
         billing_cycle:
           type: string
-          example: "monthly"
+          example: 'monthly'
         original_amount:
           type: number
           format: double
@@ -2692,9 +2688,9 @@ components:
           format: date-time
           nullable: true
         cancelled_by:
-          $ref: "#/components/schemas/AdminBriefResponse"
+          $ref: '#/components/schemas/AdminBriefResponse'
         updated_by:
-          $ref: "#/components/schemas/AdminBriefResponse"
+          $ref: '#/components/schemas/AdminBriefResponse'
         paid_at:
           type: string
           format: date-time
@@ -2786,10 +2782,10 @@ components:
           example: Doe
         phone:
           type: string
-          example: "+628123456789"
+          example: '+628123456789'
         subscription:
           allOf:
-            - $ref: "#/components/schemas/MemberSubscriptionBrief"
+            - $ref: '#/components/schemas/MemberSubscriptionBrief'
           nullable: true
           description: Most relevant subscription (active preferred); null if never subscribed
         total_orders:
@@ -2825,11 +2821,11 @@ components:
           example: Doe
         phone:
           type: string
-          example: "+628123456789"
+          example: '+628123456789'
         subscriptions:
           type: array
           items:
-            $ref: "#/components/schemas/MemberSubscriptionBrief"
+            $ref: '#/components/schemas/MemberSubscriptionBrief'
           description: All subscriptions (active first, then by expired_at desc)
         total_orders:
           type: integer

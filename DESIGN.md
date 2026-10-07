@@ -16,9 +16,9 @@ colors:
   destructive-foreground: oklch(1 0 0)
   border: oklch(0.9288 0.0126 255.5078)
   ring: oklch(0.4778 0.1356 251.8383)
-  success: "#22c55e"
-  warning: "#f59e0b"
-  danger: "#ef4444"
+  success: '#22c55e'
+  warning: '#f59e0b'
+  danger: '#ef4444'
   chart-1: oklch(0.4778 0.1356 251.8383)
   chart-2: oklch(0.7535 0.139 232.6615)
   chart-3: oklch(0.6959 0.1491 162.4796)
@@ -32,7 +32,7 @@ colors:
 typography:
   sans:
     fontFamily: Satoshi, Inter, sans-serif
-    fontSize: "14px (body)"
+    fontSize: '14px (body)'
     fontWeight: 400
     lineHeight: 1.5
   mono:
@@ -45,16 +45,16 @@ rounded:
   full: 9999px
 spacing:
   px: 1px
-  "0.5": 2px
-  "1": 4px
-  "2": 8px
-  "3": 12px
-  "4": 16px
-  "5": 20px
-  "6": 24px
-  "8": 32px
-  "10": 40px
-  "12": 48px
+  '0.5': 2px
+  '1': 4px
+  '2': 8px
+  '3': 12px
+  '4': 16px
+  '5': 20px
+  '6': 24px
+  '8': 32px
+  '10': 40px
+  '12': 48px
 components:
   button-default:
     backgroundColor: oklch(0.4778 0.1356 251.8383)
@@ -107,6 +107,7 @@ TG Manager is a command center for Telegram community operators — a clean, pro
 The system is built around a **flat-rest, subtle-hover** philosophy: surfaces sit flat with clean borders and no elevation at rest, then respond with a gentle lift on interaction. This creates a calm, organized workspace where the hierarchy emerges from spacing and typography rather than exaggerated depth.
 
 **Key Characteristics:**
+
 - Clean, flat surfaces with crisp 1px borders
 - Warm blue primary accent (the "Command" blue) — used sparingly for actionable elements
 - Spacious typography with Satoshi as the primary voice — modern, approachable, professional
@@ -119,9 +120,11 @@ The system is built around a **flat-rest, subtle-hover** philosophy: surfaces si
 The palette centers on a single confident blue primary, supported by a cool-gray neutral family. Color is a reward — applied to interactive elements, status indicators, and semantic feedback, not decoration.
 
 ### Primary
+
 - **Command Blue** (oklch(0.4778 0.1356 251.84)): Primary actions, active states, links, and the brand anchor. Applied sparingly — buttons, active sidebar items, badges in their color-coded variant. Not used for backgrounds or decorative elements.
 
 ### Neutral
+
 - **Card White** (oklch(1 0 0)): Cards, popovers, sidebar — all surface backgrounds.
 - **Near-Black** (oklch(0.2077 0.0398 265.75)): Body text, headings, high-emphasis content.
 - **Muted Gray** (oklch(0.9683 0.0069 247.90)): Muted backgrounds, secondary buttons, tag backgrounds.
@@ -129,6 +132,7 @@ The palette centers on a single confident blue primary, supported by a cool-gray
 - **Border Gray** (oklch(0.9288 0.0126 255.51)): Default border for cards, inputs, dividers. The signature structural line — every surface boundary.
 
 ### Semantic
+
 - **Destructive Red** (oklch(0.6368 0.2078 25.33)): Destructive actions (delete, disconnect), error states. Used with white text (`destructive-foreground`).
 - **Chart Blue** (oklch(0.7535 0.139 232.66)): Secondary chart color, occasional accent.
 - **Chart Green** (oklch(0.6959 0.1491 162.48)): Success states, active status badges.
@@ -136,6 +140,7 @@ The palette centers on a single confident blue primary, supported by a cool-gray
 - **Chart Purple** (oklch(0.5854 0.2041 277.12)): Role accent (gatekeeper), tertiary emphasis.
 
 ### Named Rules
+
 **The One Voice Rule.** The primary blue is used on maximum 15% of any given screen. Its restraint is the point — when a user sees blue, they know it's actionable.
 
 **The Status Color Convention.** Green = active/success. Red = with caution/destructive. Amber = pending/expiring. This convention is non-negotiable across all components and pages.
@@ -158,6 +163,7 @@ Satoshi is a modern geometric sans-serif — warmer than Inter, sharper than SF 
 - **Mono** (JetBrains Mono 500, 13px): Telegram bot IDs, chat IDs, token values, command snippets.
 
 ### Named Rules
+
 **The Tabular-Numbers Rule.** Any number that represents a countable quantity (member count, total bots, durations) uses `tabular-nums` for stable width during updates.
 
 ## Layout
@@ -174,12 +180,14 @@ The layout follows a responsive dashboard pattern with a collapsible sidebar (de
 - **Stat grid:** `grid-cols-2 lg:grid-cols-4` for metric rows.
 
 ### Breakpoints
+
 - `sm`: 640px — tablet portrait, card grid expands to 2 columns
 - `md`: 768px — tablet landscape, sidebar becomes visible
 - `lg`: 1024px — desktop, stat grid to 4 columns
 - `xl`: 1280px — wide desktop, card grid to 3 columns
 
 ### Named Rules
+
 **The Bottom-Up Rule.** On mobile, primary actions are placed at the bottom of the content (modals, sheets, bottom bar). On desktop, they migrate to the top-right.
 
 ## Elevation & Depth
@@ -187,12 +195,15 @@ The layout follows a responsive dashboard pattern with a collapsible sidebar (de
 Flat at rest, lifted on interaction.
 
 ### System
+
 - **Rest state:** All surfaces are flat — no box-shadow, no drop-shadow. Depth is communicated entirely through layering (background color) and the 1px `border-border` boundary.
 - **Interactive state:** Hovered elements (buttons, cards, items) lift with `hover:-translate-y-0.5` and `hover:shadow-md`. The shadow is subtle — enough to feel the separation, not enough to compete.
 - **Floating surfaces:** Modals, drawers, tooltips, and dropdowns sit above the content layer with their own shadow boundary (via the Dialog/Sheet overlay backdrop at ~40% black).
 
 ### Shadow Vocabulary (when re-enabled)
+
 The project's shadow CSS variables are currently set to `none`. Re-enabling for hover states should use:
+
 - **shadow-sm** (`0 1px 2px 0 rgba(0,0,0,0.05)`): Subtle card hover on compact surfaces.
 - **shadow-md** (`0 4px 6px -1px rgba(0,0,0,0.1)`): Default hover elevation for cards and interactive containers.
 
@@ -200,13 +211,13 @@ The project's shadow CSS variables are currently set to `none`. Re-enabling for 
 
 ### Radii
 
-| Token | Value | Used For |
-|-------|-------|----------|
-| `rounded-sm` | 4px | Skeleton elements, compact surfaces |
-| `rounded-xl` | 12px | Buttons, inputs, selects, cards, dialogs, sheets, modals |
-| `rounded-lg` | 8px | Sidebar items, menu items |
-| `rounded-2xl` | 16px | Quota cards, large containers, landing pricing cards |
-| `rounded-full` | 9999px | Badges, pills, status indicators, "Tambah" buttons |
+| Token          | Value  | Used For                                                 |
+| -------------- | ------ | -------------------------------------------------------- |
+| `rounded-sm`   | 4px    | Skeleton elements, compact surfaces                      |
+| `rounded-xl`   | 12px   | Buttons, inputs, selects, cards, dialogs, sheets, modals |
+| `rounded-lg`   | 8px    | Sidebar items, menu items                                |
+| `rounded-2xl`  | 16px   | Quota cards, large containers, landing pricing cards     |
+| `rounded-full` | 9999px | Badges, pills, status indicators, "Tambah" buttons       |
 
 - **Borders:** 1px solid, `border-border` — the signature element that defines card boundaries without shadows.
 - **Icon containers:** Internal icon wells inside cards often use `rounded-lg` (8px) with a colored background (e.g., `bg-primary/10`).
@@ -270,15 +281,18 @@ The project's shadow CSS variables are currently set to `none`. Re-enabling for 
 - **Sheets:** Slide-over panels (`SheetContent`, `sm:max-w-[420px]` or `480px`) for group detail, connect flow. Full-width on mobile.
 
 ### Modals (AlertModal)
+
 - Parameterized wrapper around shadcn Dialog. `confirmVariant` prop controls button color (`destructive` for delete, `default` for toggle). Optional `title` and `description` for context-specific messaging.
 
 ### Data Display / Tables
+
 - The project uses `DataTable` (TanStack Table wrapper) for the legacy listing views that the card grid is replacing. Tables have a toolbar with search, filters, column visibility toggles, and pagination.
 - Bot card grid uses animation: `animate-fade-up` with staggered delays (0, 150, 300, 450ms) for entry.
 
 ## Do's and Don'ts
 
 ### Do:
+
 - **Do** use `rounded-xl` (12px) for all main content cards — this is the system's signature radius.
 - **Do** use gradient accent backgrounds (`from-{color}/15 via-{color}/5 to-transparent`) for stat cards — they add color without overwhelming.
 - **Do** use the semi-transparent badge pattern (`bg-{color}/10 text-{color}-600 border-{color}/20`) for all status and role badges — it's the system's consistent badge language.
@@ -287,6 +301,7 @@ The project's shadow CSS variables are currently set to `none`. Re-enabling for 
 - **Do** keep destructive actions (delete, disconnect) in a red-toned variant with an AlertModal confirmation — never execute without asking.
 
 ### Don't:
+
 - **Don't** add box shadows to surfaces at rest — the system is flat by design.
 - **Don't** use the Command Blue (primary) for decorative or background elements — it's reserved for actionable elements only.
 - **Don't** add custom shadows to cards or buttons — use only the re-enabled `shadow-sm` / `shadow-md` when the hybrid system is in place.

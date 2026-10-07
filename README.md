@@ -18,29 +18,29 @@ plus a public marketing/checkout surface.
 
 ### Public site
 
-| Area | Detail |
-| --- | --- |
+| Area         | Detail                                                                                          |
+| ------------ | ----------------------------------------------------------------------------------------------- |
 | Landing page | Hero, features, live pricing (reads `/api/v1/public/plans` with a static fallback), FAQ, footer |
-| Legal | `/about`, `/privacy-policy`, `/terms-of-service` |
-| Checkout | `/checkout` → Midtrans Snap payment for a member subscription, `checkout/success` result page |
+| Legal        | `/about`, `/privacy-policy`, `/terms-of-service`                                                |
+| Checkout     | `/checkout` → Midtrans Snap payment for a member subscription, `checkout/success` result page   |
 
 ### Tenant dashboard — `/{locale}/{tenant-slug}/dashboard/*`
 
-| Page | Detail |
-| --- | --- |
-| Overview | KPI cards + revenue charts (Recharts) |
-| Bots | Telegram bot CRUD, bot detail, stats, connect/disconnect, transfer-to-group flow |
-| Groups | Connect flow (token + status polling), group detail, disconnect, sync, bulk delete |
-| Members | Listing, detail drawer, kick/extend/sync/resend-link, bulk actions |
-| Packages | Subscription packages per group |
-| Discounts | Package discounts — percentage or fixed amount |
-| Commands | Custom bot command CRUD |
-| Broadcast | Rich-text (Tiptap) Telegram broadcast composer, scheduling, confirm dialog |
-| Transactions | Tenant transaction/payment history |
-| Reports | Daily report settings and failed-job listing |
-| Billing | Active plan, quota card, billing history, cancel pending checkout |
-| Midtrans | Payment gateway credentials (encrypted key exchange with the backend) |
-| Migration | Bulk member import from CSV/Excel, template download + export |
+| Page         | Detail                                                                             |
+| ------------ | ---------------------------------------------------------------------------------- |
+| Overview     | KPI cards + revenue charts (Recharts)                                              |
+| Bots         | Telegram bot CRUD, bot detail, stats, connect/disconnect, transfer-to-group flow   |
+| Groups       | Connect flow (token + status polling), group detail, disconnect, sync, bulk delete |
+| Members      | Listing, detail drawer, kick/extend/sync/resend-link, bulk actions                 |
+| Packages     | Subscription packages per group                                                    |
+| Discounts    | Package discounts — percentage or fixed amount                                     |
+| Commands     | Custom bot command CRUD                                                            |
+| Broadcast    | Rich-text (Tiptap) Telegram broadcast composer, scheduling, confirm dialog         |
+| Transactions | Tenant transaction/payment history                                                 |
+| Reports      | Daily report settings and failed-job listing                                       |
+| Billing      | Active plan, quota card, billing history, cancel pending checkout                  |
+| Midtrans     | Payment gateway credentials (encrypted key exchange with the backend)              |
+| Migration    | Bulk member import from CSV/Excel, template download + export                      |
 
 ### Superadmin — `/{locale}/superadmin/*`
 
@@ -51,20 +51,20 @@ platform plans, and audit logs.
 
 ## Tech stack
 
-| Concern | Choice |
-| --- | --- |
-| Framework | Next.js **16.2.6** (App Router, RSC, standalone output) |
-| UI runtime | React **19.2.4** |
-| Language | TypeScript **5.7.2** (`strict`) |
-| Styling | Tailwind CSS **4.2.2** (`@tailwindcss/postcss`), shadcn/ui *new-york*, zinc, CSS variables |
-| i18n | next-intl **4.13** — locale prefix `as-needed`, currently `id` only (`messages/en.json` is kept for translation work) |
-| Data | TanStack Query 5, TanStack Table 8, TanStack Form 1 + Zod 4 |
-| State | Zustand 5 (auth stores), nuqs (URL state) |
-| Editor | Tiptap 3 (broadcast composer) |
-| Charts | Recharts 2 |
-| Payments | Midtrans Snap |
-| Quality | oxlint + oxfmt, husky + lint-staged |
-| Package manager | **Bun** (`bun.lock`) |
+| Concern         | Choice                                                                                                                |
+| --------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Framework       | Next.js **16.2.6** (App Router, RSC, standalone output)                                                               |
+| UI runtime      | React **19.2.4**                                                                                                      |
+| Language        | TypeScript **5.7.2** (`strict`)                                                                                       |
+| Styling         | Tailwind CSS **4.2.2** (`@tailwindcss/postcss`), shadcn/ui _new-york_, zinc, CSS variables                            |
+| i18n            | next-intl **4.13** — locale prefix `as-needed`, currently `id` only (`messages/en.json` is kept for translation work) |
+| Data            | TanStack Query 5, TanStack Table 8, TanStack Form 1 + Zod 4                                                           |
+| State           | Zustand 5 (auth stores), nuqs (URL state)                                                                             |
+| Editor          | Tiptap 3 (broadcast composer)                                                                                         |
+| Charts          | Recharts 2                                                                                                            |
+| Payments        | Midtrans Snap                                                                                                         |
+| Quality         | oxlint + oxfmt, husky + lint-staged                                                                                   |
+| Package manager | **Bun** (`bun.lock`)                                                                                                  |
 
 The auth layer is **custom JWT** (`access_token` / `refresh_token` httpOnly cookies), not Clerk —
 `src/features/auth/api/service.ts` sets and refreshes those cookies, and `src/lib/api-client.ts`
@@ -89,25 +89,25 @@ bun dev                        # http://localhost:3000
 
 ### Environment variables
 
-| Variable | Required | Description |
-| --- | --- | --- |
-| `NEXT_PUBLIC_API_URL` | yes | Backend base URL. Falls back to `http://127.0.0.1:8080` when unset |
-| `NEXT_PUBLIC_MIDTRANS_CLIENT_KEY` | for checkout | Midtrans Snap client key |
-| `NEXT_PUBLIC_MIDTRANS_ENV` | no | `sandbox` (default) or `production` |
-| `BUILD_STANDALONE` | no | `true` enables Next.js standalone output (Docker/self-host) |
-| `NEXT_DIST_DIR` | no | Overrides the build output directory |
+| Variable                          | Required     | Description                                                        |
+| --------------------------------- | ------------ | ------------------------------------------------------------------ |
+| `NEXT_PUBLIC_API_URL`             | yes          | Backend base URL. Falls back to `http://127.0.0.1:8080` when unset |
+| `NEXT_PUBLIC_MIDTRANS_CLIENT_KEY` | for checkout | Midtrans Snap client key                                           |
+| `NEXT_PUBLIC_MIDTRANS_ENV`        | no           | `sandbox` (default) or `production`                                |
+| `BUILD_STANDALONE`                | no           | `true` enables Next.js standalone output (Docker/self-host)        |
+| `NEXT_DIST_DIR`                   | no           | Overrides the build output directory                               |
 
 See [`.env.example`](.env.example) for the annotated template.
 
 ### Scripts
 
-| Command | Purpose |
-| --- | --- |
-| `bun dev` | Dev server (HMR) |
-| `bun build` | Production build |
-| `bun start` | Serve the production build |
-| `bun lint` / `bun lint:strict` | oxlint (strict = warnings are errors) |
-| `bun format` / `bun format:check` | oxfmt write / check |
+| Command                           | Purpose                               |
+| --------------------------------- | ------------------------------------- |
+| `bun dev`                         | Dev server (HMR)                      |
+| `bun build`                       | Production build                      |
+| `bun start`                       | Serve the production build            |
+| `bun lint` / `bun lint:strict`    | oxlint (strict = warnings are errors) |
+| `bun format` / `bun format:check` | oxfmt write / check                   |
 
 Git hooks: `pre-commit` runs `lint-staged` (oxfmt on staged files); `pre-push` runs a real
 `next build` into a throwaway `.next-build-verify-*` directory.

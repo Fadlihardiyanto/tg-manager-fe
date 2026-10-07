@@ -212,7 +212,9 @@ export function ConnectGroupModal({ open, onOpenChange }: ConnectGroupModalProps
 
           {!token && (
             <div className='space-y-2'>
-              <label className='text-sm font-medium'>Pilih Bot</label>
+              <label className='text-sm font-medium' htmlFor='connect-group-bot-select'>
+                Pilih Bot
+              </label>
               {activeBots.length === 0 ? (
                 <div className='rounded-lg border border-amber-500/20 bg-amber-500/5 p-4 text-sm text-amber-800'>
                   <p className='font-medium'>Belum ada bot aktif.</p>
@@ -232,7 +234,7 @@ export function ConnectGroupModal({ open, onOpenChange }: ConnectGroupModalProps
                   }}
                   disabled={!!token}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger id='connect-group-bot-select'>
                     <SelectValue placeholder='Pilih bot...' />
                   </SelectTrigger>
                   <SelectContent>

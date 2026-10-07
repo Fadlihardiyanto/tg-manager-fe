@@ -8,8 +8,7 @@ export function filterNavItems(
   return items
     .filter((item) => {
       if (!item.access) return true;
-      if (item.access.permission && !permissions.includes(item.access.permission))
-        return false;
+      if (item.access.permission && !permissions.includes(item.access.permission)) return false;
       if (item.access.role && item.access.role !== role) return false;
       return true;
     })
