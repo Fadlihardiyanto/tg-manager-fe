@@ -14,13 +14,12 @@ const Hero = () => {
 
   return (
     <div className='relative min-h-[calc(100vh-4rem)] w-full flex items-center justify-center overflow-hidden'>
-      <div className='absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,hsl(var(--primary)/0.08),transparent_60%),radial-gradient(ellipse_at_bottom_left,hsl(var(--primary)/0.04),transparent_50%)]' />
-      <div className='bg-dot-grid absolute inset-0 -z-10 opacity-60 [mask-image:radial-gradient(ellipse_65%_65%_at_50%_40%,black,transparent)]' />
+      <div className='absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,hsl(var(--primary)/0.06),transparent_60%),radial-gradient(ellipse_at_bottom_left,hsl(var(--primary)/0.03),transparent_50%)]' />
+      <div className='bg-dot-grid absolute inset-0 -z-10 opacity-[0.18] [mask-image:radial-gradient(ellipse_65%_65%_at_50%_40%,black,transparent)]' />
       <div className='max-w-(--breakpoint-xl) w-full flex flex-col lg:flex-row mx-auto items-center justify-between gap-y-14 gap-x-10 px-6 py-12 lg:py-0'>
         <div className='max-w-xl animate-fade-up'>
-          <h1 className='mt-6 max-w-[20ch] text-4xl xs:text-5xl sm:text-6xl lg:text-[4rem] xl:text-7xl font-bold leading-[1.1]! tracking-tight'>
+          <h1 className='mt-6 max-w-[18ch] text-4xl xs:text-5xl sm:text-6xl lg:text-[4rem] xl:text-7xl font-bold leading-[1.1]! tracking-tight text-balance'>
             {t.rich('title', {
-              br: () => <br />,
               highlight: (chunks) => <span className='text-primary'>{chunks}</span>
             })}
           </h1>

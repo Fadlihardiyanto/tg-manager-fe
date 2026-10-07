@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function TransactionsPage() {
   return (
-    <PageContainer pageTitle='Transaksi' pageDescription='Transaksi pembelian paket oleh member.'>
+    <PageContainer pageTitle='Transaksi'>
       <TransactionsListingContent />
     </PageContainer>
   );

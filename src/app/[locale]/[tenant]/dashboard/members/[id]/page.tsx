@@ -13,10 +13,7 @@ export default async function MemberDetailPage(props: PageProps) {
   const { id } = await props.params;
 
   return (
-    <PageContainer
-      pageTitle='Detail Member'
-      pageDescription='Lihat informasi lengkap member dan riwayat langganannya.'
-    >
+    <PageContainer pageTitle='Detail Member'>
       <Suspense fallback={<MemberDetailSkeleton />}>
         <MemberDetail memberId={id} />
       </Suspense>

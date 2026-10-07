@@ -4,6 +4,7 @@
 'use client';
 
 import { useCallback, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { BotCardGrid } from './bot-card-grid';
 import { BotStats } from './bot-stats';
 import { BotFormDialog } from './bot-form-dialog';
@@ -20,9 +21,12 @@ import { botKeys } from '../api/queries';
 import { useBulkDelete } from '@/hooks/use-bulk-delete';
 
 export function BotListingContent() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingBot, setEditingBot] = useState<TelegramBot | null>(null);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(() => searchParams.get('q') ?? '');
   const { hasQuota } = useActivePlan();
   const canCreateBot = hasQuota('bots');
   const bulkDelete = useBulkDelete({
@@ -30,6 +34,18 @@ export function BotListingContent() {
     noun: 'bot',
     queryKeys: [botKeys.all]
   });
+
+  const syncSearch = useCallback(
+    (value: string) => {
+      setSearch(value);
+      const sp = new URLSearchParams(searchParams.toString());
+      if (value.trim()) sp.set('q', value);
+      else sp.delete('q');
+      const qs = sp.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    },
+    [pathname, router, searchParams]
+  );
 
   const handleEdit = useCallback((bot: TelegramBot) => {
     setEditingBot(bot);
@@ -51,7 +67,6 @@ export function BotListingContent() {
   return (
     <PageContainer
       pageTitle='Bot'
-      pageDescription='Kelola bot Telegram, peran, dan status koneksinya'
       pageHeaderAction={
         <Button onClick={handleAdd} disabled={!canCreateBot} className='rounded-full shrink-0'>
           {canCreateBot ? (
@@ -84,12 +99,13 @@ export function BotListingContent() {
             <Input
               placeholder='Cari bot...'
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => syncSearch(e.target.value)}
               className='h-10 rounded-full pl-9'
             />
             {search && (
               <button
-                onClick={() => setSearch('')}
+                onClick={() => syncSearch('')}
+                aria-label='Bersihkan pencarian'
                 className='absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground'
               >
                 <Icons.close className='size-4' />

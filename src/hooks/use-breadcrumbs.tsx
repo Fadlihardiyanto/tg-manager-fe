@@ -13,6 +13,7 @@ const localePattern = new RegExp(`^/(${routing.locales.join('|')})(/|$)`);
 
 // This allows to add custom title as well
 const routeMapping: Record<string, BreadcrumbItem[]> = {
+  '/dashboard/overview': [{ title: 'Dashboard', link: '/dashboard/overview' }],
   '/dashboard': [{ title: 'Dashboard', link: '/dashboard/overview' }],
   '/dashboard/bots': [
     { title: 'Dashboard', link: '/dashboard/overview' },

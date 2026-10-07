@@ -328,8 +328,8 @@ function SidebarHeader({ className, ...props }: React.ComponentProps<'div'>) {
       data-slot='sidebar-header'
       data-sidebar='header'
       className={cn(
-        'flex flex-col gap-2 px-3 py-4', // ← px-3 py-4 (was p-2)
-        'border-b border-sidebar-border/60', // ← subtle bottom divider
+        'flex flex-col gap-2 px-3 py-2', // ← sinkron dengan header h-14 (56px)
+        'border-b border-border', // ← satu token dengan navbar & border-r
         className
       )}
       {...props}
@@ -344,7 +344,7 @@ function SidebarFooter({ className, ...props }: React.ComponentProps<'div'>) {
       data-sidebar='footer'
       className={cn(
         'flex flex-col gap-2 px-3 py-3', // ← consistent padding
-        'border-t border-sidebar-border/60', // ← subtle top divider
+        'border-t border-border', // ← satu token dengan navbar & border-r
         className
       )}
       {...props}

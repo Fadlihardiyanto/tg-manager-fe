@@ -79,7 +79,7 @@ export default function AuditLogsPage() {
   };
 
   return (
-    <PageContainer pageTitle='Audit Logs' pageDescription='Log aktivitas seluruh platform'>
+    <PageContainer pageTitle='Audit Logs'>
       <div className='mb-4 flex flex-wrap items-center gap-2'>
         <Select value={filterAction} onValueChange={applyAction}>
           <SelectTrigger className='h-10 w-40 rounded-full border-border font-semibold'>

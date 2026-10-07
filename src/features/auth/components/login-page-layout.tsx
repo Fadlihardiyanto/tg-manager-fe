@@ -21,7 +21,7 @@ function Showcase() {
         {STATS.map((s) => (
           <div
             key={s.label}
-            className='flex flex-col gap-1.5 rounded-xl border border-border/40 bg-card/80 p-3 shadow-sm shadow-primary/3'
+            className='flex flex-col gap-1.5 rounded-xl border border-border/40 bg-card/80 p-3'
           >
             <div
               className={cn(
@@ -38,7 +38,7 @@ function Showcase() {
       </div>
 
       {/* Mini bot card */}
-      <div className='overflow-hidden rounded-xl border border-border/40 bg-card/80 shadow-md shadow-primary/5'>
+      <div className='overflow-hidden rounded-xl border border-border/40 bg-card/80'>
         <div className='h-1.5 bg-gradient-to-r from-sky-400 to-sky-500' />
         <div className='flex items-center gap-3 p-4'>
           <div className='relative shrink-0'>
@@ -81,7 +81,7 @@ export default function LoginPageLayout() {
         <div className='relative z-10 flex flex-col items-center text-center max-w-sm'>
           <div className='mb-10'>
             <Image
-              src='/uration-landscape.png'
+              src='/assets/urator.png'
               alt='Urator Logo'
               width={96}
               height={32}

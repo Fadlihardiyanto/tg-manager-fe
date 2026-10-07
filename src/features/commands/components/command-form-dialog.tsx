@@ -250,6 +250,8 @@ export function CommandFormDialog({ command, open, onOpenChange }: CommandFormDi
   const groupsForBot = groups.filter((g) => g.bot_id === selectedBotId);
   const hiddenGroupCount = groups.length - groupsForBot.length;
   const isPending = createMutation.isPending || updateMutation.isPending;
+  const isSubmitting = useStore(form.store, (state) => state.isSubmitting);
+  const isLoading = isPending || isSubmitting;
   const canCreateCommand = isEdit || isBillingLoading || hasQuota('custom_commands');
   const maxChars = responseType === 'text' ? 4096 : 1024;
   const responseText = useStore(form.store, (state) => state.values.response_text);
@@ -583,7 +585,7 @@ export function CommandFormDialog({ command, open, onOpenChange }: CommandFormDi
             <Button
               type='submit'
               form='command-form-dialog'
-              isLoading={isPending}
+              isLoading={isLoading}
               disabled={!canCreateCommand}
             >
               <Icons.check className='mr-2 h-4 w-4' />

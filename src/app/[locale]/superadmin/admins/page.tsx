@@ -156,7 +156,7 @@ export default function AdminsPage() {
   };
 
   return (
-    <PageContainer pageTitle='Admin' pageDescription='Kelola akun admin platform'>
+    <PageContainer pageTitle='Admin'>
       <div className='mb-4 flex flex-wrap items-center justify-between gap-3'>
         <Input
           value={search}

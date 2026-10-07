@@ -106,4 +106,7 @@ export function TextField({
   );
 }
 
+export const authInputClass =
+  'pl-10 h-11 border border-border rounded-xl focus-visible:ring-2 focus-visible:ring-ring/40 text-sm placeholder:text-muted-foreground bg-background';
+
 export const FormTextField = createFormField(TextField);

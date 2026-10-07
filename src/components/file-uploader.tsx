@@ -131,6 +131,10 @@ export function FileUploader(props: FileUploaderProps) {
 
       setFiles(updatedFiles);
 
+      if (!onUpload && newFiles.length > 0) {
+        toast.success(`${newFiles.map((f) => f.name).join(', ')} berhasil dipilih`);
+      }
+
       if (rejectedFiles.length > 0) {
         rejectedFiles.forEach(({ file }) => {
           toast.error(`File ${file.name} ditolak`);
@@ -174,10 +178,19 @@ export function FileUploader(props: FileUploaderProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const rootRef = React.useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    if (files?.length) {
+      rootRef.current
+        ?.querySelector('[data-slot="file-list"]')
+        ?.scrollIntoView({ block: 'nearest' });
+    }
+  }, [files?.length]);
+
   const isDisabled = disabled || (files?.length ?? 0) >= maxFiles;
 
   return (
-    <div className='relative flex flex-col gap-6 overflow-hidden'>
+    <div ref={rootRef} className='relative flex flex-col gap-6 overflow-hidden'>
       <Dropzone
         onDrop={onDrop}
         accept={accept}
@@ -229,7 +242,7 @@ export function FileUploader(props: FileUploaderProps) {
       </Dropzone>
       {files?.length ? (
         <ScrollArea className='h-fit w-full px-3'>
-          <div className='max-h-48 space-y-4'>
+          <div data-slot='file-list' className='max-h-48 space-y-4'>
             {files?.map((file, index) => (
               <FileCard
                 key={index}

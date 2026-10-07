@@ -15,10 +15,7 @@ export function ReportsContent() {
   const [tab, setTab] = useState('settings');
 
   return (
-    <PageContainer
-      pageTitle='Laporan'
-      pageDescription='Laporan harian otomatis dan pemantauan kegagalan aksi'
-    >
+    <PageContainer pageTitle='Laporan'>
       <div className='flex min-h-0 flex-1 flex-col gap-4'>
         <PageTabs value={tab} onValueChange={setTab} items={tabs} />
         {tab === 'settings' ? <ReportSettingsForm /> : <ReportFailures />}

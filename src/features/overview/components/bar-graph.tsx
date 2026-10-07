@@ -26,9 +26,10 @@ function formatDate(dateStr: string) {
 }
 
 function formatCompact(value: number) {
-  if (value >= 1_000_000) return `Rp${(value / 1_000_000).toFixed(1).replace('.0', '')}jt`;
-  if (value >= 1_000) return `Rp${(value / 1_000).toFixed(0)}rb`;
-  return `Rp${value}`;
+  if (value === 0) return '0';
+  if (value >= 1_000_000) return `Rp ${(value / 1_000_000).toFixed(1).replace('.0', '')} jt`;
+  if (value >= 1_000) return `Rp ${(value / 1_000).toFixed(0)} rb`;
+  return `Rp ${value}`;
 }
 
 export function BarGraph({ data }: { data: RevenueChartItem[] }) {

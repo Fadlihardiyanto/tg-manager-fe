@@ -150,7 +150,9 @@ const KickMock = () => (
       ))}
     </div>
     <div className='rounded-md bg-amber-500/10 px-3 py-2 text-center'>
-      <p className='text-[11px] font-medium text-amber-700'>Auto-kick dalam hitungan milidetik</p>
+      <p className='text-[11px] font-medium text-amber-700 dark:text-amber-400'>
+        Auto-kick dalam hitungan milidetik
+      </p>
     </div>
   </div>
 );

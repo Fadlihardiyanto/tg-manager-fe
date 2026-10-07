@@ -7,10 +7,7 @@ export const metadata = {
 
 export default function BillingCheckoutResult() {
   return (
-    <PageContainer
-      pageTitle='Verifikasi Checkout Billing'
-      pageDescription='Cek status billing terbaru setelah Anda kembali dari alur pembayaran.'
-    >
+    <PageContainer pageTitle='Verifikasi Checkout Billing'>
       <BillingCheckoutResultPage />
     </PageContainer>
   );

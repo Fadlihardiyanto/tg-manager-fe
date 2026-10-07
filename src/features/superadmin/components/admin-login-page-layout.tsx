@@ -13,7 +13,7 @@ export default function AdminLoginPageLayout() {
           <Card className='rounded-[15px] w-full p-8 md:p-10 bg-background/80 backdrop-blur-sm'>
             <div className='flex justify-center mb-6'>
               <Image
-                src='/uration-landscape.png'
+                src='/assets/urator.png'
                 alt='Urator Logo'
                 width={96}
                 height={32}

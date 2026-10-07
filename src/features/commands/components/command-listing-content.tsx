@@ -45,7 +45,6 @@ export function CommandListingContent() {
   return (
     <PageContainer
       pageTitle='Perintah'
-      pageDescription='Buat perintah kustom untuk bot Telegram Anda'
       pageHeaderAction={
         <Button onClick={handleAdd} disabled={!canCreateCommand} className='rounded-full'>
           {canCreateCommand ? (

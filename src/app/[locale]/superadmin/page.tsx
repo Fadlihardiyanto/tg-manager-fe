@@ -32,10 +32,7 @@ export default function SuperadminOverviewPage() {
 
   if (loading) {
     return (
-      <PageContainer
-        pageTitle='Platform Overview'
-        pageDescription='Ringkasan aktivitas platform Urator'
-      >
+      <PageContainer pageTitle='Platform Overview'>
         <div className='space-y-6'>
           <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4'>
             {Array.from({ length: 4 }).map((_, i) => (
@@ -81,10 +78,7 @@ export default function SuperadminOverviewPage() {
   }
 
   return (
-    <PageContainer
-      pageTitle='Platform Overview'
-      pageDescription='Ringkasan aktivitas platform Urator'
-    >
+    <PageContainer pageTitle='Platform Overview'>
       <div className='space-y-6'>
         <PlatformStatsCards clients={clients} subs={subs} admins={admins} plans={plans} />
         <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-7'>

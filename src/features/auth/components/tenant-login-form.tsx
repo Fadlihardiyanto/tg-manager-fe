@@ -8,7 +8,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import { useAppForm } from '@/components/ui/tanstack-form';
-import { TextField } from '@/components/forms/fields';
+import { TextField, authInputClass } from '@/components/forms/fields';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import type { TenantLoginInput } from '../schemas/auth-schema';
 import { useLoginMutation, useResendVerificationMutation } from '../api/queries';
@@ -103,15 +103,16 @@ export function TenantLoginForm({ ...props }: React.ComponentProps<'form'>) {
       <header className='flex flex-col items-center text-center mb-8'>
         <div className='md:hidden relative flex items-center justify-center mb-4 h-12 w-full max-w-[200px]'>
           <Image
-            src='/uration-landscape.png'
+            src='/assets/urator.png'
             alt='Urator Logo'
             width={96}
             height={32}
             className='relative h-full w-auto object-contain'
           />
         </div>
-        <h1 className='text-2xl font-bold text-foreground'>Selamat datang kembali</h1>
-        <p className='text-muted-foreground text-sm mt-1.5'>Silakan masuk ke akun Anda.</p>
+        <h1 className='text-2xl font-bold tracking-tight text-foreground'>
+          Selamat datang kembali
+        </h1>
       </header>
 
       <form.AppForm>
@@ -174,7 +175,7 @@ export function TenantLoginForm({ ...props }: React.ComponentProps<'form'>) {
 
           <form.AppField
             name='email'
-            validators={{ onBlur: emailSchema, onChange: emailSchema }}
+            validators={{ onBlur: emailSchema }}
             children={(field) => (
               <TextField
                 label='Email'
@@ -183,14 +184,14 @@ export function TenantLoginForm({ ...props }: React.ComponentProps<'form'>) {
                 autoComplete='email'
                 name='email'
                 leftIcon={<Icons.mail className='h-5 w-5' />}
-                className='pl-10 h-11 border border-border rounded-xl focus-visible:ring-2 focus-visible:ring-ring/40 text-sm placeholder:text-muted-foreground bg-background'
+                className={authInputClass}
               />
             )}
           />
 
           <form.AppField
             name='password'
-            validators={{ onBlur: passwordSchema, onChange: passwordSchema }}
+            validators={{ onBlur: passwordSchema }}
             children={(field) => (
               <TextField
                 label='Kata Sandi'
@@ -214,7 +215,7 @@ export function TenantLoginForm({ ...props }: React.ComponentProps<'form'>) {
                     )}
                   </button>
                 }
-                className='pl-10 h-11 border border-border rounded-xl focus-visible:ring-2 focus-visible:ring-ring/40 text-sm placeholder:text-muted-foreground bg-background'
+                className={authInputClass}
               />
             )}
           />

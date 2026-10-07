@@ -4,6 +4,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -255,7 +256,7 @@ function BotCard({
           description={`Bot @${bot.username} masih digunakan oleh ${connectedGroups.length} grup. Pindahkan ke bot lain atau hapus grup tersebut sebelum menghapus bot.`}
           isOpen={deleteOpen}
           onClose={() => setDeleteOpen(false)}
-          className='sm:max-w-xl'
+          className='sm:max-w-xl max-h-[85vh] overflow-y-auto'
         >
           <div className='space-y-2 pt-2'>
             {connectedGroups.map((group) => (
@@ -385,13 +386,12 @@ function BotCard({
               </div>
               <div className='min-w-0'>
                 <h6 className='text-base font-semibold'>
-                  <button
-                    type='button'
-                    onClick={() => router.push(getTenantHref(`/dashboard/bots/${bot.id}`))}
-                    className='block max-w-full truncate hover:text-primary hover:underline transition-colors text-left'
+                  <Link
+                    href={getTenantHref(`/dashboard/bots/${bot.id}`)}
+                    className='block max-w-full truncate hover:text-primary hover:underline transition-colors'
                   >
                     @{bot.username}
-                  </button>
+                  </Link>
                 </h6>
                 <p className='truncate text-xs text-muted-foreground'>ID: {bot.telegram_bot_id}</p>
               </div>
@@ -403,7 +403,8 @@ function BotCard({
                   <Button
                     variant='ghost'
                     size='icon'
-                    className='size-8 opacity-60 hover:opacity-100'
+                    aria-label='Ubah bot'
+                    className='size-8'
                     onClick={() => onEdit(bot)}
                   >
                     <Icons.edit className='size-4' />
@@ -416,7 +417,8 @@ function BotCard({
                   <Button
                     variant='ghost'
                     size='icon'
-                    className='size-8 opacity-60 hover:opacity-100'
+                    aria-label={bot.is_active ? 'Nonaktifkan bot' : 'Aktifkan bot'}
+                    className='size-8'
                     onClick={() => setToggleOpen(true)}
                   >
                     {bot.is_active ? (
@@ -433,10 +435,13 @@ function BotCard({
                   <Button
                     variant='ghost'
                     size='icon'
-                    className='size-8 opacity-60 hover:opacity-100'
-                    onClick={() => router.push(getTenantHref(`/dashboard/bots/${bot.id}`))}
+                    asChild
+                    aria-label='Jaringan bot'
+                    className='size-8'
                   >
-                    <Icons.network className='size-4' />
+                    <Link href={getTenantHref(`/dashboard/bots/${bot.id}`)}>
+                      <Icons.network className='size-4' />
+                    </Link>
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Jaringan</TooltipContent>
@@ -446,7 +451,8 @@ function BotCard({
                   <Button
                     variant='ghost'
                     size='icon'
-                    className='size-8 opacity-60 hover:opacity-100 text-destructive hover:text-destructive'
+                    aria-label='Hapus bot'
+                    className='size-8 text-destructive hover:text-destructive'
                     onClick={() => setDeleteOpen(true)}
                   >
                     <Icons.trash className='size-4' />
@@ -504,14 +510,13 @@ function BotCard({
                 year: 'numeric'
               })}
             </span>
-            <button
-              type='button'
+            <Link
+              href={getTenantHref(`/dashboard/bots/${bot.id}`)}
               className='flex items-center gap-1 font-medium text-primary transition-colors hover:text-primary/80'
-              onClick={() => onEdit(bot)}
             >
               Kelola
               <Icons.chevronRight className='size-3' />
-            </button>
+            </Link>
           </div>
         </div>
       </div>

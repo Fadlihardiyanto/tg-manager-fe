@@ -59,12 +59,14 @@ const Features = () => {
         {features.map((feature) => (
           <Card
             key={feature.title}
-            className='group flex flex-col border-0 bg-accent/30 rounded-2xl overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-lg'
+            className='group flex flex-col border border-border/40 bg-accent/20 rounded-2xl overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-md hover:border-primary/15 hover:bg-accent/30'
           >
             <CardHeader>
-              <feature.icon className='h-6 w-6 text-primary' />
+              <div className='flex size-10 items-center justify-center rounded-xl bg-background border border-border/60 shadow-sm'>
+                <feature.icon className='h-5 w-5 text-foreground' />
+              </div>
               <h4 className='mt-3! text-xl font-semibold tracking-tight'>{feature.title}</h4>
-              <p className='mt-1 text-muted-foreground text-sm xs:text-[17px]'>
+              <p className='mt-1 text-muted-foreground text-sm xs:text-[15px] leading-relaxed'>
                 {feature.description}
               </p>
             </CardHeader>

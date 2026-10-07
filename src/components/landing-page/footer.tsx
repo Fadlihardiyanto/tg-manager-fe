@@ -42,7 +42,7 @@ const Footer = () => {
           {/* Logo */}
           <Link href='/'>
             <Image
-              src='/uration-landscape.png'
+              src='/assets/urator.png'
               alt='Urator Logo'
               width={96}
               height={32}

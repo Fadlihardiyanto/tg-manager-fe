@@ -8,7 +8,7 @@ import { useStore } from '@tanstack/react-form';
 import { Icons } from '@/components/icons';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useAppForm } from '@/components/ui/tanstack-form';
-import { TextField } from '@/components/forms/fields';
+import { TextField, authInputClass } from '@/components/forms/fields';
 import { tenantRegisterSchema, type TenantRegisterInput } from '../schemas/auth-schema';
 import { useRegisterMutation } from '../api/queries';
 
@@ -59,6 +59,10 @@ const RegisterForm = () => {
   });
 
   const formValues = useStore(form.store, (s) => s.values);
+  const fieldMeta = useStore(form.store, (s) => s.fieldMeta);
+  const isPasswordTouched = Boolean(
+    (fieldMeta as Record<string, { isTouched?: boolean }>)?.password?.isTouched
+  );
 
   const passwordChecks = useMemo(
     () => getPasswordChecks(formValues.password),
@@ -77,8 +81,7 @@ const RegisterForm = () => {
             className='relative h-full w-auto object-contain'
           />
         </div>
-        <h1 className='text-2xl font-bold text-foreground mb-2'>Buat akun</h1>
-        <p className='text-muted-foreground text-sm'>Isi data Anda untuk membuat akun.</p>
+        <h1 className='text-2xl font-bold tracking-tight text-foreground mb-2'>Buat akun</h1>
       </header>
 
       <form.AppForm>
@@ -100,7 +103,7 @@ const RegisterForm = () => {
                 autoComplete='name'
                 name='name'
                 leftIcon={<Icons.user className='h-5 w-5' />}
-                className='pl-10 h-11 border border-border rounded-xl focus-visible:ring-2 focus-visible:ring-ring/40 text-sm placeholder:text-muted-foreground bg-background'
+                className={authInputClass}
               />
             )}
           />
@@ -115,7 +118,7 @@ const RegisterForm = () => {
                 autoComplete='email'
                 name='email'
                 leftIcon={<Icons.mail className='h-5 w-5' />}
-                className='pl-10 h-11 border border-border rounded-xl focus-visible:ring-2 focus-visible:ring-ring/40 text-sm placeholder:text-muted-foreground bg-background'
+                className={authInputClass}
               />
             )}
           />
@@ -147,27 +150,29 @@ const RegisterForm = () => {
                     )}
                   </button>
                 }
-                className='pl-10 h-11 border border-border rounded-xl focus-visible:ring-2 focus-visible:ring-ring/40 text-sm placeholder:text-muted-foreground bg-background'
+                className={authInputClass}
               />
             )}
           />
 
-          <div
-            id='password-requirements'
-            role='status'
-            aria-live='polite'
-            className='-mt-1 mb-1 flex flex-col gap-1.5'
-          >
-            <ValidationItem label='Minimal 8 karakter' valid={passwordChecks.length} />
-            <ValidationItem
-              label='Minimal satu angka (0-9) atau simbol'
-              valid={passwordChecks.numberOrSymbol}
-            />
-            <ValidationItem
-              label='Huruf kecil (a-z) dan huruf besar (A-Z)'
-              valid={passwordChecks.mixedCase}
-            />
-          </div>
+          {isPasswordTouched && (
+            <div
+              id='password-requirements'
+              role='status'
+              aria-live='polite'
+              className='-mt-1 mb-1 flex flex-col gap-1.5'
+            >
+              <ValidationItem label='Minimal 8 karakter' valid={passwordChecks.length} />
+              <ValidationItem
+                label='Minimal satu angka (0-9) atau simbol'
+                valid={passwordChecks.numberOrSymbol}
+              />
+              <ValidationItem
+                label='Huruf kecil (a-z) dan huruf besar (A-Z)'
+                valid={passwordChecks.mixedCase}
+              />
+            </div>
+          )}
 
           <form.AppField
             name='confirmPassword'
@@ -196,7 +201,7 @@ const RegisterForm = () => {
                     )}
                   </button>
                 }
-                className='pl-10 h-11 border border-border rounded-xl focus-visible:ring-2 focus-visible:ring-ring/40 text-sm placeholder:text-muted-foreground bg-background'
+                className={authInputClass}
               />
             )}
           />
@@ -233,11 +238,11 @@ function ValidationItem({ label, valid }: { label: string; valid: boolean }) {
   return (
     <div
       className={`flex items-center gap-2 text-xs ${
-        valid ? 'text-green-500' : 'text-muted-foreground'
+        valid ? 'text-green-600' : 'text-muted-foreground'
       }`}
     >
       {valid ? (
-        <Icons.check aria-hidden='true' className='h-3.5 w-3.5 text-green-500' />
+        <Icons.check aria-hidden='true' className='h-3.5 w-3.5 text-green-600' />
       ) : (
         <span aria-hidden='true' className='h-1.5 w-1.5 rounded-full bg-muted-foreground' />
       )}

@@ -135,10 +135,7 @@ export default function RolesPage() {
   };
 
   return (
-    <PageContainer
-      pageTitle='Roles & Permissions'
-      pageDescription='Kelola role dan hak akses admin platform'
-    >
+    <PageContainer pageTitle='Roles & Permissions'>
       <div className='flex justify-end mb-4'>
         <Button onClick={openCreate}>
           <Icons.add className='mr-2 size-4' />

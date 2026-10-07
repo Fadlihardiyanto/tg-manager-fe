@@ -201,7 +201,7 @@ export default function DashboardMock() {
             <circle cx='8' cy='8' r='2' />
             <path d='m21 15-3.09-3.09a2 2 0 0 0-2.82 0L7 20' />
           </svg>
-          urato.com/dashboard
+          urator.com/dashboard
         </div>
         <div className='flex items-center gap-3'>
           <svg

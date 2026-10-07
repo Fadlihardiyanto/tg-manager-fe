@@ -41,7 +41,6 @@ export function OverviewContent() {
   return (
     <PageContainer
       pageTitle='Dasbor'
-      pageDescription='Pantau performa bisnis Anda'
       pageHeaderAction={
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

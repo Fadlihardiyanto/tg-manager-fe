@@ -57,7 +57,6 @@ export function PackageListingContent() {
   return (
     <PageContainer
       pageTitle='Paket'
-      pageDescription='Kelola paket langganan dan harga'
       pageHeaderAction={
         canCreatePackage ? (
           hasActiveGroups ? (

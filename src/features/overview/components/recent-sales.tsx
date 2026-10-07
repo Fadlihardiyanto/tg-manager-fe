@@ -47,7 +47,7 @@ function getStatusBadgeClass(status: string) {
 
 export function RecentSales({ data }: { data: RecentOrder[] }) {
   return (
-    <Card className='h-full overflow-hidden border-border/70 shadow-sm'>
+    <Card className='h-full overflow-hidden border-border/70'>
       <CardHeader className='border-b bg-muted/20'>
         <CardTitle className='text-base'>Pesanan Terbaru</CardTitle>
         <CardDescription>{data.length} transaksi terakhir</CardDescription>
@@ -57,7 +57,7 @@ export function RecentSales({ data }: { data: RecentOrder[] }) {
           {data.map((order) => (
             <div
               key={order.id}
-              className='group flex items-center rounded-lg border border-transparent p-2 transition-colors hover:border-border hover:bg-muted/35'
+              className='group flex items-center rounded-lg p-2 transition-colors hover:bg-muted/35'
             >
               <Avatar className='h-10 w-10 border shadow-xs'>
                 <AvatarFallback className='bg-primary/10 text-primary text-xs font-semibold'>
@@ -69,8 +69,14 @@ export function RecentSales({ data }: { data: RecentOrder[] }) {
                 <p className='text-muted-foreground text-xs'>
                   @{order.member_username} &middot; {order.package_name}
                 </p>
-                <p className='text-muted-foreground text-xs'>
-                  {order.external_id} &middot; {formatDate(order.created_at)}
+                <p className='text-muted-foreground text-xs truncate'>
+                  <span
+                    className='inline-block max-w-[14ch] truncate align-bottom'
+                    title={order.external_id}
+                  >
+                    {order.external_id}
+                  </span>{' '}
+                  &middot; {formatDate(order.created_at)}
                 </p>
               </div>
               <div className='ml-auto text-right'>

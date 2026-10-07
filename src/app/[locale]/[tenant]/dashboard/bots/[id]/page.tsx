@@ -26,10 +26,7 @@ export default async function BotDetailPage({ params }: BotDetailPageProps) {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <PageContainer
-        pageTitle='Detail Bot'
-        pageDescription='Kelola bot, lihat jaringan grup, dan hubungkan grup baru.'
-      >
+      <PageContainer pageTitle='Detail Bot'>
         <Suspense fallback={<Skeleton className='h-64 w-full' />}>
           <BotDetailContent botId={id} />
         </Suspense>

@@ -1,11 +1,4 @@
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardAction,
-  CardFooter
-} from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardDescription, CardAction } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Icons } from '@/components/icons';
 import type { AnalyticsOverview } from '../api/types';
@@ -24,36 +17,33 @@ const cards: {
   label: string;
   icon: Icon;
   value: (d: AnalyticsOverview) => string;
-  desc: string;
   accent: string;
 }[] = [
   {
     label: 'Pendapatan Bulan Ini',
     icon: Icons.trendingUp,
     value: (d) => formatRp(d.total_revenue_this_month),
-    desc: 'Total pendapatan bulan ini',
-    accent: 'from-emerald-500/15 via-emerald-500/5 to-transparent text-emerald-600'
+    accent:
+      'from-emerald-500/15 via-emerald-500/5 to-transparent text-emerald-600 dark:text-emerald-400'
   },
   {
     label: 'Pelanggan Aktif',
     icon: Icons.user,
     value: (d) => String(d.total_active_members),
-    desc: 'Total member aktif',
-    accent: 'from-sky-500/15 via-sky-500/5 to-transparent text-sky-600'
+    accent: 'from-sky-500/15 via-sky-500/5 to-transparent text-sky-600 dark:text-sky-400'
   },
   {
     label: 'Grup & Total Member',
     icon: Icons.teams,
     value: (d) => `${d.total_groups} / ${d.total_members_in_groups}`,
-    desc: 'Grup dan total anggota',
-    accent: 'from-violet-500/15 via-violet-500/5 to-transparent text-violet-600'
+    accent:
+      'from-violet-500/15 via-violet-500/5 to-transparent text-violet-600 dark:text-violet-400'
   },
   {
     label: 'Transaksi Berhasil',
     icon: Icons.check,
     value: (d) => String(d.success_transactions),
-    desc: 'Total transaksi sukses bulan ini',
-    accent: 'from-amber-500/15 via-amber-500/5 to-transparent text-amber-600'
+    accent: 'from-amber-500/15 via-amber-500/5 to-transparent text-amber-600 dark:text-amber-400'
   }
 ];
 
@@ -64,7 +54,7 @@ export function StatsCards({ data }: { data: AnalyticsOverview }) {
         <Card
           key={c.label}
           className={cn(
-            '@container/card overflow-hidden border-border/70 bg-gradient-to-br shadow-sm transition-colors duration-200 hover:border-border',
+            '@container/card overflow-hidden border-border/70 bg-gradient-to-br transition-colors duration-200 hover:border-border',
             c.accent
           )}
         >
@@ -84,9 +74,6 @@ export function StatsCards({ data }: { data: AnalyticsOverview }) {
               </Badge>
             </CardAction>
           </CardHeader>
-          <CardFooter className='text-muted-foreground flex-col items-start gap-1.5 text-sm'>
-            <div className='line-clamp-1 flex gap-2 font-medium'>{c.desc}</div>
-          </CardFooter>
         </Card>
       ))}
     </div>

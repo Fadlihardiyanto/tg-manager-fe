@@ -54,7 +54,6 @@ export function GroupListingContent() {
   return (
     <PageContainer
       pageTitle='Grup'
-      pageDescription='Kelola grup Telegram dan koneksi bot'
       pageHeaderAction={
         <div className='flex items-center gap-2'>
           <Button

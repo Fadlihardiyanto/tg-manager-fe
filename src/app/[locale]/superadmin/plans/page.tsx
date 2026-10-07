@@ -127,10 +127,7 @@ export default function PlansPage() {
   ];
 
   return (
-    <PageContainer
-      pageTitle='Billing & Plans'
-      pageDescription='Kelola paket harga dan langganan tenant'
-    >
+    <PageContainer pageTitle='Billing & Plans'>
       <PageTabs value={tab} onValueChange={setTab} items={tabs} />
       <div className='mt-6'>{tab === 'plans' ? <PlansTab /> : <SubscriptionsTab />}</div>
     </PageContainer>

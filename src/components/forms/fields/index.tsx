@@ -1,5 +1,5 @@
 // Base (for AppField/field group render props)
-export { TextField } from './text-field';
+export { TextField, authInputClass } from './text-field';
 export { TextareaField } from './textarea-field';
 export { SelectField } from './select-field';
 export { CheckboxField } from './checkbox-field';

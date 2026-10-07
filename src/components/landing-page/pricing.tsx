@@ -265,12 +265,20 @@ const Pricing = () => {
             )}
           >
             {t('yearly')}
+            <span className='ml-1.5 hidden sm:inline rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-600'>
+              Hemat 17%
+            </span>
           </button>
         </div>
+        <p className='mt-3 text-xs text-muted-foreground'>
+          {billing === 'yearly'
+            ? 'Bayar tahunan — 2 bulan gratis dibanding bulanan.'
+            : 'Bisa batal kapan saja.'}
+        </p>
       </div>
 
       {isError && (
-        <div className='mt-4 mx-auto max-w-md flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700'>
+        <div className='mt-4 mx-auto max-w-md flex items-center gap-2 rounded-lg border border-destructive/20 bg-destructive/10 px-4 py-2 text-sm text-destructive'>
           <Icons.warning className='h-4 w-4 shrink-0' />
           <span className='flex-1'>{t('error')}</span>
           <Button variant='ghost' size='sm' className='h-7 px-2 text-xs' onClick={() => refetch()}>

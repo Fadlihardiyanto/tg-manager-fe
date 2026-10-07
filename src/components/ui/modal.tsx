@@ -30,7 +30,7 @@ export function Modal({ title, description, isOpen, onClose, children, className
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
-        <div>{children}</div>
+        <div className='min-w-0'>{children}</div>
       </DialogContent>
     </Dialog>
   );

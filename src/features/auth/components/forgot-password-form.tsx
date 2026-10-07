@@ -6,7 +6,8 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import { useAppForm } from '@/components/ui/tanstack-form';
-import { TextField } from '@/components/forms/fields';
+import { TextField, authInputClass } from '@/components/forms/fields';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { forgotPasswordSchema, type ForgotPasswordInput } from '../schemas/auth-schema';
 import { forgotPassword } from '../api/service';
 
@@ -37,7 +38,6 @@ export function ForgotPasswordForm({ ...props }: React.ComponentProps<'form'>) {
   });
 
   const handleRetry = () => {
-    form.reset();
     setError(null);
     setIsSubmitted(false);
   };
@@ -92,7 +92,7 @@ export function ForgotPasswordForm({ ...props }: React.ComponentProps<'form'>) {
             className='relative h-full w-auto object-contain'
           />
         </div>
-        <h1 className='text-2xl font-bold text-foreground mb-2'>Lupa kata sandi?</h1>
+        <h1 className='text-2xl font-bold tracking-tight text-foreground mb-2'>Lupa kata sandi?</h1>
         <p className='text-muted-foreground text-sm'>
           Masukkan email Anda, kami akan mengirim tautan reset.
         </p>
@@ -110,15 +110,15 @@ export function ForgotPasswordForm({ ...props }: React.ComponentProps<'form'>) {
                 autoComplete='email'
                 name='email'
                 leftIcon={<Icons.mail className='h-5 w-5' />}
-                className='pl-10 h-11 border border-border rounded-xl focus-visible:ring-2 focus-visible:ring-ring/40 text-sm placeholder:text-muted-foreground bg-background'
+                className={authInputClass}
               />
             )}
           />
 
           {error && (
-            <p className='text-sm text-destructive' role='alert'>
-              {error}
-            </p>
+            <Alert variant='destructive' role='alert' className='py-3'>
+              <AlertDescription className='text-sm'>{error}</AlertDescription>
+            </Alert>
           )}
 
           <form.SubmitButton
